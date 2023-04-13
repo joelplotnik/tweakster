@@ -1,6 +1,6 @@
 class Api::V1::ArticlesController < ApplicationController
     def index
-      @articles = Article.all
+      @articles = Article.order(created_at: :desc)
       render json: @articles
     end
   
@@ -17,6 +17,10 @@ class Api::V1::ArticlesController < ApplicationController
       else
         render json: { errors: article.errors.full_messages }, status: :unprocessable_entity
       end
+    end
+
+    def edit
+      @article = Article.find(params[:id])
     end
   
     private
