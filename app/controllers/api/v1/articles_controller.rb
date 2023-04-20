@@ -1,6 +1,6 @@
 class Api::V1::ArticlesController < ApplicationController
   def index
-    @articles = Article.includes(:user).order(created_at: :desc)
+    @articles = Article.paginate(page: params[:page], per_page: 5).order(created_at: :desc)
     render json: @articles, include: { user: { only: [:id, :username] } }
   end
 
