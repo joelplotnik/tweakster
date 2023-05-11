@@ -1,7 +1,8 @@
 class Api::V1::UsersController < ApplicationController
     def show
-        @user = User.find(params[:id])
-        render json: @user
+        @user = User.includes(:articles).find(params[:id])
+        render json: @user, include: { articles: { only: [:title, :content, :created_at] } }
+
     end
 
     def create
