@@ -1,9 +1,22 @@
 class Api::V1::UsersController < ApplicationController
-    def show
-        @user = User.includes(:articles).find(params[:id])
-        render json: @user, include: { articles: { only: [:title, :content, :created_at] } }
-
+    def index
+        @users = User.all.order(created_at: :asc).map do |user|
+          { id: user.id, username: user.username, article_count: user.articles.count }
+        end
+        render json: @users
     end
+
+    def show
+        @user = User.find(params[:id])
+        page = params[:page] || 1
+        per_page = params[:per_page] || 5
+        @articles = @user.articles.paginate(page: page, per_page: per_page).order(created_at: :desc)
+        render json: {
+          user: @user,
+          articles: @articles.as_json(only: [:id, :title, :content, :created_at])
+        }
+    end
+      
 
     def create
         @user = User.new(user_params)
@@ -23,7 +36,7 @@ class Api::V1::UsersController < ApplicationController
         else
           render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
-      end
+    end
 
     private
     def user_params
