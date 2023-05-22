@@ -7,7 +7,7 @@ class Users::SessionsController < Devise::SessionsController
     render json: {
       status: {
         code: 200,
-        message: 'User signed in successfully',
+        message: 'Successfully signed in user.',
         data: current_user
       }
     }, status: :ok
@@ -19,12 +19,12 @@ class Users::SessionsController < Devise::SessionsController
     if current_user
       render json: {
         status: 200,
-        message: 'Signed out successfully'
+        message: 'Successfully signed out user.'
       }, status: :ok
     else
       render json: {
         status: 401,
-        message: 'User has no active session'
+        message: 'User has no active session.'
       }, status: :unauthorized
     end
   end
