@@ -1,4 +1,6 @@
 class Api::V1::UsersController < ApplicationController
+  before_action :authenticate_user!, only: [:update]
+
   def index
     users = User.all.order(created_at: :asc).map do |user|
       { id: user.id, username: user.username, article_count: user.articles.count }
@@ -20,22 +22,20 @@ class Api::V1::UsersController < ApplicationController
   def update
     user = User.find(params[:id])
 
-    if user.update(user_params)
-      render json: user, status: :ok
+    puts "*************************************************"
+    puts "This is the current user: #{current_user.inspect}"
+    puts "*************************************************"
+
+    if user == current_user 
+      if user.update(user_params)
+        render json: user, status: :ok
+      else
+        render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+      end
     else
-      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: 'Unauthorized' }, status: :unauthorized
     end
   end
-
-  # def create
-  #   user = User.new(user_params)
-  
-  #   if user.save
-  #     render json: user, status: :created
-  #   else
-  #     render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
-  #   end
-  # end  
 
   private
 
