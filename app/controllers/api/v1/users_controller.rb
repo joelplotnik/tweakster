@@ -2,11 +2,12 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate_user!, only: [:update]
 
   def index
-    users = User.all.order(created_at: :asc).map do |user|
+    users = User.paginate(page: params[:page], per_page: 10).order(created_at: :asc).map do |user|
       { id: user.id, username: user.username, article_count: user.articles.count }
     end
     render json: users
   end
+
 
   def show
     user = User.find(params[:id])
