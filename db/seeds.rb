@@ -10,13 +10,13 @@ unless User.exists?
       )
     end
 
-    # Assign Articles to Users
+    # Assign Pieces to Users
     users = User.all.to_a
-    article_count = 50
+    piece_count = 50
   
-    article_count.times do
+    piece_count.times do
       user = users.sample
-      Article.create!(
+      Piece.create!(
         title: Faker::Book.title,
         content: Faker::Lorem.paragraph(sentence_count: 20),
         user_id: user.id
@@ -27,7 +27,7 @@ end
   # # For a custom user
   # 10.times do
   #   user = User.first
-  #   Article.create(
+  #   Prticle.create(
   #     title: Faker::Book.title,
   #     content: Faker::Lorem.paragraph(sentence_count: 20),
   #     user_id: user.id

@@ -1,6 +1,6 @@
 # Tweakster - API
 
-Tweakster is an application that allows people to tweak each other's articles. This is the backend API for Tweakster. Tweakster is built using Rails 7 and serves as the backend for the Tweakster React frontend application.
+Tweakster is an application that allows people to tweak each other's content pieces. This is the backend API for Tweakster. Tweakster is built using Rails 7 and serves as the backend for the Tweakster React frontend application.
 
 ## Requirements
 

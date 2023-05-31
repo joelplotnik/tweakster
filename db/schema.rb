@@ -10,8 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_05_22_185358) do
-  create_table "articles", force: :cascade do |t|
+ActiveRecord::Schema[7.0].define(version: 2023_05_31_164515) do
+  create_table "pieces", force: :cascade do |t|
     t.string "title"
     t.text "content"
     t.datetime "created_at", null: false
