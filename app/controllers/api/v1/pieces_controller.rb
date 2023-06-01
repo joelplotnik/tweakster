@@ -1,4 +1,6 @@
 class Api::V1::PiecesController < ApplicationController
+  before_action :authenticate_user!, only: [:create]
+
   def index
     pieces = Piece.paginate(page: params[:page], per_page: 5).order(created_at: :desc)
     render json: pieces, include: { user: { only: [:id, :username] } }
@@ -11,7 +13,7 @@ class Api::V1::PiecesController < ApplicationController
 
   def create
     piece = Piece.new(piece_params)
-    piece.user = User.first
+    piece.user = current_user
 
     if piece.save
       render json: piece, include: { user: { only: [:id, :username] } }, status: :created
