@@ -6,8 +6,16 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :users, only: [:show, :index, :update, :destroy]
-      resources :pieces, only: [:show, :index, :create, :update, :destroy]
+      resources :users, only: [:show, :index, :update, :destroy] do
+        member do
+          get 'check_ownership'
+        end
+      end
+      resources :pieces, only: [:show, :index, :create, :update, :destroy] do
+        member do
+          get 'check_ownership'
+        end
+      end
     end
   end
 end
