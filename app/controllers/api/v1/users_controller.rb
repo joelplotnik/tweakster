@@ -1,5 +1,10 @@
 class Api::V1::UsersController < ApplicationController
+  load_and_authorize_resource
   before_action :authenticate_user!, only: [:update, :destroy, :check_ownership]
+
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { warning: exception }, status: :unauthorized
+  end
 
   def index
     users = User.paginate(page: params[:page], per_page: 10).order(created_at: :asc).map do |user|
@@ -26,23 +31,18 @@ class Api::V1::UsersController < ApplicationController
     puts "This is the current user: #{current_user.inspect}"
     puts "*************************************************"
 
-    if user == current_user 
-      if user.update(user_params)
-        render json: user, status: :ok
-      else
-        render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
-      end
+    if user.update(user_params)
+      render json: user, status: :ok
     else
-      render json: { error: 'Unauthorized' }, status: :unauthorized
+      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def destroy
     user = User.find(params[:id])
-
-    if user == current_user
-      sign_out
-      user.destroy
+  
+    if user.destroy
+      sign_out if !user.admin? || user == current_user
       render json: { message: 'User deleted successfully' }
     else
       render json: { error: 'Unauthorized' }, status: :unauthorized
@@ -51,7 +51,8 @@ class Api::V1::UsersController < ApplicationController
 
   def check_ownership
     user = User.find(params[:id])
-    belongs_to_user = user == current_user
+
+    belongs_to_user = user == current_user || current_user.admin?
     render json: { belongs_to_user: belongs_to_user }
   end
 

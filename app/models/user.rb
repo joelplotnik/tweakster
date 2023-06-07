@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
+
   has_many :pieces, dependent: :destroy
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :database_authenticatable, :jwt_authenticatable, 
@@ -10,6 +12,14 @@ class User < ApplicationRecord
          length: { minimum: 3, maximum: 25 },
          format: { with: /^[a-zA-Z0-9_\.]*$/, multiline: true }
 
+  ROLES = %w{admin moderator advertiser user}
+  
+  # Create methods at runtime for users (meta programming)
+  ROLES.each do |role_name|
+    define_method "#{role_name}?" do
+      role == role_name
+    end
+  end
 
   attr_writer :login
   validate :validate_username
@@ -36,4 +46,5 @@ class User < ApplicationRecord
   def jwt_payload
     super
   end
+
 end

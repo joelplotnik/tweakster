@@ -33,8 +33,14 @@ gem "will_paginate", "~> 3.3"
 # Library for generating fake data
 gem "faker"
 
+# Flexible authentication solution for Rails
 gem "devise"
+
+# JSON Web Token authentication for Devise
 gem "devise-jwt"
+
+# Authorization gem for defining and managing user permissions
+gem 'cancancan'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]

@@ -1,5 +1,10 @@
 class Api::V1::PiecesController < ApplicationController
+  load_and_authorize_resource
   before_action :authenticate_user!, except: [:index, :show]
+
+  rescue_from CanCan::AccessDenied do |exception|
+    render json: { warning: exception }, status: :unauthorized
+  end
 
   def index
     pieces = Piece.paginate(page: params[:page], per_page: 5).order(created_at: :desc)
@@ -35,19 +40,16 @@ class Api::V1::PiecesController < ApplicationController
   def destroy
     piece = Piece.find(params[:id])
   
-    if piece.user == current_user
-      piece.destroy
+    if piece.destroy
       render json: { message: 'Piece deleted successfully' }
     else
-      render json: { error: 'Unauthorized' }, status: :unauthorized
+      render json: { error: 'Unable to delete the piece' }, status: :unprocessable_entity
     end
   end
 
   def check_ownership
     piece = Piece.find(params[:id])
-
-    belongs_to_user = piece.user == current_user
-
+    belongs_to_user = piece.user == current_user || current_user.admin?
     render json: { belongs_to_user: belongs_to_user }
   end
 
