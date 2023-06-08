@@ -18,7 +18,7 @@ unless User.exists?
       user = users.sample
       Piece.create!(
         title: Faker::Book.title,
-        content: Faker::Lorem.paragraph(sentence_count: 20),
+        content: Faker::Lorem.paragraph(sentence_count: 35),
         user_id: user.id
       )
     end
