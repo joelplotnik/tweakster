@@ -16,6 +16,11 @@ Rails.application.routes.draw do
           get 'check_ownership'
         end
       end
+      resources :channels, only: [:show, :index, :create, :update, :destroy] do
+        member do
+          get 'check_ownership'
+        end
+      end
     end
   end
 end
