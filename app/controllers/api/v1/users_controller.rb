@@ -17,12 +17,12 @@ class Api::V1::UsersController < ApplicationController
     user = User.find(params[:id])
     page = params[:page] || 1
     per_page = params[:per_page] || 5
-    pieces = user.pieces.paginate(page: page, per_page: per_page).order(created_at: :desc)
+    pieces = user.pieces.includes(:channel).paginate(page: page, per_page: per_page).order(created_at: :desc)
     render json: {
       user: user,
-      pieces: pieces.as_json(only: [:id, :title, :content, :created_at])
+      pieces: pieces.as_json(only: [:id, :title, :content, :created_at], include: { channel: { only: [:id, :name] } })
     }
-  end
+  end  
 
   def update
     user = User.find(params[:id])

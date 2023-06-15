@@ -7,7 +7,8 @@ class Api::V1::PiecesController < ApplicationController
   end
 
   def index
-    pieces = Piece.paginate(page: params[:page], per_page: 5).order(created_at: :desc)
+    channel = Channel.find(params[:channel_id])
+    pieces = channel.pieces.paginate(page: params[:page], per_page: 5).order(created_at: :desc)
     render json: pieces, include: { user: { only: [:id, :username] } }
   end
 
@@ -19,6 +20,7 @@ class Api::V1::PiecesController < ApplicationController
   def create
     piece = Piece.new(piece_params)
     piece.user = current_user
+    piece.channel_id = params[:channel_id]
 
     if piece.save
       render json: piece, include: { user: { only: [:id, :username] } }, status: :created

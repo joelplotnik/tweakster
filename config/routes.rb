@@ -6,19 +6,23 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      root 'home#index'
+
       resources :users, only: [:show, :index, :update, :destroy] do
         member do
           get 'check_ownership'
         end
       end
-      resources :pieces, only: [:show, :index, :create, :update, :destroy] do
-        member do
-          get 'check_ownership'
-        end
-      end
+
       resources :channels, only: [:show, :index, :create, :update, :destroy] do
         member do
           get 'check_ownership'
+        end
+
+        resources :pieces, only: [:show, :index, :create, :update, :destroy] do
+          member do
+            get 'check_ownership'
+          end
         end
       end
     end
