@@ -14,13 +14,8 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def show
-        channel = Channel.find(params[:id])
-        render json: channel
-    end
-
-    def show
         channel = Channel.includes(pieces: :user).find(params[:id])
-        pieces = channel.pieces.paginate(page: params[:page], per_page: 5).map do |piece|
+        pieces = channel.pieces.order(created_at: :desc).paginate(page: params[:page], per_page: 5).map do |piece|
           {
             id: piece.id,
             title: piece.title,
@@ -34,17 +29,17 @@ class Api::V1::ChannelsController < ApplicationController
         end
       
         render json: {
-            id: channel.id,
-            name: channel.name,
-            url: channel.url,
-            protocol: channel.protocol,
-            pieces: pieces,
-            user: {
-                id: channel.user.id,
-                username: channel.user.username
-            }
+          id: channel.id,
+          name: channel.name,
+          url: channel.url,
+          protocol: channel.protocol,
+          pieces: pieces,
+          user: {
+            id: channel.user.id,
+            username: channel.user.username
+          }
         }
-    end
+      end      
 
     def create
         channel = Channel.new(channel_params)
