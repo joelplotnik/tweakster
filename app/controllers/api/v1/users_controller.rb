@@ -28,17 +28,25 @@ class Api::V1::UsersController < ApplicationController
 
   def update
     user = User.find(params[:id])
-
-    puts "*************************************************"
-    puts "This is the current user: #{current_user.inspect}"
-    puts "*************************************************"
-
-    if user.update(user_params)
-      render json: user, status: :ok
+  
+    if params[:user][:new_password].present? 
+      if user.valid_password?(params[:user][:password]) 
+        if user.update(password: params[:user][:new_password]) 
+          render json: user, status: :ok
+        else
+          render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+        end
+      else
+        render json: { error: 'Invalid password' }, status: :unauthorized
+      end
     else
-      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+      if user.update(user_params) 
+        render json: user, status: :ok
+      else
+        render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+      end
     end
-  end
+  end  
 
   def destroy
     user = User.find(params[:id])
@@ -61,6 +69,6 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:username, :email, :password)
+    params.require(:user).permit(:username, :email, :password, :new_password)
   end 
 end
