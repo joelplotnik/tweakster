@@ -37,6 +37,7 @@ class Api::V1::ChannelsController < ApplicationController
             id: channel.id,
             name: channel.name,
             url: channel.url,
+            summary: channel.summary,
             protocol: channel.protocol,
             pieces: pieces,
             user: {
@@ -53,6 +54,7 @@ class Api::V1::ChannelsController < ApplicationController
         channel.user = current_user
 
         if channel.save
+            channel.subscriptions.create(user: current_user)
             render json: channel, status: :created
         else
             render json: { errors: channel.errors.full_messages }, status: :unprocessable_entity
@@ -88,7 +90,7 @@ class Api::V1::ChannelsController < ApplicationController
     private
 
     def channel_params
-        params.require(:channel).permit(:name, :url, :protocol)
+        params.require(:channel).permit(:name, :url, :summary, :protocol)
     end
 
 end

@@ -24,6 +24,11 @@ Rails.application.routes.draw do
             get 'check_ownership'
           end
         end
+
+        # Add subscriptions routes
+        post 'subscribe', to: 'subscriptions#create'
+        delete 'unsubscribe', to: 'subscriptions#destroy'
+
       end
     end
   end
