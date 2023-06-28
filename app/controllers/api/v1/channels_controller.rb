@@ -15,8 +15,8 @@ class Api::V1::ChannelsController < ApplicationController
 
     def show
         channel = Channel.includes(pieces: :user).find(params[:id])
-        pieces = channel.pieces.paginate(page: params[:page], per_page: 5).map do |piece|
-          {
+        pieces = channel.pieces.order(created_at: :desc).paginate(page: params[:page], per_page: 5).map do |piece|
+        {
             id: piece.id,
             title: piece.title,
             content: piece.content,
@@ -25,11 +25,11 @@ class Api::V1::ChannelsController < ApplicationController
                 name: piece.channel.name
             },
             user: {
-              id: piece.user.id,
-              username: piece.user.username
+                id: piece.user.id,
+                username: piece.user.username
             }
-          }
-        end
+        }
+    end
 
         subscribed = current_user && channel.subscriptions.exists?(user_id: current_user.id)
       
