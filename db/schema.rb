@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_26_213323) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_01_035924) do
   create_table "channels", force: :cascade do |t|
     t.string "name"
     t.string "url"
@@ -20,6 +20,14 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_26_213323) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "summary"
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "message"
+    t.integer "user_id"
+    t.integer "piece_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "pieces", force: :cascade do |t|

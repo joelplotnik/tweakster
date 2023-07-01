@@ -23,6 +23,9 @@ Rails.application.routes.draw do
           member do
             get 'check_ownership'
           end
+
+          # Add comments routes
+          resources :comments, only: [:create]
         end
 
         # Add subscriptions routes
