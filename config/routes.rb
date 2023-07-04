@@ -25,7 +25,7 @@ Rails.application.routes.draw do
           end
 
           # Add comments routes
-          resources :comments, only: [:create]
+          resources :comments, only: [:index, :create]
         end
 
         # Add subscriptions routes

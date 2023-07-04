@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_01_035924) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_03_181230) do
   create_table "channels", force: :cascade do |t|
     t.string "name"
     t.string "url"
@@ -28,6 +28,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_01_035924) do
     t.integer "piece_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "parent_comment_id"
+    t.index ["parent_comment_id"], name: "index_comments_on_parent_comment_id"
   end
 
   create_table "pieces", force: :cascade do |t|
@@ -65,4 +67,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_01_035924) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "comments", "comments", column: "parent_comment_id"
 end
