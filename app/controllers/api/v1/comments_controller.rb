@@ -8,8 +8,7 @@ class Api::V1::CommentsController < ApplicationController
 
   def index
     piece = Piece.find(params[:piece_id])
-    comments = piece.comments.includes(:user)
-
+    comments = piece.comments.includes(:user).paginate(page: params[:page], per_page: 10).order(created_at: :asc)
     render json: comments, include: { user: { only: [:username] } }
   end
 
