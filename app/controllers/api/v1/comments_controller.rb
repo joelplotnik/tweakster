@@ -1,3 +1,5 @@
+require 'will_paginate/array'
+
 class Api::V1::CommentsController < ApplicationController
   load_and_authorize_resource except: :index
   before_action :authenticate_user!, except: [:index, :show]
@@ -8,8 +10,18 @@ class Api::V1::CommentsController < ApplicationController
 
   def index
     piece = Piece.find(params[:piece_id])
-    comments = piece.comments.includes(:user).paginate(page: params[:page], per_page: 10).order(created_at: :asc)
-    render json: comments, include: { user: { only: [:username] } }
+    comments = piece.comments.includes(:user).order(created_at: :asc)
+  
+    parent_comments = comments.select { |comment| comment.parent_comment_id.nil? }
+    all_comments = []
+  
+    parent_comments.each do |parent_comment|
+      all_comments << parent_comment
+      all_comments += build_comment_tree(parent_comment)
+    end
+  
+    paginated_comments = all_comments.paginate(page: params[:page], per_page: 10)
+    render json: paginated_comments, include: { user: { only: [:username] } }
   end
 
   def create
@@ -51,6 +63,19 @@ class Api::V1::CommentsController < ApplicationController
   end
 
   private
+
+  def build_comment_tree(comment)
+    children = comment.child_comments
+    return [] if children.empty?
+  
+    tree = []
+    children.each do |child|
+      tree << child
+      tree += build_comment_tree(child)
+    end
+  
+    tree
+  end
 
   def comment_params
     params.require(:comment).permit(:message, :piece_id, :parent_comment_id)
