@@ -18,7 +18,17 @@ class Api::V1::CommentsController < ApplicationController
     comment.user = current_user
 
     if comment.save
-      render json: comment, status: :created
+      render json: comment, include: { user: { only: [:username] } }, status: :created
+    else
+      render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def update
+    comment = Comment.find(params[:id])
+  
+    if comment.update(comment_params)
+      render json: comment, status: :ok
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
     end
@@ -26,12 +36,19 @@ class Api::V1::CommentsController < ApplicationController
 
   def destroy
     comment = Comment.find(params[:id])
-
-    if comment.destroy
-      render json: { message: 'Comment successfully deleted' }, status: :ok
+    comment.destroy
+  
+    if comment.destroyed?
+      render json: { message: 'Comment and its children successfully deleted' }, status: :ok
     else
       render json: { error: 'Failed to delete comment' }, status: :unprocessable_entity
     end
+  end
+
+  def check_ownership
+    comment = Comment.find(params[:id])
+    belongs_to_user = comment.user == current_user || current_user.admin?
+    render json: { belongs_to_user: belongs_to_user }
   end
 
   private

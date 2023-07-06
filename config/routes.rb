@@ -24,8 +24,11 @@ Rails.application.routes.draw do
             get 'check_ownership'
           end
 
-          # Add comments routes
-          resources :comments, only: [:index, :create]
+          resources :comments, only: [:index, :create, :update, :destroy] do
+            member do
+              get 'check_ownership'
+            end
+          end
         end
 
         # Add subscriptions routes
