@@ -10,7 +10,7 @@ class Api::V1::CommentsController < ApplicationController
 
   def index
     piece = Piece.find(params[:piece_id])
-    comments = piece.comments.includes(:user).order(created_at: :asc)
+    comments = piece.comments.includes(:user).order(created_at: :desc)
   
     parent_comments = comments.select { |comment| comment.parent_comment_id.nil? }
     all_comments = []
