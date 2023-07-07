@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_03_181230) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_07_223413) do
   create_table "channels", force: :cascade do |t|
     t.string "name"
     t.string "url"
@@ -29,6 +29,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_03_181230) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "parent_comment_id"
+    t.integer "likes", default: 0
+    t.integer "dislikes", default: 0
     t.index ["parent_comment_id"], name: "index_comments_on_parent_comment_id"
   end
 
@@ -65,6 +67,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_03_181230) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  create_table "votes", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "votable_type", null: false
+    t.integer "votable_id", null: false
+    t.integer "vote_type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["votable_type", "votable_id"], name: "index_votes_on_votable_type_and_votable_id"
   end
 
   add_foreign_key "comments", "comments", column: "parent_comment_id"

@@ -1,0 +1,21 @@
+class Vote < ApplicationRecord
+    belongs_to :user
+    belongs_to :votable, polymorphic: true
+  
+    validates :vote_type, inclusion: { in: [1, -1] }, presence: true
+    validates_uniqueness_of :user_id, scope: [:votable_type, :votable_id], message: "has already voted on this %{model_name.downcase}"
+  
+    after_create :update_likes_and_dislikes
+    after_destroy :update_likes_and_dislikes
+  
+    private
+  
+    def update_likes_and_dislikes
+        likes = votable.votes.where(vote_type: 1).count
+        dislikes = votable.votes.where(vote_type: -1).count
+      
+        votable.update_columns(likes: likes, dislikes: dislikes)
+    end
+      
+  end
+  
