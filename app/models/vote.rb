@@ -6,6 +6,7 @@ class Vote < ApplicationRecord
     validates_uniqueness_of :user_id, scope: [:votable_type, :votable_id], message: "has already voted on this %{model_name.downcase}"
   
     after_create :update_likes_and_dislikes
+    after_update :update_likes_and_dislikes
     after_destroy :update_likes_and_dislikes
   
     private
