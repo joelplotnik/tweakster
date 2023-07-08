@@ -2,8 +2,8 @@ class Vote < ApplicationRecord
     belongs_to :user
     belongs_to :votable, polymorphic: true
   
-    validates :vote_type, inclusion: { in: [1, -1] }, presence: true
-    validates_uniqueness_of :user_id, scope: [:votable_type, :votable_id], message: "has already voted on this %{model_name.downcase}"
+    validates :vote_type, inclusion: { in: [1, -1], message: "is not a valid vote type. Please choose 1 or -1." }, presence: true
+    validates_uniqueness_of :user_id, scope: [:votable_type, :votable_id], message: "has already voted on this piece or comment"
   
     after_create :update_likes_and_dislikes
     after_update :update_likes_and_dislikes

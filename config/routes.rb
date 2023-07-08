@@ -24,13 +24,14 @@ Rails.application.routes.draw do
             get 'check_ownership'
           end
 
-          resources :votes, only: [:create]
-
           resources :comments, only: [:index, :create, :update, :destroy] do
             member do
               get 'check_ownership'
             end
+
           end
+
+          resources :votes, only: [:create]
         end
 
         # Add subscriptions routes

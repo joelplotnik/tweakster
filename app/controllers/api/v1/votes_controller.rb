@@ -24,7 +24,7 @@ class Api::V1::VotesController < ApplicationController
         render json: { success: true, message: 'Vote removed' }
       else
         # User is trying to change their vote type, update the existing vote
-        existing_vote.update_vote(vote_params[:vote_type])
+        existing_vote.update(vote_type: vote_params[:vote_type])
         render json: { success: true, vote: existing_vote }
       end
     end
