@@ -12,6 +12,7 @@ class Ability
     can :manage, Channel, user: user # user can manage their own channel
     can :manage, Subscription, user: user # user can manage their own subscription
     can :manage, Comment, user: user # user can manage their own comment
+    can :manage, Vote, user: user # user can manage their own comment
     
     return unless user.admin?  # additional permissions for administrators
     can :manage, Piece # admin can manage all pieces
@@ -19,5 +20,6 @@ class Ability
     can :manage, Channel  # admin can manage all channels
     can :manage, Subscription # admin can manage all subscriptions
     can :manage, Comment # admin can manage all comments
+    can :manage, Vote, user: user # admin can manage their all comments
   end
 end

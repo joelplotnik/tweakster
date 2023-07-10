@@ -13,12 +13,13 @@ class Api::V1::PiecesController < ApplicationController
   end
 
   def show
-    piece = Piece.includes(:user, :channel, :comments).find(params[:id])
+    piece = Piece.includes(:user, :channel, :comments, :votes).find(params[:id])
     comments_count = piece.comments.count
   
     render json: piece.as_json(include: {
       user: { only: [:username] },
       channel: { only: [:name] },
+      votes: { only: [:user_id, :vote_type] }
     }).merge({ comments_count: comments_count })
   end
 

@@ -3,7 +3,8 @@ class Api::V1::HomeController < ApplicationController
         pieces = Piece.paginate(page: params[:page], per_page: 5).order(created_at: :desc)
         render json: pieces, include: { 
             user: { only: [:id, :username] },
-            channel: { only: [:id, :name] }
+            channel: { only: [:id, :name] },
+            votes: { only: [:user_id, :vote_type] }
         }
       end
 end

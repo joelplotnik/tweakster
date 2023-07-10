@@ -1,5 +1,9 @@
 class Api::V1::VotesController < ApplicationController
     before_action :authenticate_user!
+
+    rescue_from CanCan::AccessDenied do |exception|
+      render json: { warning: exception }, status: :unauthorized
+    end  
   
     def create
       existing_vote = current_user.votes.find_by(votable_type: vote_params[:votable_type], votable_id: vote_params[:votable_id])
