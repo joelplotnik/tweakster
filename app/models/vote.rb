@@ -12,10 +12,12 @@ class Vote < ApplicationRecord
     private
   
     def update_likes_and_dislikes
-        likes = votable.votes.where(vote_type: 1).count
-        dislikes = votable.votes.where(vote_type: -1).count
-      
-        votable.update_columns(likes: likes, dislikes: dislikes)
+        if votable.present?
+            likes = votable.votes.where(vote_type: 1).count
+            dislikes = votable.votes.where(vote_type: -1).count
+        
+            votable.update_columns(likes: likes, dislikes: dislikes)
+        end
     end
       
   end

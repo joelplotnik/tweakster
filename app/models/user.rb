@@ -1,10 +1,10 @@
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
-  has_many :channels, through: :subscriptions, dependent: :destroy
   has_many :subscriptions, dependent: :destroy
+  has_many :channels, through: :subscriptions, dependent: :destroy
   has_many :pieces, dependent: :destroy
   has_many :comments, dependent: :destroy
-  has_many :votes
+  has_many :votes, dependent: :destroy
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
