@@ -39,11 +39,12 @@ class Api::V1::CommentsController < ApplicationController
     comment = Comment.find(params[:id])
   
     if comment.update(comment_params)
-      render json: comment, status: :ok
+      render json: comment.as_json(include: { user: { only: :username } }), status: :ok
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
     end
   end
+  
 
   def destroy
     comment = Comment.find(params[:id])

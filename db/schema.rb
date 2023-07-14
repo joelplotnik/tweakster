@@ -10,12 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_12_191340) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_14_213853) do
   create_table "channels", force: :cascade do |t|
     t.string "name"
     t.string "url"
     t.text "protocol"
-    t.integer "total_users", default: 0
+    t.integer "subscriptions_count", default: 0
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -43,7 +43,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_12_191340) do
     t.integer "channel_id"
     t.integer "likes", default: 0
     t.integer "dislikes", default: 0
-    t.integer "total_comments", default: 0
+    t.integer "comments_count", default: 0
     t.integer "parent_piece_id"
     t.index ["parent_piece_id"], name: "index_pieces_on_parent_piece_id"
   end

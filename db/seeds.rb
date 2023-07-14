@@ -10,9 +10,9 @@ end
 
 # Create Admin User
 admin_user = User.create!(
-  email: 'tweakster@example.com',
+  email: 'superadmin@example.com',
   password: 'Password11!!',
-  username: 'tweakster',
+  username: 'superadmin',
   role: 'admin'
 )
 

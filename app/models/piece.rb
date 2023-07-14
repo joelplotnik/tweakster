@@ -4,7 +4,7 @@ class Piece < ApplicationRecord
     belongs_to :parent_piece, class_name: 'Piece', optional: true
 
     has_many :votes, as: :votable
-    has_many :comments, dependent: :destroy
+    has_many :comments, dependent: :destroy, counter_cache: true
     has_many :child_pieces, class_name: 'Piece', foreign_key: 'parent_piece_id', dependent: :destroy
 
     validates :title, presence: true, length: { minimum: 5, maximum: 100 }
