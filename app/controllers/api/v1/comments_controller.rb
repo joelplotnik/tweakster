@@ -10,7 +10,7 @@ class Api::V1::CommentsController < ApplicationController
 
   def index
     piece = Piece.find(params[:piece_id])
-    comments = piece.comments.includes(:user).order(created_at: :desc)
+    comments = piece.comments.includes(:user, :votes).order(created_at: :desc)
   
     parent_comments = comments.select { |comment| comment.parent_comment_id.nil? }
     all_comments = []
@@ -21,7 +21,10 @@ class Api::V1::CommentsController < ApplicationController
     end
   
     paginated_comments = all_comments.paginate(page: params[:page], per_page: 10)
-    render json: paginated_comments, include: { user: { only: [:username] } }
+    render json: paginated_comments, include: { 
+      user: { only: [:username] }, 
+      votes: { only: [:user_id, :vote_type] } 
+    }
   end
 
   def create
