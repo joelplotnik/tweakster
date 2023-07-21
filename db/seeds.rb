@@ -43,7 +43,6 @@ subscriptions_count.times do
   user = users.sample
   channel = channels.sample
 
-  # Check if the subscription already exists
   next if Subscription.exists?(user_id: user.id, channel_id: channel.id)
 
   Subscription.create!(
@@ -68,7 +67,7 @@ end
 # Create Comments
 pieces = Piece.all
 pieces.each do |piece|
-  num_comments = rand(0..10) # Randomly choose the number of comments for each piece
+  num_comments = rand(0..10) 
   users.sample(num_comments).each do |comment_user|
     parent_comment = piece.comments.sample if piece.comments.present? && rand(2).zero?
 
@@ -83,21 +82,20 @@ pieces.each do |piece|
       parent_comment.child_comments << comment
       parent_comment.save
     else
-      piece.comments << comment # Assign top-level comment to piece
+      piece.comments << comment 
     end
   end
 end
 
 
-# Create Votes
+# Create Votes for Pieces
 users.each do |user|
   voted_pieces = []
-  num_votes = rand(1..10) # Randomly choose the number of votes for each user
+  num_votes = rand(5..10) 
 
   num_votes.times do
     piece = Piece.all.sample
 
-    # Skip if the piece has already been voted by the user
     next if voted_pieces.include?(piece.id)
 
     voted_pieces << piece.id
@@ -108,6 +106,29 @@ users.each do |user|
       user_id: user.id,
       votable_type: 'Piece',
       votable_id: piece.id,
+      vote_type: vote_type
+    )
+  end
+end
+
+# Create Votes for Comments
+users.each do |user|
+  voted_comments = []
+  num_votes = rand(10..20) 
+
+  num_votes.times do
+    comment = Comment.all.sample
+
+    next if voted_comments.include?(comment.id)
+
+    voted_comments << comment.id
+
+    vote_type = [1, -1].sample
+
+    Vote.create!(
+      user_id: user.id,
+      votable_type: 'Comment',
+      votable_id: comment.id,
       vote_type: vote_type
     )
   end

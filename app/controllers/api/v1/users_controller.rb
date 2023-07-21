@@ -20,7 +20,7 @@ class Api::V1::UsersController < ApplicationController
     pieces = user.pieces.includes(:channel, :votes)
                      .paginate(page: page, per_page: per_page)
                      .order(created_at: :desc)
-                     .as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id],
+                     .as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id, :comments_count],
                               include: {
                                 channel: { only: [:id, :name] },
                                 votes: { only: [:user_id, :vote_type] }
