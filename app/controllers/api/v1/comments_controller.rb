@@ -14,6 +14,14 @@ class Api::V1::CommentsController < ApplicationController
     piece = Piece.find(params[:piece_id])
     comments = piece.comments.includes(:user, :votes).order(created_at: :desc)
 
+    excluded_comment_ids = JSON.parse(params[:exclude])
+
+    puts "*********************************************"
+    puts "Excluded Comment IDs: #{excluded_comment_ids}"
+    puts "*********************************************"
+
+    comments = comments.where.not(id: excluded_comment_ids)
+
     root_comments = comments.select { |comment| comment.parent_comment_id.nil? }
 
     comments_with_children = root_comments.map { |comment| build_comment_tree(comment) }
