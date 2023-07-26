@@ -12,20 +12,20 @@ class Api::V1::CommentsController < ApplicationController
 
   def index
     piece = Piece.find(params[:piece_id])
-    comments = piece.comments.includes(:user, :votes).order(created_at: :desc)
+    comments = piece.comments.includes(:user, :votes)
 
     excluded_comment_ids = JSON.parse(params[:exclude])
-
-    puts "*********************************************"
-    puts "Excluded Comment IDs: #{excluded_comment_ids}"
-    puts "*********************************************"
-
     comments = comments.where.not(id: excluded_comment_ids)
 
+    if params[:sort] == 'new'
+      comments = comments.order(created_at: :desc)
+    else
+      # By default, sort comments by their score
+      comments = comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
+    end
+
     root_comments = comments.select { |comment| comment.parent_comment_id.nil? }
-
-    comments_with_children = root_comments.map { |comment| build_comment_tree(comment) }
-
+    comments_with_children = root_comments.map { |comment| build_comment_tree(comment, sort_by_score: params[:sort] != 'new') }
     paginated_comments = comments_with_children.paginate(page: params[:page], per_page: 10)
 
     render json: paginated_comments, include: {
@@ -38,7 +38,8 @@ class Api::V1::CommentsController < ApplicationController
         }
       }
     }
-  end
+end
+
 
   def create
     comment = Comment.new(comment_params)
