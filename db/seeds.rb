@@ -134,7 +134,12 @@ users.each do |user|
   end
 end
 
-
-
+# Create Tweaks (50% chance)
+pieces.each do |piece|
+  if rand(2).zero? 
+    parent_piece = pieces.sample
+    piece.update(parent_piece_id: parent_piece.id)
+  end
+end
 
 

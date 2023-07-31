@@ -1,7 +1,7 @@
 class Piece < ApplicationRecord
     belongs_to :user
     belongs_to :channel
-    belongs_to :parent_piece, class_name: 'Piece', optional: true
+    belongs_to :parent_piece, class_name: 'Piece', counter_cache: :tweaks_count, optional: true
 
     has_many :votes, as: :votable
     has_many :comments, dependent: :destroy

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_14_213853) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_31_175606) do
   create_table "channels", force: :cascade do |t|
     t.string "name"
     t.string "url"
@@ -45,6 +45,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_14_213853) do
     t.integer "dislikes", default: 0
     t.integer "comments_count", default: 0
     t.integer "parent_piece_id"
+    t.integer "tweaks_count", default: 0
     t.index ["parent_piece_id"], name: "index_pieces_on_parent_piece_id"
   end
 
