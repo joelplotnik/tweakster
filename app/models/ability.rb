@@ -5,6 +5,7 @@ class Ability
 
   def initialize(user)
     can :read, [User, Piece, Channel, Subscription, Comment, Vote]
+    can :tweaks, Piece
 
     return unless user.present?  # additional permissions for logged in users
     can :manage, Piece, user: user # user can manage their own pieces

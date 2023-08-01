@@ -1,6 +1,10 @@
+require 'will_paginate/array'
+
 class Api::V1::PiecesController < ApplicationController
+  include Pieceable
+
   load_and_authorize_resource
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_user!, except: [:index, :show, :tweaks]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
@@ -21,6 +25,25 @@ class Api::V1::PiecesController < ApplicationController
       channel: { only: [:name] },
       votes: { only: [:user_id, :vote_type] }
     }).merge({ comments_count: comments_count })
+  end
+
+  def tweaks
+    parent_piece = Piece.includes(:user, :channel).find(params[:id])
+    tweaks = parent_piece.child_pieces
+
+    sorted_tweaks = if params[:sort] == 'new'
+                      tweaks.order(created_at: :desc)
+                    else
+                      tweaks.sort_by { |tweak| calculate_piece_score(tweak) }.reverse
+                    end
+
+    paginated_tweaks = sorted_tweaks.paginate(page: params[:page], per_page: 5)
+
+    render json: paginated_tweaks.as_json(include: {
+      user: { only: [:username] },
+      channel: { only: [:name] },
+      votes: { only: [:user_id, :vote_type] }
+    })
   end
 
   def create

@@ -21,6 +21,7 @@ Rails.application.routes.draw do
 
         resources :pieces, only: [:show, :index, :create, :update, :destroy] do
           member do
+            get 'tweaks', to: 'pieces#tweaks'
             get 'check_ownership'
           end
 
