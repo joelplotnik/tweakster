@@ -41,7 +41,7 @@ class Api::V1::PiecesController < ApplicationController
 
     render json: paginated_tweaks.as_json(include: {
       user: { only: [:username] },
-      channel: { only: [:name] },
+      channel: { only: [:name, :channel_id] },
       votes: { only: [:user_id, :vote_type] }
     })
   end
