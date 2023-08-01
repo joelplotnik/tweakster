@@ -1,16 +1,22 @@
+require 'will_paginate/array'
+
 class Api::V1::HomeController < ApplicationController
-    def index
-      pieces = Piece.select('pieces.*, COALESCE(SUM(votes.vote_type), 0) AS score')
-                    .left_joins(:votes)
-                    .group('pieces.id')
-                    .order('score DESC')
-                    .paginate(page: params[:page], per_page: 5)
-  
-      render json: pieces, include: { 
-        user: { only: [:id, :username] },
-        channel: { only: [:id, :name] },
-        votes: { only: [:user_id, :vote_type] }
-      }
-    end
+  include Pieceable
+
+  def index
+    all_pieces = Piece.all
+    sorted_pieces = if params[:sort] == 'new'
+                      all_pieces.order(created_at: :desc)
+                    else
+                      all_pieces.sort_by { |piece| calculate_piece_score(piece) }.reverse
+                    end
+
+    paginated_pieces = sorted_pieces.paginate(page: params[:page], per_page: 5)
+
+    render json: paginated_pieces.as_json(include: {
+      user: { only: [:id, :username] },
+      channel: { only: [:id, :name] },
+      votes: { only: [:user_id, :vote_type] }
+    })
   end
-  
+end

@@ -35,7 +35,6 @@ Rails.application.routes.draw do
           resources :votes, only: [:create]
         end
 
-        # Add subscriptions routes
         post 'subscribe', to: 'subscriptions#create'
         delete 'unsubscribe', to: 'subscriptions#destroy'
 

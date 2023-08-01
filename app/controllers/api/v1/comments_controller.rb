@@ -20,7 +20,6 @@ class Api::V1::CommentsController < ApplicationController
     if params[:sort] == 'new'
       comments = comments.order(created_at: :desc)
     else
-      # By default, sort comments by their score
       comments = comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
     end
 
@@ -38,8 +37,7 @@ class Api::V1::CommentsController < ApplicationController
         }
       }
     }
-end
-
+  end
 
   def create
     comment = Comment.new(comment_params)
