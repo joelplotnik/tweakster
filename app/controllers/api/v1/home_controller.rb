@@ -1,6 +1,7 @@
 require 'will_paginate/array'
 
 class Api::V1::HomeController < ApplicationController
+  include Userable
   include Pieceable
 
   def index
@@ -14,7 +15,10 @@ class Api::V1::HomeController < ApplicationController
     paginated_pieces = sorted_pieces.paginate(page: params[:page], per_page: 5)
 
     render json: paginated_pieces.as_json(include: {
-      user: { only: [:id, :username] },
+      user: {
+        only: [:id, :username],
+        methods: [:avatar_url] 
+      },
       channel: { only: [:id, :name] },
       votes: { only: [:user_id, :vote_type] }
     })

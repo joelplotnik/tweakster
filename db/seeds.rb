@@ -1,11 +1,17 @@
 # Create Users
 users = []
 20.times do
-  users << User.create!(
+  user = User.create!(
     email: Faker::Internet.email,
     password: 'Password11!!',
     username: Faker::Internet.username
   )
+  
+  # Attach an avatar image to the user
+  avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
+  user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
+  
+  users << user
 end
 
 # Create Admin User
@@ -15,6 +21,9 @@ admin_user = User.create!(
   username: 'superadmin',
   role: 'admin'
 )
+
+avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
+admin_user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
 
 users << admin_user
 

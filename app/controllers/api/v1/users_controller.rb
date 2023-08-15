@@ -25,18 +25,24 @@ class Api::V1::UsersController < ApplicationController
                                 channel: { only: [:id, :name] },
                                 votes: { only: [:user_id, :vote_type] }
                               })
-  
+            
+    user_serializer = UserSerializer.new(@user).serializable_hash[:data][:attributes]
+
     render json: {
       id: user.id,
       username: user.username,
       email: user.email,
+      avatar: user_serializer,
       pieces: pieces
     }
   end
-   
 
   def update
     user = User.find(params[:id])
+  
+    if params[:user][:avatar].present?
+      user.avatar.attach(params[:user][:avatar])
+    end
   
     if params[:user][:new_password].present? 
       if user.valid_password?(params[:user][:password]) 
@@ -50,12 +56,14 @@ class Api::V1::UsersController < ApplicationController
       end
     else
       if user.update(user_params) 
-        render json: user, status: :ok
+        user_serializer = UserSerializer.new(@user).serializable_hash[:data][:attributes]
+        render json: user_serializer, status: :ok
       else
         render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
       end
     end
-  end  
+  end
+  
 
   def destroy
     user = User.find(params[:id])
@@ -78,6 +86,6 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:username, :email, :password, :new_password)
+    params.require(:user).permit(:avatar, :username, :email, :password, :new_password)
   end 
 end
