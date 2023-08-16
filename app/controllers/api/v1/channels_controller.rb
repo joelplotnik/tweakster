@@ -9,7 +9,7 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def index
-        channels = Channel.paginate(page: params[:page], per_page: 20).order(created_at: :asc).map do |channel|
+        channels = Channel.paginate(page: params[:page], per_page: 25).order(created_at: :asc).map do |channel|
             { id: channel.id, name: channel.name, subscriptions_count: channel.subscriptions_count }
         end
         render json: channels

@@ -9,7 +9,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def index
-    users = User.paginate(page: params[:page], per_page: 20).order(created_at: :asc).map do |user|
+    users = User.paginate(page: params[:page], per_page: 25).order(created_at: :asc).map do |user|
       { id: user.id, username: user.username, piece_count: user.pieces.count, avatar_url: user.avatar_url, }
     end
     render json: users
