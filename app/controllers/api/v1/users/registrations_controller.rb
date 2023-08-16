@@ -9,7 +9,7 @@ class Api::V1::Users::RegistrationsController < Devise::RegistrationsController
         status: {
           code: 200,
           message: 'Successfully signed up user.',
-          data: resource
+          data: resource.as_json(methods: [:avatar_url])
         }
       }
     else

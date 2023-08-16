@@ -1,4 +1,6 @@
 class Api::V1::ChannelsController < ApplicationController
+    include Userable
+
     load_and_authorize_resource
     before_action :authenticate_user!, except: [:index, :show]
 
@@ -7,7 +9,7 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def index
-        channels = Channel.paginate(page: params[:page], per_page: 10).order(created_at: :asc).map do |channel|
+        channels = Channel.paginate(page: params[:page], per_page: 20).order(created_at: :asc).map do |channel|
             { id: channel.id, name: channel.name, subscriptions_count: channel.subscriptions_count }
         end
         render json: channels
@@ -19,7 +21,7 @@ class Api::V1::ChannelsController < ApplicationController
                  .order(created_at: :desc)
                  .paginate(page: params[:page], per_page: 5)
                  .as_json(include: {
-                   user: { only: [:id, :username] },
+                   user: { only: [:id, :username], methods: [:avatar_url] },
                    votes: { only: [:user_id, :vote_type] }
                  })
                  
@@ -34,7 +36,8 @@ class Api::V1::ChannelsController < ApplicationController
           pieces: pieces,
           user: {
             id: channel.user.id,
-            username: channel.user.username
+            username: channel.user.username,
+            avatar_url: channel.user.avatar_url
           },
           subscriber_count: channel.subscribers.count,
           subscribed: subscribed

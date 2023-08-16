@@ -1,6 +1,7 @@
 require 'will_paginate/array'
 
 class Api::V1::PiecesController < ApplicationController
+  include Userable
   include Pieceable
 
   load_and_authorize_resource
@@ -21,7 +22,7 @@ class Api::V1::PiecesController < ApplicationController
     comments_count = piece.comments.count
   
     render json: piece.as_json(include: {
-      user: { only: [:username] },
+      user: { only: [:username], methods: [:avatar_url] },
       channel: { only: [:name] },
       votes: { only: [:user_id, :vote_type] }
     }).merge({ comments_count: comments_count })
@@ -40,7 +41,7 @@ class Api::V1::PiecesController < ApplicationController
     paginated_tweaks = sorted_tweaks.paginate(page: params[:page], per_page: 5)
 
     render json: paginated_tweaks.as_json(include: {
-      user: { only: [:username] },
+      user: { only: [:username], methods: [:avatar_url] },
       channel: { only: [:name, :channel_id] },
       votes: { only: [:user_id, :vote_type] }
     })

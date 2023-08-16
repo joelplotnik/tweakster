@@ -8,7 +8,7 @@ class Api::V1::Users::SessionsController < Devise::SessionsController
       status: {
         code: 200,
         message: 'Successfully signed in user.',
-        data: current_user
+        data: current_user.as_json(methods: [:avatar_url])
       }
     }, status: :ok
   end

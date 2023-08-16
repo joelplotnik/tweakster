@@ -1,4 +1,6 @@
 class Api::V1::UsersController < ApplicationController
+  include Userable
+
   load_and_authorize_resource
   before_action :authenticate_user!, only: [:update, :destroy, :check_ownership]
 
@@ -7,8 +9,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def index
-    users = User.paginate(page: params[:page], per_page: 10).order(created_at: :asc).map do |user|
-      { id: user.id, username: user.username, piece_count: user.pieces.count }
+    users = User.paginate(page: params[:page], per_page: 20).order(created_at: :asc).map do |user|
+      { id: user.id, username: user.username, piece_count: user.pieces.count, avatar_url: user.avatar_url, }
     end
     render json: users
   end
@@ -25,14 +27,12 @@ class Api::V1::UsersController < ApplicationController
                                 channel: { only: [:id, :name] },
                                 votes: { only: [:user_id, :vote_type] }
                               })
-            
-    user_serializer = UserSerializer.new(@user).serializable_hash[:data][:attributes]
 
     render json: {
       id: user.id,
       username: user.username,
       email: user.email,
-      avatar: user_serializer,
+      avatar_url: user.avatar_url,
       pieces: pieces
     }
   end
