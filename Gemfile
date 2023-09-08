@@ -39,8 +39,14 @@ gem "devise"
 # JSON Web Token authentication for Devise
 gem "devise-jwt"
 
+# Log in as another user
+gem "pretender"
+
 # Authorization gem for defining and managing user permissions
 gem 'cancancan'
+
+# Framework for serializing and deserializing JSON API data
+gem "jsonapi-serializer", "~> 2.2"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
@@ -63,6 +69,3 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 end
-
-
-gem "jsonapi-serializer", "~> 2.2"
