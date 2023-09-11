@@ -16,6 +16,26 @@ class Api::V1::UsersController < ApplicationController
     render json: users
   end
 
+  def search
+    search_term = params[:search_term].downcase.strip 
+    users = User.where('LOWER(username) LIKE ?', "#{search_term}%")
+  
+    users = users
+      .paginate(page: params[:page], per_page: 5)
+      .order(created_at: :asc)
+      .map do |user|
+        {
+          id: user.id,
+          username: user.username,
+          piece_count: user.pieces.count,
+          avatar_url: user.avatar_url
+        }
+      end
+  
+    render json: users
+  end
+  
+
   def show
     user = User.find(params[:id])
     page = params[:page] || 1

@@ -15,6 +15,7 @@ Rails.application.routes.draw do
         end
         
         collection do
+          get 'search', to: 'users#search'
           post :stop_impersonating
         end
       end
@@ -22,8 +23,10 @@ Rails.application.routes.draw do
       resources :channels, only: [:show, :index, :create, :update, :destroy] do
         member do
           get 'check_ownership'
-          post 'subscribe', to: 'subscriptions#create'
-          delete 'unsubscribe', to: 'subscriptions#destroy'
+        end
+
+        collection do
+          get 'search', to: 'channels#search'
         end
 
         resources :pieces, only: [:show, :index, :create, :update, :destroy] do
@@ -40,6 +43,10 @@ Rails.application.routes.draw do
 
           resources :votes, only: [:create]
         end
+
+        post 'subscribe', to: 'subscriptions#create'
+        delete 'unsubscribe', to: 'subscriptions#destroy'
+
       end
     end
   end

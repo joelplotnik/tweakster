@@ -2,7 +2,7 @@ class Api::V1::ChannelsController < ApplicationController
     include Userable
 
     load_and_authorize_resource
-    before_action :authenticate_user!, except: [:index, :show]
+    before_action :authenticate_user!, except: [:index, :show, :search]
 
     rescue_from CanCan::AccessDenied do |exception|
         render json: { warning: exception }, status: :unauthorized
@@ -14,6 +14,25 @@ class Api::V1::ChannelsController < ApplicationController
         end
         render json: channels
     end
+
+    def search
+        search_term = params[:search_term].downcase.strip 
+        channels = Channel.where('LOWER(name) LIKE ?', "#{search_term}%")
+      
+        channels = channels
+          .paginate(page: params[:page], per_page: 5)
+          .order(created_at: :asc)
+          .map do |channel|
+            {
+              id: channel.id,
+              name: channel.name,
+              subscriptions_count: channel.subscriptions_count
+            }
+          end
+      
+        render json: channels
+      end
+      
 
     def show
         channel = Channel.includes(pieces: [:user, :votes]).find(params[:id])
