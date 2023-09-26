@@ -31,19 +31,30 @@ class Api::V1::ChannelsController < ApplicationController
           end
       
         render json: channels
-      end
+    end
       
 
     def show
         channel = Channel.includes(pieces: [:user, :votes]).find(params[:id])
-        pieces = channel.pieces
-                 .order(created_at: :desc)
-                 .paginate(page: params[:page], per_page: 5)
-                 .as_json(include: {
-                   user: { only: [:id, :username], methods: [:avatar_url] },
-                   votes: { only: [:user_id, :vote_type] }
-                 })
-                 
+      
+        pieces_with_images = channel.pieces
+          .order(created_at: :desc)
+          .paginate(page: params[:page], per_page: 5)
+          .map do |piece|
+            image_urls = piece.images.map { |image| url_for(image) }
+      
+            piece_json = piece.as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id, 
+              :comments_count, :tweaks_count, :youtube_url],
+              include: {
+                user: { only: [:id, :username], methods: [:avatar_url] },
+                votes: { only: [:user_id, :vote_type] }
+              })
+      
+            piece_json['images'] = image_urls
+      
+            piece_json
+          end
+      
         subscribed = current_user && channel.subscriptions.exists?(user_id: current_user.id)
       
         render json: {
@@ -52,17 +63,16 @@ class Api::V1::ChannelsController < ApplicationController
           url: channel.url,
           summary: channel.summary,
           protocol: channel.protocol,
-          pieces: pieces,
           user: {
             id: channel.user.id,
             username: channel.user.username,
             avatar_url: channel.user.avatar_url
           },
           subscriber_count: channel.subscribers.count,
-          subscribed: subscribed
+          subscribed: subscribed,
+          pieces: pieces_with_images
         }
-      end
-      
+    end
 
     def create
         channel = Channel.new(channel_params)

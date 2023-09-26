@@ -14,13 +14,21 @@ class Api::V1::HomeController < ApplicationController
 
     paginated_pieces = sorted_pieces.paginate(page: params[:page], per_page: 5)
 
-    render json: paginated_pieces.as_json(include: {
-      user: {
-        only: [:id, :username],
-        methods: [:avatar_url] 
-      },
-      channel: { only: [:id, :name] },
-      votes: { only: [:user_id, :vote_type] }
-    })
+    pieces_with_images = paginated_pieces.map do |piece|
+      image_urls = piece.images.map { |image| url_for(image) }
+
+      piece.as_json(include: {
+        user: {
+          only: [:id, :username],
+          methods: [:avatar_url] 
+        },
+        channel: { only: [:id, :name] },
+        votes: { only: [:user_id, :vote_type] }
+      }).merge({ 
+        images: image_urls
+      })
+    end
+
+    render json: pieces_with_images
   end
 end

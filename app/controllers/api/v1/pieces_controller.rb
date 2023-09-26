@@ -1,8 +1,9 @@
 require 'will_paginate/array'
 
 class Api::V1::PiecesController < ApplicationController
-  include Userable
   include Pieceable
+  include Userable
+  include Sanitizable
 
   load_and_authorize_resource
   before_action :authenticate_user!, except: [:index, :show, :tweaks]
@@ -19,13 +20,18 @@ class Api::V1::PiecesController < ApplicationController
 
   def show
     piece = Piece.includes(:user, :channel, :comments, :votes).find(params[:id])
+
     comments_count = piece.comments.count
+    image_urls = piece.images.map { |image| url_for(image) }
   
     render json: piece.as_json(include: {
       user: { only: [:username], methods: [:avatar_url] },
       channel: { only: [:name] },
       votes: { only: [:user_id, :vote_type] }
-    }).merge({ comments_count: comments_count })
+    }).merge({ 
+      comments_count: comments_count,
+      images: image_urls
+     })
   end
 
   def tweaks
@@ -48,7 +54,18 @@ class Api::V1::PiecesController < ApplicationController
   end
 
   def create
-    piece = Piece.new(piece_params)
+    piece = Piece.new(piece_params.except(:images))
+
+    sanitized_content = sanitize_rich_content(params[:piece][:content])
+    piece.content = sanitized_content
+
+    images = params[:piece][:images]
+    if images
+      images.each do |image|
+        piece.images.attach(image)
+      end
+    end
+
     piece.user = current_user
     piece.channel_id = params[:channel_id]
 
@@ -62,7 +79,10 @@ class Api::V1::PiecesController < ApplicationController
   def update
     piece = Piece.find(params[:id])
 
-    if piece.update(piece_params)
+    sanitized_content = sanitize_rich_content(params[:piece][:content])
+    piece.content = sanitized_content
+
+    if piece.update(piece_params.except(:images))
       render json: piece, include: { user: { only: [:id, :username] } }, status: :ok
     else
       render json: { errors: piece.errors.full_messages }, status: :unprocessable_entity
@@ -88,6 +108,6 @@ class Api::V1::PiecesController < ApplicationController
   private
 
   def piece_params
-    params.require(:piece).permit(:title, :content)
+    params.require(:piece).permit(:title, :content, :youtube_url, images: [])
   end
 end
