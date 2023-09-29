@@ -9,15 +9,11 @@ class Piece < ApplicationRecord
     has_many :child_pieces, class_name: 'Piece', foreign_key: 'parent_piece_id', dependent: :destroy
 
     validates :title, presence: true, length: { minimum: 1, maximum: 300 }
-    validate :content_length_within_limit
+    validate :has_material
 
-    def content_length_within_limit
-        return if content.nil?
-
-        plain_text_content = Sanitize.fragment(content)
-
-        if plain_text_content.length < 10 || plain_text_content.length > 40000
-            errors.add(:content, 'must be between 10 and 2500 characters without HTML tags')
+    def has_material
+        unless images.attached? || content.present? || youtube_url.present?
+            errors.add(:base, 'A piece must have at least one image, content, or YouTube URL')
         end
     end
 end
