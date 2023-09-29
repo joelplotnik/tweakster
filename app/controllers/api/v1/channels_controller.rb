@@ -33,7 +33,6 @@ class Api::V1::ChannelsController < ApplicationController
         render json: channels
     end
       
-
     def show
         channel = Channel.includes(pieces: [:user, :votes]).find(params[:id])
       
@@ -46,6 +45,7 @@ class Api::V1::ChannelsController < ApplicationController
             piece_json = piece.as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id, 
               :comments_count, :tweaks_count, :youtube_url],
               include: {
+                channel: {only: [:id, :name]},
                 user: { only: [:id, :username], methods: [:avatar_url] },
                 votes: { only: [:user_id, :vote_type] }
               })
@@ -55,9 +55,9 @@ class Api::V1::ChannelsController < ApplicationController
             piece_json
           end
       
-        subscribed = current_user && channel.subscriptions.exists?(user_id: current_user.id)
-      
-        render json: {
+        subscribed = !!current_user && channel.subscriptions.exists?(user_id: current_user.id)
+
+        channel_data = {
           id: channel.id,
           name: channel.name,
           url: channel.url,
@@ -69,9 +69,16 @@ class Api::V1::ChannelsController < ApplicationController
             avatar_url: channel.user.avatar_url
           },
           subscriber_count: channel.subscribers.count,
-          subscribed: subscribed,
           pieces: pieces_with_images
         }
+
+        if current_user
+          channel_data['can_edit'] = current_user == channel.user || current_user.admin?
+          channel_data['subscribed'] = channel.subscriptions.exists?(user_id: current_user.id)
+
+        end
+      
+        render json: channel_data
     end
 
     def create

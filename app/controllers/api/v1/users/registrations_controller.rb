@@ -1,6 +1,12 @@
 class Api::V1::Users::RegistrationsController < Devise::RegistrationsController
   respond_to :json
 
+  def create
+    super do |resource|
+      UserRegistrationService.call(resource)
+    end
+  end
+
   private
 
   def respond_with(resource, _opts = {})
