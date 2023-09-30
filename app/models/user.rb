@@ -15,7 +15,7 @@ class User < ApplicationRecord
          jwt_revocation_strategy: self
   validates :username, presence: true, 
          uniqueness: { case_sensitive: false }, 
-         length: { minimum: 3, maximum: 25 },
+         length: { minimum: 2, maximum: 25 },
          format: { with: /^[a-zA-Z0-9_\.]*$/, multiline: true }
 
   ROLES = %w{admin moderator advertiser user}

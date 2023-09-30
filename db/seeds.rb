@@ -62,15 +62,60 @@ end
 
 # Assign Pieces to Users and Channels
 piece_count = 50
-piece_count.times do
+youtube_urls = [
+  "https://www.youtube.com/watch?v=C0DPdy98e4c",
+  "https://www.youtube.com/watch?v=sZtCF_9pee4",
+  "https://www.youtube.com/watch?v=IIqtuupvdWg"
+]
+
+piece_count.times do |index|
   user = users.sample
   channel = channels.sample
-  Piece.create!(
+  youtube_url = youtube_urls.sample
+
+  # Generate random image URLs with non-square dimensions
+  image_urls = []
+  rand(1..3).times do
+    width = rand(300..800)
+    height = rand(300..800)
+    image_urls << Faker::LoremFlickr.image(size: "#{width}x#{height}")
+  end
+
+  piece = Piece.new(
     title: Faker::Book.title,
-    content: Faker::Lorem.paragraph(sentence_count: 35),
     user_id: user.id,
     channel_id: channel.id
   )
+
+  if index.even?
+    # Apply variations for half of the pieces (even index)
+    attributes = [:images, :youtube_url, :content].sample
+
+    case attributes
+    when :images
+      image_urls.each do |image_url|
+        piece.images.attach(io: URI.open(image_url), filename: 'image.png')
+      end
+    when :youtube_url
+      piece.youtube_url = youtube_url
+    when :content
+      piece.content = Faker::Lorem.paragraph(sentence_count: 50)
+    end
+  else
+    # Apply all attributes for the other half of the pieces (odd index)
+    piece.youtube_url = youtube_url
+    image_urls.each do |image_url|
+      piece.images.attach(io: URI.open(image_url), filename: 'image.png')
+    end
+    piece.content = Faker::Lorem.paragraph(sentence_count: 50)
+  end
+
+  # Validate that at least one attribute is present
+  unless piece.content.present? || piece.youtube_url.present? || piece.images.attached?
+    piece.errors.add(:base, 'At least one attribute (content, youtube_url, or images) must be present')
+  end
+
+  piece.save
 end
 
 # Create Comments
@@ -100,7 +145,7 @@ end
 # Create Votes for Pieces
 users.each do |user|
   voted_pieces = []
-  num_votes = rand(5..10) 
+  num_votes = rand(10..20) 
 
   num_votes.times do
     piece = Piece.all.sample
@@ -143,12 +188,11 @@ users.each do |user|
   end
 end
 
-# Create Tweaks (50% chance)
+# Create Tweaks (75% chance)
 pieces.each do |piece|
-  if rand(2).zero? 
-    parent_piece = pieces.sample
-    piece.update(parent_piece_id: parent_piece.id)
+  if rand(4) >= 1 
+    parent_candidates = pieces.reject { |p| p == piece || p.parent_piece_id == piece.id }
+    parent_piece = parent_candidates.sample
+    piece.update(parent_piece_id: parent_piece.id) if parent_piece
   end
 end
-
-

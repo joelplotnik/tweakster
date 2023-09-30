@@ -46,11 +46,16 @@ class Api::V1::PiecesController < ApplicationController
 
     paginated_tweaks = sorted_tweaks.paginate(page: params[:page], per_page: 5)
 
-    render json: paginated_tweaks.as_json(include: {
-      user: { only: [:username], methods: [:avatar_url] },
-      channel: { only: [:name, :channel_id] },
-      votes: { only: [:user_id, :vote_type] }
-    })
+    tweaks_with_images = paginated_tweaks.map do |tweak|
+      image_urls = tweak.images.map { |image| url_for(image) }
+      tweak.as_json(include: {
+        user: { only: [:username], methods: [:avatar_url] },
+        channel: { only: [:name, :channel_id] },
+        votes: { only: [:user_id, :vote_type] }
+      }).merge(images: image_urls)
+    end
+  
+    render json: tweaks_with_images
   end
 
   def create
