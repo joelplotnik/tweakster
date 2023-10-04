@@ -3,7 +3,6 @@ class Api::V1::UsersController < ApplicationController
 
   load_and_authorize_resource
   before_action :authenticate_user!, only: [:update, :destroy, :check_ownership]
-  before_action :require_admin!, only: [:impersonate, :stop_impersonating]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
@@ -68,7 +67,6 @@ class Api::V1::UsersController < ApplicationController
   
     if current_user
       user_data['can_edit'] = current_user.id == user.id || current_user.admin?
-      user_data['can_impersonate'] = current_user.admin? && current_user != user
     end
   
     render json: user_data
@@ -112,25 +110,6 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def impersonate
-    user = User.find(params[:id])
-    if impersonate_user(user)
-      user_to_render = user.as_json.merge(avatar_url: user.avatar_url)
-      render json: { message: "Impersonating #{user.username}", user: user_to_render }, status: :ok
-    else
-      render json: { error: "Failed to start impersonation." }, status: :unprocessable_entity
-    end
-  end
-
-  def stop_impersonating
-    if stop_impersonating_user
-      user_to_render = current_user.as_json.merge(avatar_url: current_user.avatar_url)
-      render json: { message: "Impersonating stopped successfully. Back to #{current_user.username}", user: user_to_render }, status: :ok
-    else
-      render json: { error: "Failed to stop impersonation." }, status: :unprocessable_entity
-    end
-  end
-
   def check_ownership
     user = User.find(params[:id])
     belongs_to_user = user == current_user || current_user.admin?
@@ -142,10 +121,4 @@ class Api::V1::UsersController < ApplicationController
   def user_params
     params.require(:user).permit(:avatar, :username, :email, :password, :new_password)
   end 
-
-  def require_admin!
-    unless true_user.admin?
-      render json: { error: "You are not authorized to impersonate." }, status: :forbidden
-    end
-  end
 end

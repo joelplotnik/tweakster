@@ -50,7 +50,6 @@ class User < ApplicationRecord
   end
          
   def jwt_payload
-    super
+    super.merge({ username: self.username, role: self.role }) 
   end
-
 end

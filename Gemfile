@@ -30,9 +30,6 @@ gem "devise"
 # JSON Web Token authentication for Devise
 gem "devise-jwt"
 
-# Log in as another user
-gem "pretender"
-
 # Authorization gem for defining and managing user permissions
 gem 'cancancan'
 

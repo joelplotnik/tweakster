@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::API
-    impersonates :user
     before_action :configure_permitted_parameters, if: :devise_controller?
 
     protected

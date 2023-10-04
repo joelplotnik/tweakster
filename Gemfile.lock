@@ -139,8 +139,6 @@ GEM
     nokogiri (1.15.3-x86_64-darwin)
       racc (~> 1.4)
     orm_adapter (0.5.0)
-    pretender (0.5.0)
-      actionpack (>= 6.1)
     puma (5.6.6)
       nio4r (~> 2.0)
     racc (1.7.1)
@@ -219,7 +217,6 @@ DEPENDENCIES
   faker
   image_processing (~> 1.2)
   jsonapi-serializer (~> 2.2)
-  pretender
   puma (~> 5.0)
   rack-cors
   rails (~> 7.0.4, >= 7.0.4.3)

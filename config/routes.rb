@@ -11,12 +11,10 @@ Rails.application.routes.draw do
       resources :users, only: [:show, :index, :update, :destroy] do
         member do
           get 'check_ownership'
-          post :impersonate
         end
         
         collection do
           get 'search', to: 'users#search'
-          post :stop_impersonating
         end
       end
 
