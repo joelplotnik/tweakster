@@ -25,8 +25,8 @@ class Api::V1::PiecesController < ApplicationController
     image_urls = piece.images.map { |image| url_for(image) }
   
     render json: piece.as_json(include: {
-      user: { only: [:username], methods: [:avatar_url] },
-      channel: { only: [:name] },
+      user: { only: [:id, :username], methods: [:avatar_url] },
+      channel: { only: [:id, :name] },
       votes: { only: [:user_id, :vote_type] }
     }).merge({ 
       comments_count: comments_count,
@@ -49,8 +49,8 @@ class Api::V1::PiecesController < ApplicationController
     tweaks_with_images = paginated_tweaks.map do |tweak|
       image_urls = tweak.images.map { |image| url_for(image) }
       tweak.as_json(include: {
-        user: { only: [:username], methods: [:avatar_url] },
-        channel: { only: [:name, :channel_id] },
+        user: { only: [:id, :username], methods: [:avatar_url] },
+        channel: { only: [ :id, :name] },
         votes: { only: [:user_id, :vote_type] }
       }).merge(images: image_urls)
     end
