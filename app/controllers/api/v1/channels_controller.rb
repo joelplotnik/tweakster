@@ -1,5 +1,6 @@
 class Api::V1::ChannelsController < ApplicationController
-    include Userable
+  include Channelable
+  include Userable
 
     load_and_authorize_resource
     before_action :authenticate_user!, except: [:index, :show, :search]
@@ -16,7 +17,7 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def search
-        search_term = params[:search_term].downcase.strip 
+        search_term = params[:search_term].dncase.strip 
         channels = Channel.where('LOWER(name) LIKE ?', "#{search_term}%")
       
         channels = channels
@@ -60,6 +61,7 @@ class Api::V1::ChannelsController < ApplicationController
         channel_data = {
           id: channel.id,
           name: channel.name,
+          visual_url: channel.visual_url,
           url: channel.url,
           summary: channel.summary,
           protocol: channel.protocol,
@@ -69,7 +71,7 @@ class Api::V1::ChannelsController < ApplicationController
             avatar_url: channel.user.avatar_url
           },
           subscriber_count: channel.subscribers.count,
-          pieces: pieces_with_images
+          pieces: pieces_with_images,
         }
 
         if current_user
@@ -94,13 +96,18 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def update
-        channel = Channel.find(params[:id])
-
-        if channel.update(channel_params)
-            render json: channel, status: :ok
-        else
-            render json: { errors: channel.errors.full_messages }, status: :unprocessable_entity
-        end
+      channel = Channel.find(params[:id])
+  
+      if params[:channel][:visual].present?
+        channel.visual.attach(params[:channel][:visual])
+      end
+  
+      if channel.update(channel_params)
+        channel_serializer = ChannelSerializer.new(channel).serializable_hash[:data][:attributes]
+        render json: channel_serializer, status: :ok
+      else
+        render json: { errors: channel.errors.full_messages }, status: :unprocessable_entity
+      end
     end
 
     def destroy
@@ -122,7 +129,7 @@ class Api::V1::ChannelsController < ApplicationController
     private
 
     def channel_params
-        params.require(:channel).permit(:name, :url, :summary, :protocol)
+        params.require(:channel).permit(:visual, :name, :url, :summary, :protocol)
     end
 
 end

@@ -1,6 +1,9 @@
 class Channel < ApplicationRecord
+    include Channelable
+    
     belongs_to :user
 
+    has_one_attached :visual
     has_many :pieces
     has_many :subscriptions, dependent: :destroy
     has_many :subscribers, through: :subscriptions, source: :user

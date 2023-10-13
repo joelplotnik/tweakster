@@ -91,7 +91,7 @@ class Api::V1::UsersController < ApplicationController
       end
     else
       if user.update(user_params) 
-        user_serializer = UserSerializer.new(@user).serializable_hash[:data][:attributes]
+        user_serializer = UserSerializer.new(user).serializable_hash[:data][:attributes]
         render json: user_serializer, status: :ok
       else
         render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
