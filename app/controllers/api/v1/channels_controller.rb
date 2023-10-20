@@ -1,6 +1,7 @@
 class Api::V1::ChannelsController < ApplicationController
   include Channelable
   include Userable
+  include Pieceable
 
     load_and_authorize_resource
     before_action :authenticate_user!, except: [:index, :show, :search]
@@ -11,13 +12,13 @@ class Api::V1::ChannelsController < ApplicationController
 
     def index
         channels = Channel.paginate(page: params[:page], per_page: 25).order(created_at: :asc).map do |channel|
-            { id: channel.id, name: channel.name, subscriptions_count: channel.subscriptions_count }
+            { id: channel.id, name: channel.name, subscriptions_count: channel.subscriptions_count, visual_url: channel.visual_url, }
         end
         render json: channels
     end
 
     def search
-        search_term = params[:search_term].dncase.strip 
+        search_term = params[:search_term].downcase.strip 
         channels = Channel.where('LOWER(name) LIKE ?', "#{search_term}%")
       
         channels = channels
@@ -27,6 +28,7 @@ class Api::V1::ChannelsController < ApplicationController
             {
               id: channel.id,
               name: channel.name,
+              visual_url: channel.visual_url,
               subscriptions_count: channel.subscriptions_count
             }
           end
@@ -42,6 +44,8 @@ class Api::V1::ChannelsController < ApplicationController
           .paginate(page: params[:page], per_page: 5)
           .map do |piece|
             image_urls = piece.images.map { |image| url_for(image) }
+
+            parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
       
             piece_json = piece.as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id, 
               :comments_count, :tweaks_count, :youtube_url],
@@ -52,6 +56,7 @@ class Api::V1::ChannelsController < ApplicationController
               })
       
             piece_json['images'] = image_urls
+            piece_json['parent_piece'] = parent_piece_info
       
             piece_json
           end

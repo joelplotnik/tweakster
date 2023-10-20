@@ -23,6 +23,8 @@ class Api::V1::PiecesController < ApplicationController
 
     comments_count = piece.comments.count
     image_urls = piece.images.map { |image| url_for(image) }
+
+    parent_piece = get_parent_piece_info(piece.parent_piece_id)
   
     render json: piece.as_json(include: {
       user: { only: [:id, :username], methods: [:avatar_url] },
@@ -30,7 +32,8 @@ class Api::V1::PiecesController < ApplicationController
       votes: { only: [:user_id, :vote_type] }
     }).merge({ 
       comments_count: comments_count,
-      images: image_urls
+      images: image_urls,
+      parent_piece: parent_piece,
      })
   end
 
@@ -113,6 +116,6 @@ class Api::V1::PiecesController < ApplicationController
   private
 
   def piece_params
-    params.require(:piece).permit(:title, :content, :youtube_url, images: [])
+    params.require(:piece).permit(:title, :content, :youtube_url, :parent_piece_id,  images: [])
   end
 end

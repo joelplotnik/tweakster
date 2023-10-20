@@ -1,5 +1,6 @@
 class Api::V1::UsersController < ApplicationController
   include Userable
+  include Pieceable
 
   load_and_authorize_resource
   before_action :authenticate_user!, only: [:update, :destroy, :check_ownership]
@@ -26,8 +27,8 @@ class Api::V1::UsersController < ApplicationController
         {
           id: user.id,
           username: user.username,
+          avatar_url: user.avatar_url,
           piece_count: user.pieces.count,
-          avatar_url: user.avatar_url
         }
       end
   
@@ -40,8 +41,10 @@ class Api::V1::UsersController < ApplicationController
     per_page = params[:per_page] || 5
     pieces = user.pieces.includes(:channel, :votes)
     
-    pieces_with_images = pieces.paginate(page: page, per_page: per_page).order(created_at: :desc).map do |piece|
+    pieces_info = pieces.paginate(page: page, per_page: per_page).order(created_at: :desc).map do |piece|
       image_urls = piece.images.map { |image| url_for(image) }
+
+      parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
    
       piece_json = piece.as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id, 
         :comments_count, :tweaks_count, :youtube_url],
@@ -52,6 +55,7 @@ class Api::V1::UsersController < ApplicationController
                                  })
   
       piece_json['images'] = image_urls
+      piece_json['parent_piece'] = parent_piece_info
   
       piece_json
     end
@@ -62,7 +66,7 @@ class Api::V1::UsersController < ApplicationController
       email: user.email,
       purity: user.purity,
       avatar_url: user.avatar_url,
-      pieces: pieces_with_images
+      pieces: pieces_info
     }
   
     if current_user

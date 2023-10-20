@@ -44,6 +44,10 @@ channels = []
     user_id: user.id
   )
   channels << channel
+
+  # Attach a visual representation to the channel
+  visual_url = Faker::LoremFlickr.image(size: '300x300')
+  channel.visual.attach(io: URI.open(visual_url), filename: 'channel_visual.png')
 end
 
 # Create Subscriptions
