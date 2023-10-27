@@ -44,8 +44,10 @@ Rails.application.routes.draw do
 
         post 'subscribe', to: 'subscriptions#create'
         delete 'unsubscribe', to: 'subscriptions#destroy'
-
+        get 'check_channel_subscription', to: 'subscriptions#check_channel_subscription'
       end
+
+      resources :subscriptions, only: [:index]
     end
   end
 end

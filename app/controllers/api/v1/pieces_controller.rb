@@ -62,25 +62,29 @@ class Api::V1::PiecesController < ApplicationController
   end
 
   def create
-    piece = Piece.new(piece_params.except(:images))
+    channel = Channel.find(params[:channel_id])
+    if current_user.subscriptions.exists?(channel: channel)
+      piece = Piece.new(piece_params.except(:images))
+      sanitized_content = sanitize_rich_content(params[:piece][:content])
+      piece.content = sanitized_content
 
-    sanitized_content = sanitize_rich_content(params[:piece][:content])
-    piece.content = sanitized_content
-
-    images = params[:piece][:images]
-    if images
-      images.each do |image|
-        piece.images.attach(image)
+      images = params[:piece][:images]
+      if images
+        images.each do |image|
+          piece.images.attach(image)
+        end
       end
-    end
 
-    piece.user = current_user
-    piece.channel_id = params[:channel_id]
+      piece.user = current_user
+      piece.channel_id = params[:channel_id]
 
-    if piece.save
-      render json: piece, include: { user: { only: [:id, :username] } }, status: :created
+      if piece.save
+        render json: piece, include: { user: { only: [:id, :username] } }, status: :created
+      else
+        render json: { errors: piece.errors.full_messages }, status: :unprocessable_entity
+      end
     else
-      render json: { errors: piece.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: 'Access denied. You must be subscribed to the channel or an admin to create a piece.' }, status: :forbidden
     end
   end
 
