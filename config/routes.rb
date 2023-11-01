@@ -8,6 +8,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       root 'home#index'
 
+      get 'mischief_makers', to: 'home#mischief_makers'
+
       resources :users, only: [:show, :index, :update, :destroy] do
         member do
           get 'check_ownership'
@@ -47,7 +49,11 @@ Rails.application.routes.draw do
         get 'check_channel_subscription', to: 'subscriptions#check_channel_subscription'
       end
 
-      resources :subscriptions, only: [:index]
+      resources :subscriptions, only: [:index] do
+        collection do
+          get 'subscribed_pieces', to: 'subscriptions#subscribed_pieces'
+        end
+      end
     end
   end
 end
