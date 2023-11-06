@@ -41,7 +41,7 @@ class Api::V1::ChannelsController < ApplicationController
       
         pieces_with_images = channel.pieces
           .order(created_at: :desc)
-          .paginate(page: params[:page], per_page: 5)
+          .paginate(page: params[:page], per_page: 10)
           .map do |piece|
             image_urls = piece.images.map { |image| url_for(image) }
 

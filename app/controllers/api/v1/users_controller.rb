@@ -38,7 +38,7 @@ class Api::V1::UsersController < ApplicationController
   def show
     user = User.find(params[:id])
     page = params[:page] || 1
-    per_page = params[:per_page] || 5
+    per_page = params[:per_page] || 10
     pieces = user.pieces.includes(:channel, :votes)
     
     pieces_info = pieces.paginate(page: page, per_page: per_page).order(created_at: :desc).map do |piece|
@@ -79,29 +79,29 @@ class Api::V1::UsersController < ApplicationController
   def update
     user = User.find(params[:id])
   
-    if params[:user][:avatar].present?
-      user.avatar.attach(params[:user][:avatar])
-    end
+    if user.valid_password?(params[:user][:password])
+      if params[:user][:avatar].present?
+        user.avatar.attach(params[:user][:avatar])
+      end
   
-    if params[:user][:new_password].present? 
-      if user.valid_password?(params[:user][:password]) 
-        if user.update(password: params[:user][:new_password]) 
+      if params[:user][:new_password].present?
+        if user.update(password: params[:user][:new_password])
           render json: user, status: :ok
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
         end
       else
-        render json: { error: 'Invalid password' }, status: :unauthorized
+        if user.update(user_params)
+          user_serializer = UserSerializer.new(user).serializable_hash[:data][:attributes]
+          render json: user_serializer, status: :ok
+        else
+          render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+        end
       end
     else
-      if user.update(user_params) 
-        user_serializer = UserSerializer.new(user).serializable_hash[:data][:attributes]
-        render json: user_serializer, status: :ok
-      else
-        render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
-      end
+      render json: { error: 'Invalid password' }, status: :unauthorized
     end
-  end
+  end  
 
   def destroy
     user = User.find(params[:id])
