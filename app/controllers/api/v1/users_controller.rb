@@ -46,7 +46,7 @@ class Api::V1::UsersController < ApplicationController
 
       parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
    
-      piece_json = piece.as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id, 
+      piece_json = piece.as_json(only: [:id, :title, :parent_piece_id, :content, :created_at, :likes, :dislikes, :channel_id, 
         :comments_count, :tweaks_count, :youtube_url],
                                  include: {
                                     user: { only: [:id, :username], methods: [:avatar_url]},
@@ -64,9 +64,12 @@ class Api::V1::UsersController < ApplicationController
       id: user.id,
       username: user.username,
       email: user.email,
-      purity: user.purity,
+      url: user.url,
+      bio: user.bio,
+      integrity: user.integrity,
       avatar_url: user.avatar_url,
-      pieces: pieces_info
+      pieces: pieces_info,
+      piece_count: pieces.count
     }
   
     if current_user
@@ -123,6 +126,6 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:avatar, :username, :email, :password, :new_password)
+    params.require(:user).permit(:avatar, :username, :email, :url, :bio, :password, :new_password)
   end 
 end

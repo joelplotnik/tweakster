@@ -13,10 +13,13 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :database_authenticatable, :jwt_authenticatable, 
          jwt_revocation_strategy: self
+
   validates :username, presence: true, 
          uniqueness: { case_sensitive: false }, 
          length: { minimum: 2, maximum: 25 },
          format: { with: /^[a-zA-Z0-9_\.]*$/, multiline: true }
+  validates :url, allow_blank: true, length: { minimum: 7, maximum: 74 }
+  validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
 
   ROLES = %w{admin moderator advertiser user}
   
@@ -51,5 +54,14 @@ class User < ApplicationRecord
          
   def jwt_payload
     super.merge({ username: self.username, role: self.role }) 
+  end
+
+  before_validation :strip_whitespace
+
+  private
+  
+  def strip_whitespace
+    self.url&.strip!
+    self.bio&.strip!
   end
 end

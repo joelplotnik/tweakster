@@ -11,7 +11,7 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def index
-        channels = Channel.paginate(page: params[:page], per_page: 25).order(created_at: :asc).map do |channel|
+        channels = Channel.paginate(page: params[:page], per_page: 25).order(subscriptions_count: :desc).map do |channel|
             { id: channel.id, name: channel.name, subscriptions_count: channel.subscriptions_count, visual_url: channel.visual_url, }
         end
         render json: channels
@@ -38,7 +38,11 @@ class Api::V1::ChannelsController < ApplicationController
       
     def show
         channel = Channel.includes(pieces: [:user, :votes]).find(params[:id])
-      
+
+        most_popular_channel = Channel.order(subscriptions_count: :desc).first
+        popularity_percentage = (channel.subscriptions_count.to_f / most_popular_channel.subscriptions_count) * 100
+        rounded_popularity_percentage = popularity_percentage.round
+
         pieces_with_images = channel.pieces
           .order(created_at: :desc)
           .paginate(page: params[:page], per_page: 10)
@@ -47,7 +51,7 @@ class Api::V1::ChannelsController < ApplicationController
 
             parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
       
-            piece_json = piece.as_json(only: [:id, :title, :content, :created_at, :likes, :dislikes, :channel_id, 
+            piece_json = piece.as_json(only: [:id, :title, :parent_piece_id, :content, :created_at, :likes, :dislikes, :channel_id, 
               :comments_count, :tweaks_count, :youtube_url],
               include: {
                 channel: {only: [:id, :name]},
@@ -77,6 +81,8 @@ class Api::V1::ChannelsController < ApplicationController
           },
           subscriber_count: channel.subscribers.count,
           pieces: pieces_with_images,
+          piece_count: channel.pieces.count,
+          popularity: rounded_popularity_percentage
         }
 
         if current_user
@@ -116,13 +122,18 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def destroy
-        channel = Channel.find(params[:id])
-
-        if channel.destroy
-            render json: { message: 'Channel deleted successfully' }
-        else
-            render json: { error: 'Unable to delete the channel' }, status: :unprocessable_entity
-        end
+      channel = Channel.find(params[:id])
+    
+      unless current_user.admin?
+        render json: { error: 'Permission denied. Only admins can delete channels.' }, status: :unauthorized
+        return
+      end
+    
+      if channel.destroy
+        render json: { message: 'Channel deleted successfully' }
+      else
+        render json: { error: 'Unable to delete the channel' }, status: :unprocessable_entity
+      end
     end
 
     def check_ownership
