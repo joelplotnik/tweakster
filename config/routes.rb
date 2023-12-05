@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       resources :users, only: [:show, :index, :update, :destroy] do
         member do
           get 'check_ownership'
+          post 'follow', to: 'relationships#create'
+          delete 'unfollow', to: 'relationships#destroy'
         end
         
         collection do

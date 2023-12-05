@@ -68,14 +68,16 @@ class Api::V1::UsersController < ApplicationController
       bio: user.bio,
       integrity: user.integrity,
       avatar_url: user.avatar_url,
+      follower_count: user.following_users.count,
       pieces: pieces_info,
       piece_count: pieces.count
     }
   
     if current_user
       user_data['can_edit'] = current_user.id == user.id || current_user.admin?
+      user_data['following'] = current_user.followees.exists?(user.id)
     end
-  
+    
     render json: user_data
   end  
 
