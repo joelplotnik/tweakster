@@ -56,10 +56,11 @@ class Api::V1::HomeController < ApplicationController
         .where(votes: { votable_type: 'Piece' })
         .where('votes.created_at >= ? AND votes.created_at < ?', target_day.beginning_of_day, (target_day + 1.day).beginning_of_day)
         .group('pieces.id')
-        .order('SUM(votes.vote_type) DESC')
+        .having('COUNT(votes.vote_type) > 0') 
+        .order('COUNT(votes.vote_type) DESC') 
         .limit(4 - pieces_with_images.length)
   
-      pieces = pieces.select { |piece| piece.images.attached? && !added_piece_ids.include?(piece.id) }
+      pieces = pieces.where('EXISTS (SELECT 1 FROM active_storage_attachments WHERE record_id = pieces.id AND record_type = "Piece")')
   
       pieces.each do |piece|
         added_piece_ids << piece.id

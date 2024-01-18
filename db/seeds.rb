@@ -1,17 +1,22 @@
 # Create Users
 users = []
 20.times do
-  user = User.create!(
-    email: Faker::Internet.email,
-    password: 'Password11!!',
-    username: Faker::Internet.username
-  )
+  begin
+    user = User.create!(
+      email: Faker::Internet.email,
+      password: 'Password11!!',
+      username: Faker::Internet.username
+    )
   
-  # Attach an avatar image to the user
-  avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
-  user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
+    # Attach an avatar image to the user
+    avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
+    user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
   
-  users << user
+    users << user
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error: #{e.message}. Skipping this user."
+    # Log or handle the validation error as needed
+  end
 end
 
 # Create Admin User
@@ -30,25 +35,31 @@ users << admin_user
 # Create Channels
 channels = []
 20.times do
-  user = users.sample
-  channel_name = ''
-  loop do
-    channel_name = Faker::Hipster.unique.word
-    break if channel_name.length >= 3
-  end
-  channel = Channel.create!(
-    name: channel_name,
-    url: Faker::Internet.url,
-    summary: Faker::Lorem.paragraph_by_chars(number: 100),
-    protocol: Faker::Lorem.paragraph_by_chars(number: 100),
-    user_id: user.id
-  )
-  channels << channel
+  begin
+    user = users.sample
+    channel_name = ''
+    loop do
+      channel_name = Faker::Hipster.unique.word
+      break if channel_name.length >= 3
+    end
+    channel = Channel.create!(
+      name: channel_name,
+      url: Faker::Internet.url,
+      summary: Faker::Lorem.paragraph_by_chars(number: 100),
+      protocol: Faker::Lorem.paragraph_by_chars(number: 100),
+      user_id: user.id
+    )
+    channels << channel
 
-  # Attach a visual representation to the channel
-  visual_url = Faker::LoremFlickr.image(size: '300x300')
-  channel.visual.attach(io: URI.open(visual_url), filename: 'channel_visual.png')
+    # Attach a visual representation to the channel
+    visual_url = Faker::LoremFlickr.image(size: '300x300')
+    channel.visual.attach(io: URI.open(visual_url), filename: 'channel_visual.png')
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Channel: #{e.message}. Skipping this channel."
+    # Log or handle the validation error as needed
+  end
 end
+
 
 # Create Subscriptions
 subscriptions_count = 50
