@@ -5,7 +5,9 @@ users = []
     user = User.create!(
       email: Faker::Internet.email,
       password: 'Password11!!',
-      username: Faker::Internet.username
+      username: Faker::Internet.username,
+      url: Faker::Internet.url,
+      bio: Faker::Lorem.paragraph_by_chars(number: 100),
     )
   
     # Attach an avatar image to the user
@@ -24,7 +26,9 @@ admin_user = User.create!(
   email: 'superadmin@example.com',
   password: 'Password11!!',
   username: 'superadmin',
-  role: 'admin'
+  role: 'admin',
+  url: Faker::Internet.url,
+  bio: Faker::Lorem.paragraph_by_chars(number: 100),
 )
 
 avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
@@ -74,6 +78,23 @@ subscriptions_count.times do
     channel_id: channel.id
   )
 end
+
+# Create Relationships 
+relationships_count = 5
+
+users.each do |follower|
+  relationships_count.times do
+    followee = users.reject { |user| user == follower }.sample
+
+    next if Relationship.exists?(follower_id: follower.id, followee_id: followee.id)
+
+    Relationship.create!(
+      follower_id: follower.id,
+      followee_id: followee.id
+    )
+  end
+end
+
 
 # Assign Pieces to Users and Channels
 piece_count = 50
