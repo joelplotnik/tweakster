@@ -80,7 +80,4 @@ class Api::V1::HomeController < ApplicationController
   
     render json: pieces_with_images, include: { user: { only: [:id, :username] } }
   end
-  
-  
-  
 end

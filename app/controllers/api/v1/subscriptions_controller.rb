@@ -81,6 +81,16 @@ class Api::V1::SubscriptionsController < ApplicationController
         render json: { message: 'Access denied' }, status: :forbidden
       end
     end
+
+    def check_user_subscriptions
+      user = current_user
+  
+      if user.subscriptions.present?
+        render json: { hasSubscriptions: true }, status: :ok
+      else
+        render json: { hasSubscriptions: false }, status: :ok
+      end
+    end
   
     private
   

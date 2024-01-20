@@ -54,6 +54,7 @@ Rails.application.routes.draw do
       resources :subscriptions, only: [:index] do
         collection do
           get 'subscribed_pieces', to: 'subscriptions#subscribed_pieces'
+          get 'check_user_subscriptions', to: 'subscriptions#check_user_subscriptions'
         end
       end
     end

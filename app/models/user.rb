@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
   include Userable
+
+  before_save :calculate_integrity
   
   has_one_attached :avatar
   has_many :subscriptions, dependent: :destroy
