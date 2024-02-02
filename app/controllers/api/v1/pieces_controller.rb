@@ -51,11 +51,18 @@ class Api::V1::PiecesController < ApplicationController
 
     tweaks_with_images = paginated_tweaks.map do |tweak|
       image_urls = tweak.images.map { |image| url_for(image) }
-      tweak.as_json(include: {
+
+      highest_scoring_tweak_info = get_highest_scoring_tweak_piece(tweak)
+
+      tweak_json = tweak.as_json(include: {
         user: { only: [:id, :username], methods: [:avatar_url] },
-        channel: { only: [ :id, :name] },
+        channel: { only: [:id, :name] },
         votes: { only: [:user_id, :vote_type] }
       }).merge(images: image_urls)
+
+      tweak_json.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
+
+      tweak_json
     end
   
     render json: tweaks_with_images

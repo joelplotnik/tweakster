@@ -18,6 +18,7 @@ class Api::V1::HomeController < ApplicationController
       image_urls = piece.images.map { |image| url_for(image) }
   
       parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
+      
       highest_scoring_tweak_info = get_highest_scoring_tweak_piece(piece)
   
       piece_data = piece.as_json(include: {
