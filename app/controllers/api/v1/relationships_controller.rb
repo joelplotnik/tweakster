@@ -3,13 +3,18 @@ class Api::V1::RelationshipsController < ApplicationController
 
   def create
     user_to_follow = User.find(params[:id])
-    relationship = Relationship.find_by(follower: current_user, followee: user_to_follow)
 
-    if relationship
-      render json: { message: "You are already following #{user_to_follow.username}" }
+    if current_user == user_to_follow
+      render json: { error: "You cannot follow yourself." }, status: :unprocessable_entity
     else
-      Relationship.create(follower: current_user, followee: user_to_follow)
-      render json: { message: "You are now following #{user_to_follow.username}" }
+      relationship = Relationship.find_by(follower: current_user, followee: user_to_follow)
+
+      if relationship
+        render json: { message: "You are already following #{user_to_follow.username}" }
+      else
+        Relationship.create(follower: current_user, followee: user_to_follow)
+        render json: { message: "You are now following #{user_to_follow.username}" }
+      end
     end
   end
 
