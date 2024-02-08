@@ -7,6 +7,12 @@ module Pieceable
       likes - dislikes
     end
 
+    def calculate_piece_votes(piece)
+      likes = piece.likes
+      dislikes = piece.dislikes
+      likes + dislikes
+    end
+
     def get_parent_piece_info(parent_piece_id)
       if parent_piece_id
         parent_piece_data = Piece.find(parent_piece_id)
@@ -29,12 +35,13 @@ module Pieceable
 
     def get_highest_scoring_tweak_piece(piece)
       parent_score = calculate_piece_score(piece)
-      
+      parent_votes = calculate_piece_votes(piece)
+  
       highest_score_tweaked_piece = Piece.where(parent_piece_id: piece.id)
                                         .select { |tweaked_piece| calculate_piece_score(tweaked_piece) > parent_score }
                                         .max_by { |tweaked_piece| calculate_piece_score(tweaked_piece) }
-      
-      if highest_score_tweaked_piece
+  
+      if highest_score_tweaked_piece && calculate_piece_votes(highest_score_tweaked_piece) >= parent_votes
         {
           user: {
             username: highest_score_tweaked_piece.user.username,
@@ -48,6 +55,5 @@ module Pieceable
         {}
       end
     end    
-    
 end
   

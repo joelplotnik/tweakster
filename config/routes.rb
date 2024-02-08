@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       root 'home#index'
 
       get 'mischief_makers', to: 'home#mischief_makers'
+      get 'personal_feed', to: 'home#personal_feed'
 
       resources :users, only: [:show, :index, :update, :destroy] do
         member do
@@ -53,7 +54,6 @@ Rails.application.routes.draw do
 
       resources :subscriptions, only: [:index] do
         collection do
-          get 'subscribed_pieces', to: 'subscriptions#subscribed_pieces'
           get 'check_user_subscriptions', to: 'subscriptions#check_user_subscriptions'
         end
       end

@@ -33,7 +33,6 @@ class Api::V1::HomeController < ApplicationController
         parent_piece: parent_piece_info
       })
   
-      # Include higher scoring tweak data only when it exists for this specific piece
       piece_data.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
   
       piece_data
@@ -42,9 +41,54 @@ class Api::V1::HomeController < ApplicationController
     render json: pieces_with_images
   end
 
+  def personal_feed
+    user = current_user
+    
+    subscribed_channels = user.subscriptions.map(&:channel)
+    
+    channel_pieces = Piece.where(channel: subscribed_channels)
+    followee_pieces = Piece.where(user_id: user.followees.pluck(:id))
+    
+    all_personal_pieces = (channel_pieces + followee_pieces).uniq
+    
+    sorted_personal_pieces = if params[:sort] == 'new'
+      all_personal_pieces.order(created_at: :desc)
+    else
+      all_personal_pieces.sort_by { |piece| calculate_piece_score(piece) }.reverse
+    end
+    
+    paginated_personal_pieces = sorted_personal_pieces.paginate(page: params[:page], per_page: 10)
+    
+    pieces_with_images = paginated_personal_pieces.map do |piece|
+      image_urls = piece.images.map { |image| url_for(image) }
+      
+      parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
+      
+      piece_data = piece.as_json(include: {
+        user: {
+          only: [:id, :username],
+          methods: [:avatar_url] 
+        },
+        channel: { only: [:id, :name] },
+        votes: { only: [:user_id, :vote_type] }
+      }).merge({ 
+        images: image_urls,
+        parent_piece: parent_piece_info
+      })
+      
+      highest_scoring_tweak_info = get_highest_scoring_tweak_piece(piece)
+      
+      piece_data.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
+      
+      piece_data
+    end
+    
+    render json: pieces_with_images
+  end    
+
   def mischief_makers
-    pieces_with_images = [] # Initialize an array to store pieces with images.
-    added_piece_ids = Set.new # Track added piece IDs
+    pieces_with_images = [] 
+    added_piece_ids = Set.new 
   
     current_day = Date.current
     days_to_look_back = 0
@@ -73,7 +117,7 @@ class Api::V1::HomeController < ApplicationController
           votes: { only: [:user_id, :vote_type] }
         }).merge(images: image_urls)
   
-        break if pieces_with_images.length >= 4 # Break the loop if we have enough pieces
+        break if pieces_with_images.length >= 4 
       end
   
       days_to_look_back += 1
