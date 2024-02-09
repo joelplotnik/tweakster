@@ -187,7 +187,6 @@ GEM
     sanitize (6.1.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    sqlite3 (1.6.3-x86_64-darwin)
     thor (1.2.2)
     timeout (0.4.0)
     tzinfo (2.0.6)
@@ -223,7 +222,6 @@ DEPENDENCIES
   rack-cors
   rails (~> 7.0.4, >= 7.0.4.3)
   sanitize
-  sqlite3 (~> 1.4)
   tzinfo-data
   will_paginate (~> 3.3)
 

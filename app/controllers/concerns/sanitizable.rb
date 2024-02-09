@@ -2,6 +2,9 @@ module Sanitizable
     extend ActiveSupport::Concern
   
     def sanitize_rich_content(content)
+      # Remove <p><br></p> pattern
+      content.gsub!(/<p>\s*<br\s*\/?>\s*<\/p>/, '')
+
       config = Sanitize::Config.merge(
         Sanitize::Config::RELAXED,
         attributes: {
