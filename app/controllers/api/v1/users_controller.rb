@@ -91,6 +91,8 @@ class Api::V1::UsersController < ApplicationController
     if user.valid_password?(params[:user][:password])
       if params[:user][:avatar].present?
         user.avatar.attach(params[:user][:avatar])
+      elsif params[:user][:remove_avatar] == 'true' 
+        user.avatar.purge
       end
   
       if params[:user][:new_password].present?
