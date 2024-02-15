@@ -115,6 +115,8 @@ class Api::V1::ChannelsController < ApplicationController
   
       if params[:channel][:visual].present?
         channel.visual.attach(params[:channel][:visual])
+      elsif params[:channel][:remove_visual] == 'true' 
+        channel.visual.purge
       end
   
       if channel.update(channel_params)
