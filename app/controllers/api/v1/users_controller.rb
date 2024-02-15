@@ -88,7 +88,7 @@ class Api::V1::UsersController < ApplicationController
   def update
     user = User.find(params[:id])
   
-    if user.valid_password?(params[:user][:password])
+    if current_user.admin?
       if params[:user][:avatar].present?
         user.avatar.attach(params[:user][:avatar])
       elsif params[:user][:remove_avatar] == 'true' 
@@ -97,22 +97,44 @@ class Api::V1::UsersController < ApplicationController
   
       if params[:user][:new_password].present?
         if user.update(password: params[:user][:new_password])
-          render json: user, status: :ok
+          render_updated_user(user)
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
         end
       else
-        if user.update(user_params)
-          user_serializer = UserSerializer.new(user).serializable_hash[:data][:attributes]
-          render json: user_serializer, status: :ok
+        if user.update(user_params.except(:password, :new_password))
+          render_updated_user(user)
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
         end
       end
     else
-      render json: { error: 'Invalid password' }, status: :unauthorized
+      if user.valid_password?(params[:user][:password])
+        if params[:user][:avatar].present?
+          user.avatar.attach(params[:user][:avatar])
+        elsif params[:user][:remove_avatar] == 'true' 
+          user.avatar.purge
+        end
+    
+        if params[:user][:new_password].present?
+          if user.update(password: params[:user][:new_password])
+            render_updated_user(user)
+          else
+            render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+          end
+        else
+          if user.update(user_params.except(:password, :new_password))
+            render_updated_user(user)
+          else
+            render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+          end
+        end
+      else
+        render json: { error: 'Invalid password' }, status: :unauthorized
+      end
     end
-  end  
+  end
+  
 
   def destroy
     user = User.find(params[:id])
@@ -136,4 +158,9 @@ class Api::V1::UsersController < ApplicationController
   def user_params
     params.require(:user).permit(:avatar, :username, :email, :url, :bio, :password, :new_password)
   end 
+
+  def render_updated_user(user)
+    user_serializer = UserSerializer.new(user).serializable_hash[:data][:attributes]
+    render json: user_serializer, status: :ok
+  end
 end
