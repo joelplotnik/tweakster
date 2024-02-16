@@ -20,6 +20,7 @@ Rails.application.routes.draw do
         
         collection do
           get 'search', to: 'users#search'
+          get 'popular', to: 'users#popular'
         end
       end
 
@@ -30,6 +31,7 @@ Rails.application.routes.draw do
 
         collection do
           get 'search', to: 'channels#search'
+          get 'popular', to: 'channels#popular'
         end
 
         resources :pieces, only: [:show, :index, :create, :update, :destroy] do

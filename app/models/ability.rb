@@ -6,9 +6,11 @@ class Ability
   def initialize(user)
     can :read, [User, Piece, Channel, Subscription, Comment, Vote] # allow users to view resources
 
-    can :search, User # allow users to view resources
-    can :search, Channel # allow users to search for users
-    can :tweaks, Piece  # allow users to search for channels
+    can :search, User # allow users to search for users
+    can :popular, User # allow users to view popular users
+    can :search, Channel # allow users to search for channels
+    can :popular, Channel # allow users to view popular channels
+    can :tweaks, Piece  # allow users to view tweaks
 
     return unless user.present?  # additional permissions for logged in users
     can :manage, Piece, user: user # user can manage their own pieces

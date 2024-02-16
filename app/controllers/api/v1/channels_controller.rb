@@ -4,7 +4,7 @@ class Api::V1::ChannelsController < ApplicationController
   include Pieceable
 
     load_and_authorize_resource
-    before_action :authenticate_user!, except: [:index, :show, :search]
+    before_action :authenticate_user!, except: [:index, :show, :search, :popular]
 
     rescue_from CanCan::AccessDenied do |exception|
         render json: { warning: exception }, status: :unauthorized
@@ -15,6 +15,48 @@ class Api::V1::ChannelsController < ApplicationController
             { id: channel.id, name: channel.name, subscriptions_count: channel.subscriptions_count, visual_url: channel.visual_url, }
         end
         render json: channels
+    end
+
+    def popular
+      channels = Channel.includes(pieces: [:votes, :comments]).all
+    
+      channel_popularity_scores = Hash.new(0)
+    
+      channels.each do |channel|
+        score = 0
+        score += channel.pieces.where("created_at >= ?", Date.today).count
+        score += channel.pieces.map { |piece| piece.comments.where("created_at >= ?", Date.today).count }.sum
+        score += channel.pieces.map { |piece| piece.votes.where("created_at >= ?", Date.today).count }.sum
+        channel_popularity_scores[channel] = score
+      end
+    
+      sorted_channels = channel_popularity_scores.sort_by { |_, score| score }.reverse
+    
+      top_channels = []
+    
+      sorted_channels.each do |channel, _|
+        top_channels << {
+          id: channel.id,
+          name: channel.name,
+          subscriptions_count: channel.subscriptions_count,
+          visual_url: channel.visual_url
+        }
+        break if top_channels.size == 10
+      end
+    
+      if top_channels.size < 10
+        remaining_channels = Channel.limit(10 - top_channels.size).order(subscriptions_count: :desc)
+        remaining_channels.each do |channel|
+          top_channels << {
+            id: channel.id,
+            name: channel.name,
+            subscriptions_count: channel.subscriptions_count,
+            visual_url: channel.visual_url
+          }
+        end
+      end
+    
+      render json: top_channels
     end
 
     def search

@@ -16,6 +16,50 @@ class Api::V1::UsersController < ApplicationController
     render json: users
   end
 
+  def popular
+    users = User.includes(:pieces => [:votes, :comments]).all
+  
+    user_popularity_scores = Hash.new(0)
+  
+    users.each do |user|
+      score = 0
+      user.pieces.each do |piece|
+        score += piece.comments.where("created_at >= ?", Date.today).count
+        score += piece.votes.where("created_at >= ?", Date.today).count
+      end
+      user_popularity_scores[user] = score
+    end
+  
+    sorted_users = user_popularity_scores.sort_by { |_, score| score }.reverse
+  
+    top_users = []
+  
+    sorted_users.each do |user, _|
+      top_users << {
+        id: user.id,
+        username: user.username,
+        piece_count: user.pieces.count,
+        avatar_url: user.avatar_url
+      }
+      break if top_users.size == 10
+    end
+  
+    if top_users.size < 10
+      remaining_users = User.limit(10 - top_users.size).order(follower_count: :desc)
+      remaining_users.each do |user|
+        top_users << {
+          id: user.id,
+          username: user.username,
+          piece_count: user.pieces.count,
+          avatar_url: user.avatar_url
+        }
+      end
+    end
+  
+    render json: top_users
+  end
+  
+
   def search
     search_term = params[:search_term].downcase.strip 
     users = User.where('LOWER(username) LIKE ?', "#{search_term}%")
