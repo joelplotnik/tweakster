@@ -3,7 +3,7 @@ class Api::V1::UsersController < ApplicationController
   include Pieceable
 
   load_and_authorize_resource
-  before_action :authenticate_user!, only: [:update, :destroy, :check_ownership]
+  before_action :authenticate_user!, only: [:update, :destroy, :top_subscribed_channels, :top_followed_users, :check_ownership]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
@@ -107,6 +107,28 @@ class Api::V1::UsersController < ApplicationController
   
       piece_json
     end
+
+    subscriptions = user.subscriptions.order(created_at: :desc).limit(5)
+    followees = user.followees.order('relationships.created_at DESC').limit(5)
+
+    subscriptions_info = subscriptions.map do |subscription|
+      {
+        id: subscription.id,
+        channel_id: subscription.channel_id,
+        channel_name: subscription.channel&.name,
+        visual_url: subscription.channel&.visual_url
+      }
+    end
+    
+    
+    followees_info = followees.map do |followee|
+      {
+        id: followee.id,
+        username: followee.username,
+        avatar_url: followee.avatar_url,
+      }
+    end
+    
   
     user_data = {
       id: user.id,
@@ -117,6 +139,8 @@ class Api::V1::UsersController < ApplicationController
       integrity: user.integrity,
       avatar_url: user.avatar_url,
       follower_count: user.following_users.count,
+      followees: followees_info,
+      subscriptions: subscriptions_info,
       pieces: pieces_info,
       piece_count: pieces.count
     }
@@ -178,6 +202,94 @@ class Api::V1::UsersController < ApplicationController
       end
     end
   end
+
+  def top_subscribed_channels
+    user = User.find(params[:id])
+
+    if !current_user.admin? && current_user != user
+      render json: { error: "Unauthorized" }, status: :unauthorized
+      return
+    end
+
+    subscribed_channels = user.subscriptions.includes(channel: { pieces: :comments })
+    
+    channel_comment_counts = {}
+
+    subscribed_channels.each do |subscription|
+      channel = subscription.channel
+      comment_count = channel.pieces.map { |piece| piece.comments.where(user_id: user.id).count }.sum
+      channel_comment_counts[channel] = comment_count
+    end
+  
+    sorted_channels = channel_comment_counts.sort_by { |_, count| count }.reverse.map do |channel, _|
+      {
+        id: channel.id,
+        name: channel.name,
+        subscriptions_count: channel.subscriptions_count,
+        visual_url: channel.visual_url,
+        comments_count: channel_comment_counts[channel]
+      }
+    end
+
+    top_5_channels = sorted_channels.slice(0, 5)
+  
+    render json: top_5_channels
+  end  
+
+  def top_followed_users
+    user = User.find(params[:id])
+  
+    if !current_user.admin? && current_user != user
+      render json: { error: "Unauthorized" }, status: :unauthorized
+      return
+    end
+  
+    followee_ids = user.followees.pluck(:id)
+  
+    commented_piece_ids = user.comments.pluck(:piece_id)
+    voted_piece_ids = user.votes.where(vote_type: 'upvote').pluck(:votable_id)
+    interacted_piece_ids = (commented_piece_ids + voted_piece_ids).uniq
+  
+    interacted_users = User.joins(pieces: :user)
+                            .where(pieces: { id: interacted_piece_ids })
+                            .where(users: { id: followee_ids })
+                            .distinct
+
+    if interacted_users.empty?
+      most_recently_followed_users = user.followees.order('relationships.created_at DESC').limit(5)
+      response_data = most_recently_followed_users.map do |u|
+        {
+          id: u.id,
+          username: u.username,
+          piece_count: u.pieces.count,
+          avatar_url: u.avatar_url
+        }
+      end
+      render json: response_data
+      return
+    end
+  
+    interacted_users = interacted_users.sort_by do |u|
+      latest_interaction_date = u.pieces.where(id: interacted_piece_ids).maximum(:created_at)
+      latest_interaction_date || u.created_at
+    end.reverse
+  
+    interacted_users.reject! { |u| u.id == user.id }
+  
+    top_5_users = interacted_users.take(5)
+  
+    response_data = top_5_users.map do |u|
+      {
+        id: u.id,
+        username: u.username,
+        piece_count: u.pieces.count,
+        avatar_url: u.avatar_url
+      }
+    end
+  
+    render json: response_data
+  end
+  
   
 
   def destroy

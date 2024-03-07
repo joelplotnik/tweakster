@@ -13,9 +13,11 @@ Rails.application.routes.draw do
 
       resources :users, only: [:show, :index, :update, :destroy] do
         member do
-          get 'check_ownership'
           post 'follow', to: 'relationships#create'
           delete 'unfollow', to: 'relationships#destroy'
+          get 'top_subscribed_channels'
+          get 'top_followed_users'
+          get 'check_ownership'
         end
         
         collection do
