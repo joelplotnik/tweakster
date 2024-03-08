@@ -205,36 +205,43 @@ class Api::V1::UsersController < ApplicationController
 
   def top_subscribed_channels
     user = User.find(params[:id])
-
+  
     if !current_user.admin? && current_user != user
       render json: { error: "Unauthorized" }, status: :unauthorized
       return
     end
-
-    subscribed_channels = user.subscriptions.includes(channel: { pieces: :comments })
+  
+    subscribed_channels = user.subscriptions.includes(channel: { pieces: [:comments, :votes] })
     
-    channel_comment_counts = {}
-
+    channel_interaction_counts = {}
+  
     subscribed_channels.each do |subscription|
       channel = subscription.channel
-      comment_count = channel.pieces.map { |piece| piece.comments.where(user_id: user.id).count }.sum
-      channel_comment_counts[channel] = comment_count
-    end
+      interaction_count = 0
   
-    sorted_channels = channel_comment_counts.sort_by { |_, count| count }.reverse.map do |channel, _|
+      channel.pieces.each do |piece|
+        interaction_count += piece.comments.where(user_id: user.id).count
+        interaction_count += piece.votes.where(user_id: user.id, vote_type: 'upvote').count
+      end
+  
+      channel_interaction_counts[channel] = interaction_count
+    end
+    
+    sorted_channels = channel_interaction_counts.sort_by { |_, count| count }.reverse.map do |channel, _|
       {
         id: channel.id,
         name: channel.name,
         subscriptions_count: channel.subscriptions_count,
         visual_url: channel.visual_url,
-        comments_count: channel_comment_counts[channel]
+        interactions_count: channel_interaction_counts[channel]
       }
     end
-
-    top_5_channels = sorted_channels.slice(0, 5)
   
+    top_5_channels = sorted_channels.slice(0, 5)
+    
     render json: top_5_channels
-  end  
+  end
+  
 
   def top_followed_users
     user = User.find(params[:id])
@@ -290,8 +297,6 @@ class Api::V1::UsersController < ApplicationController
     render json: response_data
   end
   
-  
-
   def destroy
     user = User.find(params[:id])
   
