@@ -30,5 +30,9 @@ class Ability
     can :manage, Subscription # admin can manage all subscriptions
     can :manage, Comment # admin can manage all comments
     can :manage, Vote, user: user # admin can manage their all comments
+
+    # Permissions for managing favorites
+    can :update_favorite_users, User
+    can :update_favorite_channels, User
   end
 end

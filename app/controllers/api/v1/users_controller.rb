@@ -3,7 +3,7 @@ class Api::V1::UsersController < ApplicationController
   include Pieceable
 
   load_and_authorize_resource
-  before_action :authenticate_user!, only: [:update, :destroy, :top_subscribed_channels, :top_followed_users, :check_ownership]
+  before_action :authenticate_user!, only: [:update, :destroy, :most_interacted_channels, :most_interacted_users, :update_favorite_users, :update_favorite_users, :subscriptions, :following, :check_ownership]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
@@ -17,10 +17,12 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def popular
+    limit = params[:limit] || 10 
+    
     users = User.includes(:pieces => [:votes, :comments]).all
-  
+    
     user_popularity_scores = Hash.new(0)
-  
+    
     users.each do |user|
       score = 0
       user.pieces.each do |piece|
@@ -29,11 +31,11 @@ class Api::V1::UsersController < ApplicationController
       end
       user_popularity_scores[user] = score
     end
-  
+    
     sorted_users = user_popularity_scores.sort_by { |_, score| score }.reverse
-  
+    
     top_users = []
-  
+    
     sorted_users.each do |user, _|
       top_users << {
         id: user.id,
@@ -41,11 +43,11 @@ class Api::V1::UsersController < ApplicationController
         piece_count: user.pieces.count,
         avatar_url: user.avatar_url
       }
-      break if top_users.size == 10
+      break if top_users.size == limit.to_i
     end
-  
-    if top_users.size < 10
-      remaining_users = User.limit(10 - top_users.size).order(follower_count: :desc)
+    
+    if top_users.size < limit.to_i
+      remaining_users = User.limit(limit.to_i - top_users.size).order(follower_count: :desc)
       remaining_users.each do |user|
         top_users << {
           id: user.id,
@@ -55,7 +57,7 @@ class Api::V1::UsersController < ApplicationController
         }
       end
     end
-  
+    
     render json: top_users
   end
   
@@ -107,28 +109,6 @@ class Api::V1::UsersController < ApplicationController
   
       piece_json
     end
-
-    subscriptions = user.subscriptions.order(created_at: :desc).limit(5)
-    followees = user.followees.order('relationships.created_at DESC').limit(5)
-
-    subscriptions_info = subscriptions.map do |subscription|
-      {
-        id: subscription.id,
-        channel_id: subscription.channel_id,
-        channel_name: subscription.channel&.name,
-        visual_url: subscription.channel&.visual_url
-      }
-    end
-    
-    
-    followees_info = followees.map do |followee|
-      {
-        id: followee.id,
-        username: followee.username,
-        avatar_url: followee.avatar_url,
-      }
-    end
-    
   
     user_data = {
       id: user.id,
@@ -139,18 +119,45 @@ class Api::V1::UsersController < ApplicationController
       integrity: user.integrity,
       avatar_url: user.avatar_url,
       follower_count: user.following_users.count,
-      followees: followees_info,
-      subscriptions: subscriptions_info,
+      favorite_users: [],
+      favorite_channels: [],
       pieces: pieces_info,
       piece_count: pieces.count
     }
-  
+
+    user_data[:favorite_users] = user.favorite_users.map do |favorite_user_id|
+      favorite_user = User.find_by(id: favorite_user_id)
+      if favorite_user
+        {
+          id: favorite_user.id,
+          username: favorite_user.username,
+          avatar_url: favorite_user.avatar_url
+        }
+      else
+        nil
+      end
+    end.compact
+
+    user_data[:favorite_channels] = user.favorite_channels.map do |favorite_channel_id|
+      favorite_channel = Channel.find_by(id: favorite_channel_id)
+      if favorite_channel
+        {
+          id: favorite_channel.id,
+          name: favorite_channel.name,
+          visual_url: favorite_channel.visual_url
+        }
+      else
+        nil
+      end
+    end.compact
+
     if current_user
       user_data['can_edit'] = current_user.id == user.id || current_user.admin?
       user_data['following'] = current_user.followees.exists?(user.id)
     end
-    
+
     render json: user_data
+
   end  
 
   def update
@@ -203,7 +210,7 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def top_subscribed_channels
+  def most_interacted_channels
     user = User.find(params[:id])
   
     if !current_user.admin? && current_user != user
@@ -241,9 +248,82 @@ class Api::V1::UsersController < ApplicationController
     
     render json: top_5_channels
   end
+
+  def subscriptions
+    user = User.find(params[:id])
+  
+    if !current_user.admin? && current_user != user
+      render json: { error: "Unauthorized" }, status: :unauthorized
+      return
+    end
+  
+    page = params[:page] || 1
+    per_page = params[:per_page] || 10
+  
+    subscriptions = user.subscriptions.includes(channel: :pieces)
+                                      .order(created_at: :desc)
+                                      .paginate(page: page, per_page: per_page)
+  
+    subscribed_channels = subscriptions.map do |subscription|
+      channel = subscription.channel
+      {
+        id: channel.id,
+        name: channel.name,
+        visual_url: channel.visual_url
+      }
+    end
+  
+    render json: subscribed_channels
+  end
+
+  def update_favorite_channels
+    user = User.find_by(id: params[:id])
+  
+    if !current_user.admin? && current_user != user
+      render json: { error: "Unauthorized" }, status: :unauthorized
+      return
+    end
+    
+    if user.present?
+      request_body = JSON.parse(request.body.read)
+      new_favorite_channels = request_body["favorite_channels"]
+  
+      new_favorite_channels ||= []
+  
+      new_favorite_channels = new_favorite_channels.uniq.reject { |id| id.blank? || !Channel.exists?(id: id) }
+      
+      if new_favorite_channels.empty?
+        user.favorite_channels = []
+      else
+        new_favorite_channels = new_favorite_channels.select { |id| user.subscriptions.exists?(channel_id: id) }
+        user.favorite_channels = new_favorite_channels
+      end
+  
+      if user.save
+        favorite_channels = user.favorite_channels.map do |favorite_channel_id|
+          favorite_channel = Channel.find_by(id: favorite_channel_id)
+          if favorite_channel
+            {
+              id: favorite_channel.id,
+              name: favorite_channel.name,
+              visual_url: favorite_channel.visual_url
+            }
+          else
+            nil
+          end
+        end.compact
+  
+        render json: { favorite_channels: favorite_channels }, status: :ok
+      else
+        render json: { error: "Failed to update favorite channels" }, status: :unprocessable_entity
+      end
+    else
+      render json: { error: "User not found" }, status: :not_found
+    end
+  end
   
 
-  def top_followed_users
+  def most_interacted_users
     user = User.find(params[:id])
   
     if !current_user.admin? && current_user != user
@@ -296,6 +376,74 @@ class Api::V1::UsersController < ApplicationController
   
     render json: response_data
   end
+
+  def following
+    user = User.find(params[:id])
+  
+    if !current_user.admin? && current_user != user
+      render json: { error: "Unauthorized" }, status: :unauthorized
+      return
+    end
+  
+    page = params[:page] || 1
+    per_page = params[:per_page] || 10
+  
+    followees = user.followees.order('relationships.created_at DESC')
+                               .paginate(page: page, per_page: per_page)
+  
+    followees_data = followees.map do |followee|
+      {
+        id: followee.id,
+        username: followee.username,
+        avatar_url: followee.avatar_url
+      }
+    end
+  
+    render json: followees_data
+  end
+
+  def update_favorite_users
+    user = User.find_by(id: params[:id])
+  
+    if !current_user.admin? && current_user != user
+      render json: { error: "Unauthorized" }, status: :unauthorized
+      return
+    end
+  
+    if user.present?
+      request_body = JSON.parse(request.body.read)
+      new_favorite_users = request_body["favorite_users"]
+  
+      new_favorite_users ||= []
+  
+      new_favorite_users = new_favorite_users.uniq.reject { |id| id.blank? || !User.exists?(id: id) }
+  
+      new_favorite_users = new_favorite_users.select { |id| user.followees.exists?(id: id) }
+  
+      user.favorite_users = new_favorite_users
+  
+      if user.save
+        favorite_users = user.favorite_users.map do |favorite_user_id|
+          favorite_user = User.find_by(id: favorite_user_id)
+          if favorite_user
+            {
+              id: favorite_user.id,
+              username: favorite_user.username,
+              avatar_url: favorite_user.avatar_url
+            }
+          else
+            nil
+          end
+        end.compact
+  
+        render json: { favorite_users: favorite_users }, status: :ok
+      else
+        render json: { error: "Failed to update favorite users" }, status: :unprocessable_entity
+      end
+    else
+      render json: { error: "User not found" }, status: :not_found
+    end
+  end
   
   def destroy
     user = User.find(params[:id])
@@ -317,7 +465,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:avatar, :username, :email, :url, :bio, :password, :new_password)
+    params.require(:user).permit(:avatar, :username, :email, :url, :bio, :password, :new_password, :favorite_users)
   end 
 
   def render_updated_user(user)

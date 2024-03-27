@@ -87,8 +87,8 @@ class Api::V1::HomeController < ApplicationController
   end    
 
   def mischief_makers
-    pieces_with_images = [] 
-    added_piece_ids = Set.new 
+    pieces_with_images = []
+    added_piece_ids = Set.new
   
     current_day = Date.current
     days_to_look_back = 0
@@ -101,23 +101,25 @@ class Api::V1::HomeController < ApplicationController
         .where(votes: { votable_type: 'Piece' })
         .where('votes.created_at >= ? AND votes.created_at < ?', target_day.beginning_of_day, (target_day + 1.day).beginning_of_day)
         .group('pieces.id')
-        .having('COUNT(votes.vote_type) > 0') 
-        .order('COUNT(votes.vote_type) DESC') 
+        .having('COUNT(votes.vote_type) > 0')
+        .order('COUNT(votes.vote_type) DESC')
         .limit(4 - pieces_with_images.length)
   
       pieces = pieces.where('EXISTS (SELECT 1 FROM active_storage_attachments WHERE record_id = pieces.id AND record_type = "Piece")')
   
       pieces.each do |piece|
-        added_piece_ids << piece.id
-        image_urls = piece.images.map { |image| url_for(image) }
+        unless added_piece_ids.include?(piece.id)
+          added_piece_ids << piece.id
+          image_urls = piece.images.map { |image| url_for(image) }
   
-        pieces_with_images << piece.as_json(include: {
-          user: { only: [:id, :username], methods: [:avatar_url] },
-          channel: { only: [:id, :name] },
-          votes: { only: [:user_id, :vote_type] }
-        }).merge(images: image_urls)
+          pieces_with_images << piece.as_json(include: {
+            user: { only: [:id, :username], methods: [:avatar_url] },
+            channel: { only: [:id, :name] },
+            votes: { only: [:user_id, :vote_type] }
+          }).merge(images: image_urls)
   
-        break if pieces_with_images.length >= 4 
+          break if pieces_with_images.length >= 4
+        end
       end
   
       days_to_look_back += 1
@@ -125,4 +127,5 @@ class Api::V1::HomeController < ApplicationController
   
     render json: pieces_with_images, include: { user: { only: [:id, :username] } }
   end
+  
 end

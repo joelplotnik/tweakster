@@ -15,14 +15,18 @@ Rails.application.routes.draw do
         member do
           post 'follow', to: 'relationships#create'
           delete 'unfollow', to: 'relationships#destroy'
-          get 'top_subscribed_channels'
-          get 'top_followed_users'
+          get 'most_interacted_channels'
+          get 'most_interacted_users'
+          get 'subscriptions'
+          get 'following'
+          put 'update_favorite_users'
+          put 'update_favorite_channels'
           get 'check_ownership'
         end
         
         collection do
-          get 'search', to: 'users#search'
-          get 'popular', to: 'users#popular'
+          get 'search'
+          get 'popular'
         end
       end
 
@@ -32,8 +36,8 @@ Rails.application.routes.draw do
         end
 
         collection do
-          get 'search', to: 'channels#search'
-          get 'popular', to: 'channels#popular'
+          get 'search'
+          get 'popular'
         end
 
         resources :pieces, only: [:show, :index, :create, :update, :destroy] do

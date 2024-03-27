@@ -18,6 +18,8 @@ class Api::V1::ChannelsController < ApplicationController
     end
 
     def popular
+      limit = params[:limit] || 10
+    
       channels = Channel.includes(pieces: [:votes, :comments]).all
     
       channel_popularity_scores = Hash.new(0)
@@ -41,11 +43,11 @@ class Api::V1::ChannelsController < ApplicationController
           subscriptions_count: channel.subscriptions_count,
           visual_url: channel.visual_url
         }
-        break if top_channels.size == 10
+        break if top_channels.size == limit.to_i
       end
     
-      if top_channels.size < 10
-        remaining_channels = Channel.limit(10 - top_channels.size).order(subscriptions_count: :desc)
+      if top_channels.size < limit.to_i
+        remaining_channels = Channel.limit(limit.to_i - top_channels.size).order(subscriptions_count: :desc)
         remaining_channels.each do |channel|
           top_channels << {
             id: channel.id,
@@ -134,7 +136,6 @@ class Api::V1::ChannelsController < ApplicationController
         if current_user
           channel_data['can_edit'] = current_user == channel.user || current_user.admin?
           channel_data['subscribed'] = channel.subscriptions.exists?(user_id: current_user.id)
-
         end
       
         render json: channel_data

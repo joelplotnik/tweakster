@@ -11,6 +11,9 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :votes, dependent: :destroy
 
+  serialize :favorite_users, Array
+  serialize :favorite_channels, Array
+
   # Users you follow
   has_many :followed_users, foreign_key: :follower_id,
   class_name: 'Relationship', dependent: :destroy
@@ -32,6 +35,8 @@ class User < ApplicationRecord
          format: { with: /^[a-zA-Z0-9_\.]*$/, multiline: true }
   validates :url, allow_blank: true, length: { minimum: 7, maximum: 74 }
   validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
+  validate :validate_favorite_channels_count
+  validate :validate_favorite_users_count
 
   ROLES = %w{admin moderator advertiser user}
   
@@ -75,5 +80,13 @@ class User < ApplicationRecord
   def strip_whitespace
     self.url&.strip!
     self.bio&.strip!
+  end
+
+  def validate_favorite_channels_count
+    errors.add(:favorite_channels, "can't have more than 5 favorites") if favorite_channels.size > 5
+  end
+
+  def validate_favorite_users_count
+    errors.add(:favorite_users, "can't have more than 5 favorites") if favorite_users.size > 5
   end
 end
