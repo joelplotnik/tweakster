@@ -7,8 +7,8 @@ Tweakster is an application that allows people to tweak each other's content pie
 Make sure you have the following software installed on your machine before proceeding with the setup:
 
 - Ruby 3.1.2
-- Rails 7.0.4 or higher
-- SQLite 3.4 or higher
+- Rails 7.0.8 or higher
+- MySQL 8.2.0 or higher
 
 ## Installation
 
