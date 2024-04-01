@@ -38,6 +38,7 @@ users << admin_user
 
 # Create Channels
 channels = []
+subscriptions = []
 20.times do
   begin
     user = users.sample
@@ -58,12 +59,17 @@ channels = []
     # Attach a visual representation to the channel
     visual_url = Faker::LoremFlickr.image(size: '300x300')
     channel.visual.attach(io: URI.open(visual_url), filename: 'channel_visual.png')
+
+    # Create a subscription for the user who created the channel
+    subscriptions << Subscription.create!(
+      user_id: user.id,
+      channel_id: channel.id
+    )
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Channel: #{e.message}. Skipping this channel."
     # Log or handle the validation error as needed
   end
 end
-
 
 # Create Subscriptions
 subscriptions_count = 50

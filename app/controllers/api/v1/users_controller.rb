@@ -121,6 +121,7 @@ class Api::V1::UsersController < ApplicationController
       follower_count: user.following_users.count,
       favorite_users: [],
       favorite_channels: [],
+      owned_channels: user.owned_channels,
       pieces: pieces_info,
       piece_count: pieces.count
     }
