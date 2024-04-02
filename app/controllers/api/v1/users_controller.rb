@@ -121,7 +121,6 @@ class Api::V1::UsersController < ApplicationController
       follower_count: user.following_users.count,
       favorite_users: [],
       favorite_channels: [],
-      owned_channels: user.owned_channels,
       pieces: pieces_info,
       piece_count: pieces.count
     }
@@ -270,7 +269,8 @@ class Api::V1::UsersController < ApplicationController
       {
         id: channel.id,
         name: channel.name,
-        visual_url: channel.visual_url
+        visual_url: channel.visual_url,
+        owned_channel: user.owned_channels.include?(channel)
       }
     end
   
