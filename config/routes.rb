@@ -65,6 +65,8 @@ Rails.application.routes.draw do
           get 'check_user_subscriptions', to: 'subscriptions#check_user_subscriptions'
         end
       end
+
+      resources :reports, only: [:create, :index]
     end
   end
 end
