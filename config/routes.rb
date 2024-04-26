@@ -66,7 +66,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :reports, only: [:create, :index]
+      resources :reports, only: [:index, :create, :destroy]
     end
   end
 end
