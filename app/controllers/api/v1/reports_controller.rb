@@ -85,8 +85,13 @@ class Api::V1::ReportsController < ApplicationController
 
     def destroy
       report = Report.find(params[:id])
+    
       if current_user.admin?
+        reporter = User.find(report.reporter_id)
+    
         if report.destroy
+          reporter.reports.delete(report)
+    
           render json: { message: 'Report deleted successfully' }, status: :ok
         else
           render json: { error: 'Failed to delete report' }, status: :unprocessable_entity
