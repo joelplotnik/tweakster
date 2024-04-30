@@ -72,11 +72,11 @@ class Api::V1::ReportsController < ApplicationController
         if report.save
           render json: report, status: :created
         else
-          render json: { error: "Failed to create report." }, status: :unprocessable_entity
+          render json: { error: "Failed to create report" }, status: :unprocessable_entity
         end
       else
-        if report.errors.full_messages.include?("has already been reported by this user")
-          render json: { error: "You have already reported this content." }, status: :unprocessable_entity
+        if report.errors.full_messages.include?("Content has already been reported by this user")
+          render json: { error: "Content has already been reported by this user" }, status: :unprocessable_entity
         else
           render json: report.errors, status: :unprocessable_entity
         end
