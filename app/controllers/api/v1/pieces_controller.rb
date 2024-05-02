@@ -98,6 +98,11 @@ class Api::V1::PiecesController < ApplicationController
   def update
     piece = Piece.find(params[:id])
 
+    if piece.tweaks_count > 0
+      render json: { error: 'Cannot update piece with tweaks' }, status: :unprocessable_entity
+      return
+    end
+
     sanitized_content = sanitize_rich_content(params[:piece][:content])
     piece.content = sanitized_content
 
