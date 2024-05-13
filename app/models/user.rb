@@ -12,6 +12,8 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :votes, dependent: :destroy
   has_many :reports, foreign_key: 'reporter_id'
+  has_many :sent_messages, class_name: 'Message', foreign_key: 'sender_id'
+  has_many :received_messages, class_name: 'Message', foreign_key: 'receiver_id'
 
   serialize :favorite_users, Array
   serialize :favorite_channels, Array
@@ -76,6 +78,16 @@ class User < ApplicationRecord
   end
 
   before_validation :strip_whitespace
+
+  def conversations
+    User.where(id: received_messages.select(:sender_id))
+        .or(User.where(id: sent_messages.select(:receiver_id)))
+  end
+
+  def messages_with(other_user)
+    Message.where(sender: self, receiver: other_user)
+           .or(Message.where(sender: other_user, receiver: self))
+  end
 
   private
   

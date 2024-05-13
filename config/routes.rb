@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  mount ActionCable.server => "/cable"
   devise_for :users, path: 'api/v1/users', controllers: {
     sessions: 'api/v1/users/sessions',
     registrations: 'api/v1/users/registrations'
@@ -66,6 +67,7 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :conversations, only: [:index, :show, :create, :destroy], controller: 'messages'
       resources :reports, only: [:index, :create, :destroy]
     end
   end

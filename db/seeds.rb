@@ -234,7 +234,83 @@ end
 pieces.each do |piece|
   if rand(4) >= 1 
     parent_candidates = pieces.reject { |p| p == piece || p.parent_piece_id == piece.id }
+    parent_candidates.reject! { |p| p.id == piece.parent_piece_id } if piece.parent_piece_id.present?
     parent_piece = parent_candidates.sample
-    piece.update(parent_piece_id: parent_piece.id) if parent_piece
+    if parent_piece.present? && parent_piece.parent_piece_id != piece.id
+      piece.update(parent_piece_id: parent_piece.id)
+    end
+  end
+end
+
+# Create Messages
+users.each_with_index do |user, index|
+  conversation_users = users.reject { |u| u == user }.sample(2)
+
+  conversation_users.each do |other_user|
+    next if user.conversations.include?(other_user) || other_user.conversations.include?(user)
+
+    rand(5..20).times do
+      body = Faker::Lorem.paragraph(sentence_count: rand(1..5))
+      body2 = Faker::Lorem.paragraph(sentence_count: rand(1..5))
+      Message.create!(
+        sender_id: user.id,
+        receiver_id: other_user.id,
+        body: body,
+        read: false
+      )
+      Message.create!(
+        sender_id: other_user.id,
+        receiver_id: user.id,
+        body: body2,
+        read: false
+      )
+    end
+  end
+end
+
+# Create Reports
+users.each do |user|
+  # Pieces
+  pieces_to_report = Piece.where.not(user_id: user.id)
+  pieces_to_report.sample(rand(1..5)).each do |piece|
+    Report.create!(
+      content_type: 'piece',
+      content_id: piece.id,
+      reporter_id: user.id,
+      reason: ['spam', 'inappropriate'].sample
+    )
+  end
+
+  # Comments
+  comments_to_report = Comment.where.not(user_id: user.id)
+  comments_to_report.sample(rand(1..5)).each do |comment|
+    Report.create!(
+      content_type: 'comment',
+      content_id: comment.id,
+      reporter_id: user.id,
+      reason: ['spam', 'inappropriate'].sample
+    )
+  end
+
+  # Channels
+  channels_to_report = Channel.where.not(user_id: user.id)
+  channels_to_report.sample(rand(1..5)).each do |channel|
+    Report.create!(
+      content_type: 'channel',
+      content_id: channel.id,
+      reporter_id: user.id,
+      reason: ['spam', 'inappropriate'].sample
+    )
+  end
+
+  # Users
+  users_to_report = User.where.not(id: user.id)
+  users_to_report.sample(rand(1..5)).each do |report_user|
+    Report.create!(
+      content_type: 'user',
+      content_id: report_user.id,
+      reporter_id: user.id,
+      reason: ['spam', 'inappropriate'].sample
+    )
   end
 end
