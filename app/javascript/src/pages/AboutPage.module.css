@@ -1,0 +1,38 @@
+.card {
+  margin-top: 1.5rem;
+}
+
+.about-page {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.about-page h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.about-page p {
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.about-page .mission-statement {
+  font-weight: bold;
+}
+
+.about-page .description {
+  font-style: italic;
+}
+
+.about-page .goal {
+  margin-top: 20px;
+}
+
+.about-page .thanks {
+  font-weight: bold;
+  margin-top: 20px;
+}

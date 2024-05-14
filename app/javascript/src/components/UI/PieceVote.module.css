@@ -1,0 +1,142 @@
+.vote-section {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.vote-section-header {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.vote-section-row {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  margin-bottom: 0.1rem;
+}
+
+.vote-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.vote-section .vote-count {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.vote-section-header .vote-count {
+  margin: 0 0.25rem;
+  font-size: 14px;
+  font-weight: bold;
+  color: #999;
+}
+
+.vote-section-row .vote-count {
+  margin: 0 0.15rem;
+  margin-bottom: 0.4rem;
+  font-size: 14px;
+  color: #333;
+}
+
+/* ***************************** */
+
+.vote-section .thumb-up-icon,
+.vote-section .thumb-down-icon {
+  font-size: 24px;
+  margin: 4px 0;
+  color: black;
+}
+
+.vote-section .thumb-up-icon-filled {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #d92563;
+}
+
+.vote-section .thumb-down-icon-filled {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #ff9c40;
+}
+
+.vote-section .vote-button:hover .thumb-up-icon {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #d92563;
+}
+
+.vote-section .vote-button:hover .thumb-down-icon {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #ff9c40;
+}
+
+/* ***************************** */
+
+.vote-section-header .thumb-up-icon,
+.vote-section-header .thumb-down-icon {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #999;
+}
+
+.vote-section-header .thumb-up-icon-filled {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #d92563;
+}
+
+.vote-section-header .thumb-down-icon-filled {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #ff9c40;
+}
+
+.vote-section-header .vote-button:hover .thumb-up-icon {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #d92563;
+}
+
+.vote-section-header .vote-button:hover .thumb-down-icon {
+  font-size: 24px;
+  margin: 4px 0;
+  color: #ff9c40;
+}
+
+/* ***************************** */
+
+.vote-section-row .thumb-up-icon,
+.vote-section-row .thumb-down-icon {
+  color: #333;
+  font-size: 1.2rem;
+  margin: 4px 0;
+}
+
+.vote-section-row .thumb-up-icon-filled {
+  font-size: 1.2rem;
+  margin: 4px 0;
+  color: #d92563;
+}
+
+.vote-section-row .thumb-down-icon-filled {
+  font-size: 1.2rem;
+  margin: 4px 0;
+  color: #ff9c40;
+}
+
+.vote-section-row .vote-button:hover .thumb-up-icon {
+  font-size: 1.2rem;
+  margin: 4px 0;
+  color: #d92563;
+}
+
+.vote-section-row .vote-button:hover .thumb-down-icon {
+  font-size: 1.2rem;
+  margin: 4px 0;
+  color: #ff9c40;
+}

@@ -1,0 +1,17 @@
+.tweaks {
+  margin: 0 auto;
+  padding-top: 10px;
+  margin-bottom: 2rem;
+}
+
+.note {
+  text-align: center;
+  font-size: 14px;
+  color: #999999;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.tweak-layout {
+  margin-left: 0.8rem;
+}

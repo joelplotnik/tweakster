@@ -1,0 +1,35 @@
+.top-five-button {
+  background-color: #1a1a1b;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition-duration: 0.2s;
+}
+
+.top-five-button:hover {
+  background-color: #545454;
+}
+
+.top-five-button-grey {
+  background-color: #808080;
+}
+
+.top-five-button-grey:hover {
+  background-color: #808080;
+}
+
+.top-five-button-green {
+  background-color: #53b781;
+}
+
+.top-five-button-green:hover {
+  background-color: #3f8d5d;
+}

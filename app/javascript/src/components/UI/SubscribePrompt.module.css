@@ -1,0 +1,48 @@
+.card {
+  display: flex;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: 600px;
+  text-decoration: none;
+  border: 1px solid #cccccc;
+  display: flex;
+}
+
+.content-wrapper {
+  background-color: white;
+  padding: 0.5rem;
+  padding-left: 7.5rem;
+  padding-right: 7.5rem;
+  display: flex;
+  flex-direction: column;
+  width: 97%;
+  align-items: center;
+  text-align: center;
+}
+
+.message {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+  margin-bottom: 15px;
+  white-space: pre-line;
+}
+
+.btn {
+  background-color: rgb(51, 153, 255);
+  color: #ffffff;
+  padding: 10px 20px;
+  margin-bottom: 14px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.btn:hover {
+  background-color: rgb(31, 117, 195);
+}

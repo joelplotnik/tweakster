@@ -1,0 +1,10 @@
+.skeleton-container {
+  display: flex;
+  position: relative;
+  margin-bottom: 0.4rem;
+}
+
+.square {
+  border-radius: 10px;
+  margin-right: 10px;
+}

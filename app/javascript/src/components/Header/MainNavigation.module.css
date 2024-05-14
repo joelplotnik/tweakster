@@ -1,0 +1,251 @@
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 800;
+  src: url('../../fonts/Nunito-VariableFont_wght.ttf') format('truetype');
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3rem;
+  background-color: #1a1a1b;
+  color: #eeeeee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  padding: 0 1.5%;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+}
+
+.hamburger-button {
+  background-color: #1a1a1b;
+  color: #eeeeee;
+  font-size: 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+}
+
+.title-link {
+  text-decoration: none;
+}
+
+.title-link:visited {
+  text-decoration: none;
+}
+
+.company {
+  margin-left: 0.4em;
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 34px;
+  line-height: 34px;
+  color: #eeeeee;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.icon {
+  height: 100%;
+  max-width: 38px;
+  margin-top: 0.4rem;
+}
+
+.navbar-nav {
+  display: flex;
+  align-items: center;
+}
+
+.notification-button {
+  border: none;
+  background-color: transparent;
+  font-size: 1.25rem;
+  color: #eeeeee;
+  cursor: pointer;
+  margin-right: 1rem;
+  position: relative;
+}
+
+.notification-button::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background-color: #424242;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.notification-button:hover::before {
+  opacity: 0.5;
+}
+
+.notification-button:hover {
+  color: #ffffff;
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 0.4rem;
+  margin: 0.4rem 0.2rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background-color: #1a1a1b;
+  color: #eeeeee;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.icon-button:hover {
+  color: #e0e0e0;
+}
+
+.icon-button svg:first-child {
+  font-size: 20px;
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  height: 25px;
+  border-radius: 50%;
+  width: 100%;
+}
+
+.avatar-image {
+  object-fit: cover;
+  background-color: white;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 16px;
+  margin-right: 0.25rem;
+}
+
+.dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background-color: #1a1a1b;
+  color: #eeeeee;
+  transition: background-color 0.2s ease-in-out;
+  font-size: 20px;
+}
+
+.dropdown-button:hover {
+  color: #e0e0e0;
+}
+
+/* Dropdown menu */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  padding: 0.5rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+}
+
+.dropdown-menu a {
+  color: #333333;
+  text-decoration: none;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-menu a svg {
+  margin-right: 0.5rem;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu a.active {
+  background-color: #eeeeee;
+}
+
+.dropdown-menu button {
+  color: #333333;
+  text-decoration: none;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu button svg {
+  margin-right: 0.5rem;
+}
+
+.dropdown-menu button:hover {
+  background-color: #eeeeee;
+}
+
+.banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 3.25rem;
+  max-height: 10rem;
+  object-fit: cover;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}

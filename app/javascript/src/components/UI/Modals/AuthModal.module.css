@@ -1,0 +1,133 @@
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 21;
+  overflow: hidden;
+}
+
+.modal body {
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 3rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+  width: 250px;
+  position: relative;
+  overflow: auto;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.modal label span {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.modal input {
+  display: block;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+}
+
+.modal input:focus {
+  border-bottom-color: #000;
+}
+
+.invalid input {
+  border-bottom: 2px solid #c3164b;
+}
+
+.invalid input:focus {
+  border-bottom-color: #ff9c40;
+}
+
+.error-text {
+  color: #c3164b;
+}
+
+.modal-content .submit-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: rgb(51, 153, 255);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+.modal-content .submit-btn:hover {
+  background-color: rgb(31, 117, 195);
+}
+
+.modal-content .submit-btn:disabled,
+.modal-content .submit-btn:disabled:hover,
+.modal-content .submit-btn:disabled:active {
+  background-color: #ccc;
+  color: #292929;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.close-icon {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+  z-index: 22;
+  background-color: transparent;
+  border: none;
+}
+
+.close-icon:hover {
+  color: #000;
+}
+
+.modal-content .switch-modal-btn {
+  background-color: transparent;
+  border: none;
+  color: rgb(51, 153, 255);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  margin-top: 30px;
+}
+
+.modal-content .switch-modal-btn:hover {
+  text-decoration: none;
+}

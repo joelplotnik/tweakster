@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.piece-list {
+  margin-right: 0.5rem;
+}
+
+.channel-list {
+  margin-left: 0.5rem;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .piece-list {
+    margin: 0;
+  }
+
+  .channel-list {
+    display: none;
+  }
+}

@@ -71,4 +71,7 @@ Rails.application.routes.draw do
       resources :reports, only: [:index, :create, :destroy]
     end
   end
+
+  root to: 'home#show'
+  get '*path', to: 'home#show', constraints: lambda { |request| request.format.html? }
 end
