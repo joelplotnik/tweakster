@@ -28,6 +28,12 @@ class Api::V1::SubscriptionsController < ApplicationController
   
       if subscription
         subscription.destroy
+  
+        if current_user.favorite_channels.include?(channel.id)
+          current_user.favorite_channels.delete(channel.id)
+          current_user.save
+        end
+  
         render json: { message: 'Successfully unsubscribed from the channel' }
       else
         render json: { error: 'Subscription not found' }, status: :not_found

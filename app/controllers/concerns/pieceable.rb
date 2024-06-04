@@ -30,6 +30,7 @@ module Pieceable
           user: parent_piece_user,
           channel: parent_piece_channel
         }
+        return parent_piece
       end
     end
 

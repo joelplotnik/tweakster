@@ -21,12 +21,18 @@ class Api::V1::RelationshipsController < ApplicationController
   def destroy
     user_to_unfollow = User.find(params[:id])
     relationship = current_user.followed_users.find_by(followee: user_to_unfollow)
-
+  
     if relationship
       relationship.destroy
+  
+      if current_user.favorite_users.include?(user_to_unfollow.id)
+        current_user.favorite_users.delete(user_to_unfollow.id)
+        current_user.save
+      end
+  
       render json: { message: "You have unfollowed #{user_to_unfollow.username}" }
     else
       render json: { error: "You are not following #{user_to_unfollow.username}" }, status: :unprocessable_entity
     end
-  end
+  end  
 end
