@@ -163,26 +163,22 @@ end
 # Create Comments
 pieces = Piece.all
 pieces.each do |piece|
-  num_comments = rand(0..10) 
+  num_comments = rand(0..10)
   users.sample(num_comments).each do |comment_user|
-    parent_comment = piece.comments.sample if piece.comments.present? && rand(2).zero?
+    if piece.comments.where(parent_comment_id: nil).exists? && rand(2).zero?
+      parent_comment = piece.comments.where(parent_comment_id: nil).sample
+    else
+      parent_comment = nil
+    end
 
-    comment = Comment.create!(
+    Comment.create!(
       message: Faker::Lorem.sentence,
       user_id: comment_user.id,
-      piece_id: piece.id,
-      parent_comment_id: parent_comment&.id
+      piece_id: piece.id, 
+      parent_comment_id: parent_comment&.id 
     )
-
-    if parent_comment.present?
-      parent_comment.child_comments << comment
-      parent_comment.save
-    else
-      piece.comments << comment 
-    end
   end
 end
-
 
 # Create Votes for Pieces
 users.each do |user|

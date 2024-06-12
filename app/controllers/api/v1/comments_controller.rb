@@ -42,7 +42,12 @@ class Api::V1::CommentsController < ApplicationController
   def create
     comment = Comment.new(comment_params)
     comment.user = current_user
-
+  
+    if comment.parent_comment && comment.parent_comment.parent_comment
+      render json: { error: 'Cannot comment on a comment of a comment' }, status: :unprocessable_entity
+      return
+    end
+  
     if comment.save
       render json: build_comment_tree(comment), include: {
         user: { only: [:username] },

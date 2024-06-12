@@ -8,6 +8,15 @@ class Comment < ApplicationRecord
   
     validates :user_id, presence: true
     validates :piece_id, presence: true
-    validates :message, presence: true, length: { minimum: 1, maximum: 100 }
+    validates :message, presence: true, length: { minimum: 1, maximum: 2200 }
+    validate :parent_comment_depth
+
+    private
+
+    def parent_comment_depth
+      if parent_comment.present? && parent_comment.parent_comment.present?
+        errors.add(:parent_comment, "can only be a top-level comment or a reply to a top-level comment")
+      end
+    end
   end
   
