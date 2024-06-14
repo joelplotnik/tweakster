@@ -71,6 +71,4 @@ Rails.application.routes.draw do
       resources :reports, only: [:index, :create, :destroy]
     end
   end
-
-  root to: 'home#show'
 end
