@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Tweakster - Unleash your inner journalist"
+    />
+    <link rel="icon" href="logo_color.svg" />
+    <link rel="apple-touch-icon" href="logo_color.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <title>Tweakster</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= vite_client_tag %>
+    <%= vite_javascript_tag "application.jsx", crossorigin: true, data: { turbolinks_track: "reload" } %>
+  </head>
+  <body>
+    <noscript
+      >Welcome to Tweakster! For the best experience, please enable JavaScript
+      in your browser settings.</noscript
+    >
+    <div id="backdrop-root"></div>
+    <div id="overlay-root"></div>
+    <div id="root"></div>
+  </body>
+</html>

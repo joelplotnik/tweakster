@@ -1,0 +1,12 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.piece-list {
+  margin-right: 0.5rem;
+}
+
+.channel-list {
+  margin-left: 0.5rem;
+}

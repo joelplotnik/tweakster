@@ -1,0 +1,58 @@
+.reports-container {
+  margin: 20px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.report-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.report-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.report-table tbody tr:hover {
+  background-color: #ddd;
+}
+
+.link {
+  color: rgb(31, 117, 195);
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.delete-button {
+  background-color: #d92563;
+  font-weight: bold;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  outline: none;
+}
+
+.delete-button:hover {
+  background-color: #c3164b;
+}
+
+.delete-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.deleted-row {
+  text-decoration: line-through;
+}

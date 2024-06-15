@@ -1,0 +1,20 @@
+.btn {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: inline-block;
+  width: 260px;
+  padding: 10px 20px;
+  background-color: #1a1a1b;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 20px;
+  border: none;
+  font-weight: bold;
+  font-size: small;
+  cursor: pointer;
+}
+
+.btn:hover {
+  content: 'Unfollow';
+  background-color: #030303;
+}

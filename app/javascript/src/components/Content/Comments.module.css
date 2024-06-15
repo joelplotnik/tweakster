@@ -1,0 +1,29 @@
+.comments {
+  margin: 0 auto;
+  padding-top: 10px;
+  margin-bottom: 2rem;
+}
+
+.comment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  background-color: #eaeaea;
+  color: #000000;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.comment-button:hover {
+  background-color: #e0e0e0;
+}
+
+.comment-button svg {
+  margin-right: 0.5rem;
+}

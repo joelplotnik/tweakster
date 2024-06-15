@@ -1,0 +1,20 @@
+.Toastify__toast-theme--colored.Toastify__toast--default {
+    background-color: #424242;
+    color: white;
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--info {
+    background-color: #1F75C3;
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--success {
+    background-color: #53b781;
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--warning {
+    background-color: #FAC42E;
+}
+
+.Toastify__toast-theme--colored.Toastify__toast--error {
+    background-color: #d92563;
+}

@@ -1,0 +1,126 @@
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 21;
+  overflow: hidden;
+}
+
+.modal body {
+  overflow: hidden;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 3rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+  width: 250px;
+  position: relative;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.modal-header {
+  display: flex;
+  text-align: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.modal-content h2 {
+  margin: 0;
+  text-align: center;
+}
+
+.close-circle-icon {
+  color: #d92563;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.subscribe-icon {
+  color: rgb(51, 153, 255);
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.close-icon {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+  z-index: 22;
+  background-color: transparent;
+  border: none;
+}
+
+.close-icon:hover {
+  color: #000;
+}
+
+.button-container {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.cancel-button {
+  background-color: #333;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.cancel-button:hover {
+  background-color: #444;
+}
+
+.delete-button {
+  background-color: #d92563;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.delete-button:hover {
+  background-color: #c3164b;
+}
+
+.confirm-button {
+  background-color: rgb(51, 153, 255);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.confirm-button:hover {
+  background-color: rgb(31, 117, 195);
+}
