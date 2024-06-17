@@ -35,7 +35,7 @@ bundle install
 4. Install the required Node.js dependencies:
 
 ```shell
-npm install
+yarn install
 ```
 
 5. Set up the database:
@@ -47,7 +47,7 @@ rails db:setup
 6. Start the Rails server along with Vite:
 
 ```shell
-npm start
+yarn start
 ```
 
 You can now access Tweakster by visiting http://localhost:5100 in your browser.
