@@ -1,14 +1,15 @@
-import { RiCloseLine, RiFlaskLine } from 'react-icons/ri'
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { RiCloseLine, RiFlaskLine } from 'react-icons/ri';
 
-import { Backdrop } from './Backdrop'
-import ReactDOM from 'react-dom'
-import classes from './PopulateModal.module.css'
+import { Backdrop } from './Backdrop';
+import classes from './PopulateModal.module.css';
 
 const PopulateModal = ({ onClick, onConfirm, onCheckboxChange }) => {
   const handleConfirm = () => {
-    onClick()
-    onConfirm()
-  }
+    onClick();
+    onConfirm();
+  };
 
   return (
     <>
@@ -57,7 +58,7 @@ const PopulateModal = ({ onClick, onConfirm, onCheckboxChange }) => {
         document.getElementById('overlay-root')
       )}
     </>
-  )
-}
+  );
+};
 
-export default PopulateModal
+export default PopulateModal;

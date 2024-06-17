@@ -1,25 +1,25 @@
-import { RiCloseLine, RiFlagLine } from 'react-icons/ri'
+import React, { useState } from 'react';
+import { RiCloseLine, RiFlagLine } from 'react-icons/ri';
 
-import { API_URL } from '../../../constants/constants'
-import { Backdrop } from './Backdrop'
-import ReactDOM from 'react-dom'
-import classes from './ReportModal.module.css'
-import { toast } from 'react-toastify'
-import { useRouteLoaderData } from 'react-router-dom'
-import React, { useState } from 'react'
+import { API_URL } from '../../../constants/constants';
+import { Backdrop } from './Backdrop';
+import ReactDOM from 'react-dom';
+import classes from './ReportModal.module.css';
+import { toast } from 'react-toastify';
+import { useRouteLoaderData } from 'react-router-dom';
 
 const ReportModal = ({ onClick, content }) => {
-  const token = useRouteLoaderData('root')
-  const [reportReason, setReportReason] = useState('')
-  const [otherReason, setOtherReason] = useState('')
-  const maxCharacters = 200
+  const token = useRouteLoaderData('root');
+  const [reportReason, setReportReason] = useState('');
+  const [otherReason, setOtherReason] = useState('');
+  const maxCharacters = 200;
 
   const handleConfirm = async () => {
     const reportData = {
       content_type: content.type,
       content_id: content.id,
       reason: reportReason === 'other' ? otherReason : reportReason,
-    }
+    };
 
     try {
       const response = await fetch(`${API_URL}/reports`, {
@@ -29,34 +29,34 @@ const ReportModal = ({ onClick, content }) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(reportData),
-      })
+      });
 
       if (!response.ok) {
-        const errorMessage = await response.json()
+        const errorMessage = await response.json();
         if (
           response.status === 422 &&
           errorMessage.content_type &&
           errorMessage.content_type[0] ===
             'Content has already been reported by this user'
         ) {
-          toast.error('You have already reported this content')
+          toast.error('You have already reported this content');
         } else {
-          throw new Error('Failed to report content')
+          throw new Error('Failed to report content');
         }
       } else {
         toast.success(
           `${
             content.type.charAt(0).toUpperCase() + content.type.slice(1)
           } reported successfully`
-        )
+        );
       }
-      onClick()
+      onClick();
     } catch (error) {
-      console.error('Error reporting content: ', error)
-      toast.error('Error reporting content')
-      onClick()
+      console.error('Error reporting content: ', error);
+      toast.error('Error reporting content');
+      onClick();
     }
-  }
+  };
 
   return (
     <>
@@ -139,7 +139,7 @@ const ReportModal = ({ onClick, content }) => {
         document.getElementById('overlay-root')
       )}
     </>
-  )
-}
+  );
+};
 
-export default ReportModal
+export default ReportModal;
