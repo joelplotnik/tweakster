@@ -1,45 +1,40 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useParams, useRouteLoaderData } from 'react-router-dom';
 import { RiSendPlaneLine } from 'react-icons/ri';
 
+import { API_URL } from '../../constants/constants';
 import { getUserData } from '../../util/auth';
+import { CableContext } from '../../context/cable';
 
-import { API_URL, WS_URL } from '../../constants/constants';
 import classes from './ConversationPage.module.css';
 
-const ws = new WebSocket(WS_URL);
-
 const ConversationPage = () => {
+  const { cable } = useContext(CableContext);
   const { id: convoId } = useParams();
   const [message, setMessage] = useState('');
-  const [guid, setGuid] = useState('');
   const [messages, setMessages] = useState([]);
   const chatContainerRef = useRef(null);
   const token = useRouteLoaderData('root');
   const userData = getUserData();
   const userId = userData ? parseInt(userData.userId) : null;
 
-  ws.onopen = () => {
-    console.log('Connected to websocket server');
-    setGuid(Math.random().toString(36).substring(2, 15));
-
-    ws.send(
-      JSON.stringify({
-        command: 'subscribe',
-        identifier: JSON.stringify({ id: guid, channel: 'MessagesChannel' }),
-      })
+  useEffect(() => {
+    // Subscribe to WebSocket channel when component mounts
+    const subscription = cable.subscriptions.create(
+      { channel: 'MessagesChannel' },
+      {
+        received: (data) => {
+          // Handle incoming WebSocket message
+          setMessages((prevMessages) => [...prevMessages, data]);
+        },
+      }
     );
-  };
 
-  // Handle incoming messages from the WebSocket
-  ws.onmessage = (event) => {
-    const newMessage = JSON.parse(event.data);
-    if (newMessage.type === 'ping') return;
-    if (newMessage.type === 'welcome') return;
-    if (newMessage.type === 'confirm_subscription') return;
-
-    setMessages((prevMessages) => [...prevMessages, newMessage.message]);
-  };
+    // Unsubscribe when component unmounts
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [cable, token]);
 
   useEffect(() => {
     // Scroll to the bottom of the chat container when messages change
@@ -112,7 +107,6 @@ const ConversationPage = () => {
     <div className={classes.container}>
       <h1 className={classes.heading}>(Avatar) Username</h1>
       <hr className={classes.divider} />
-      <p>Guid: {guid}</p>
       <div ref={chatContainerRef} className={classes['chat-container']}>
         <ul className={classes.chat}>
           {messages.map((message) => (
