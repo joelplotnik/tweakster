@@ -1,4 +1,4 @@
-# Tweakster - API
+# Tweakster
 
 Tweakster is a platform that brings people together to collaboratively refine content on diverse topics, ensuring accuracy and impact across various subjects. Tweakster is built using Rails 7 for the backend and React 18 for the frontend.
 
