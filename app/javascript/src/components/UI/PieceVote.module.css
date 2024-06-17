@@ -140,3 +140,8 @@
   margin: 4px 0;
   color: #ff9c40;
 }
+
+.vote-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

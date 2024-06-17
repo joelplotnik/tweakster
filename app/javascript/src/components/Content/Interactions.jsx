@@ -2,21 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { selectPieceById } from '../../store/pieces';
 import Comments from './Comments';
 import Tweaks from './Tweaks';
 
 import classes from './Interactions.module.css';
 
-const Interactions = ({ pieceId, pieceClassModalRef }) => {
+const Interactions = ({ pieceClassModalRef }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  let inPiecesSlice;
-  const piece = useSelector((state) => {
-    const selectedPiece = selectPieceById(state, pieceId);
-    inPiecesSlice = !!selectedPiece;
-    return selectedPiece || state.piece.piece;
-  });
+  const piece = useSelector((state) => state.piece.piece);
   const [activeTab, setActiveTab] = useState('comments');
 
   useEffect(() => {
@@ -71,11 +65,7 @@ const Interactions = ({ pieceId, pieceClassModalRef }) => {
 
       {activeTab === 'comments' && (
         <div>
-          <Comments
-            piece={piece}
-            inPiecesSlice={inPiecesSlice}
-            pieceClassModalRef={pieceClassModalRef}
-          />
+          <Comments piece={piece} pieceClassModalRef={pieceClassModalRef} />
         </div>
       )}
 

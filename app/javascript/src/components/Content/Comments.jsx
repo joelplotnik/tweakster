@@ -1,127 +1,129 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams, useRouteLoaderData } from 'react-router-dom'
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useRouteLoaderData } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 
-import { API_URL } from '../../constants/constants'
-import { AuthModal } from '../UI/Modals/AuthModal'
-import Comment from './Comment'
-import CommentForm from './Forms/CommentForm'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import { RiAddFill } from 'react-icons/ri'
-import SortDropdown from '../UI/SortDropdown'
-import classes from './Comments.module.css'
-import { pieceActions } from '../../store/piece'
-import { piecesActions } from '../../store/pieces'
-import { toast } from 'react-toastify'
-import { useDispatch } from 'react-redux'
+import { API_URL } from '../../constants/constants';
+import { pieceActions } from '../../store/piece';
+import Comment from './Comment';
+import CommentForm from './Forms/CommentForm';
+import AuthModal from '../UI/Modals/AuthModal';
+import SortDropdown from '../UI/SortDropdown';
 
-const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
-  const token = useRouteLoaderData('root')
-  const [comments, setComments] = useState([])
-  const params = useParams()
-  const wildcardParam = params['*']
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [activeComment, setActiveComment] = useState(null)
-  const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
-  const [isLoading, setIsLoading] = useState(false)
-  const [newCommentIds, setNewCommentIds] = useState([])
-  const [selectedSortOption, setSelectedSortOption] = useState('top')
-  const selectedSortOptionRef = useRef(selectedSortOption)
+import classes from './Comments.module.css';
+import { RiAddFill } from 'react-icons/ri';
+
+const Comments = ({ piece, pieceClassModalRef }) => {
+  const token = useRouteLoaderData('root');
+  const [comments, setComments] = useState([]);
+  const params = useParams();
+  const wildcardParam = params['*'];
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [activeComment, setActiveComment] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [newCommentIds, setNewCommentIds] = useState([]);
+  const [selectedSortOption, setSelectedSortOption] = useState('top');
+  const selectedSortOptionRef = useRef(selectedSortOption);
   const [isScrollableTargetAvailable, setScrollableTargetAvailable] =
-    useState(false)
-  const dispatch = useDispatch()
+    useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
-      setScrollableTargetAvailable(true)
+      setScrollableTargetAvailable(true);
     }
-  }, [pieceClassModalRef])
+  }, [pieceClassModalRef]);
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
+    setShowAuthModal(!showAuthModal);
+  };
 
   const handleSortChange = useCallback((option) => {
     if (option === selectedSortOptionRef.current) {
-      return
+      return;
     }
 
-    setNewCommentIds([])
-    setComments([])
-    setSelectedSortOption(option)
-    setPage(1)
-    setHasMore(true)
-  }, [])
+    setNewCommentIds([]);
+    setComments([]);
+    setSelectedSortOption(option);
+    setPage(1);
+    setHasMore(true);
+  }, []);
 
   const fetchComments = async (currentPage) => {
     try {
       const response = await fetch(
-        `${API_URL}/${wildcardParam}/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
+        `${API_URL}/channels/${piece.channel_id}/pieces/${
+          piece.id
+        }/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
           newCommentIds
         )}`
-      )
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch comments')
+        throw new Error('Failed to fetch comments');
       }
 
-      const data = await response.json()
-      return data
+      const data = await response.json();
+      return data;
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error fetching comments')
+      console.error('Error: ', error.message);
+      toast.error('Error fetching comments');
     }
-  }
+  };
 
   const fetchData = async () => {
     if (!isLoading) {
-      setIsLoading(true)
+      setIsLoading(true);
 
-      const commentsFromServer = await fetchComments(page)
+      const commentsFromServer = await fetchComments(page);
 
       if (commentsFromServer) {
-        setComments([...comments, ...commentsFromServer])
+        setComments([...comments, ...commentsFromServer]);
 
         if (selectedSortOption !== selectedSortOptionRef.current) {
           // If the selectedSortOption has changed, reset comments
-          selectedSortOptionRef.current = selectedSortOption
-          setComments(commentsFromServer)
+          selectedSortOptionRef.current = selectedSortOption;
+          setComments(commentsFromServer);
         } else {
           // If the sort option is the same, append fetched data
-          setComments([...comments, ...commentsFromServer])
+          setComments([...comments, ...commentsFromServer]);
         }
 
         if (commentsFromServer.length === 0) {
-          setHasMore(false)
+          setHasMore(false);
         }
-        setPage(page + 1)
+        setPage(page + 1);
       }
 
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchData()
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const findCommentById = (commentsArray, targetCommentId) => {
     for (const comment of commentsArray) {
       if (comment.comment.id === targetCommentId) {
-        return comment
+        return comment;
       } else if (comment.child_comments && comment.child_comments.length > 0) {
         const foundComment = findCommentById(
           comment.child_comments,
           targetCommentId
-        )
+        );
         if (foundComment) {
-          return foundComment
+          return foundComment;
         }
       }
     }
-    return null
-  }
+    return null;
+  };
 
   const updateCommentMessage = (commentsArray, targetCommentId, newMessage) => {
     return commentsArray.map((comment) => {
@@ -133,7 +135,7 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
             ...comment.comment,
             message: newMessage,
           },
-        }
+        };
       } else if (comment.child_comments && comment.child_comments.length > 0) {
         // If there are child comments, recursively update them as well
         return {
@@ -143,12 +145,12 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
             targetCommentId,
             newMessage
           ),
-        }
+        };
       } else {
-        return comment
+        return comment;
       }
-    })
-  }
+    });
+  };
 
   const handleCommentSubmit = async (
     message,
@@ -159,15 +161,15 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
     try {
       const url = commentId
         ? `${API_URL}/${wildcardParam}/comments/${commentId}`
-        : `${API_URL}/${wildcardParam}/comments`
+        : `${API_URL}/${wildcardParam}/comments`;
 
-      const method = commentId ? 'PUT' : 'POST'
+      const method = commentId ? 'PUT' : 'POST';
 
       const commentData = {
         message: message,
         piece_id: pieceId,
         parent_comment_id: parentCommentId,
-      }
+      };
 
       const response = await fetch(url, {
         method: method,
@@ -176,62 +178,58 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(commentData),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to submit comment')
+        throw new Error('Failed to submit comment');
       }
 
-      const newComment = await response.json()
+      const newComment = await response.json();
 
       // Handle the state update based on the comment action
       if (commentId) {
         // Edit comment
         setComments((prevComments) => {
-          return updateCommentMessage(prevComments, commentId, message)
-        })
+          return updateCommentMessage(prevComments, commentId, message);
+        });
       } else if (parentCommentId) {
         // Reply comment
-        const parentComment = findCommentById(comments, parentCommentId)
+        const parentComment = findCommentById(comments, parentCommentId);
         if (parentComment) {
-          parentComment.child_comments.unshift(newComment)
-          setComments((prevComments) => [...prevComments])
-          inPiecesSlice
-            ? dispatch(piecesActions.increaseCommentCount({ id: piece.id }))
-            : dispatch(pieceActions.increaseCommentCount())
+          parentComment.child_comments.unshift(newComment);
+          setComments((prevComments) => [...prevComments]);
+          dispatch(pieceActions.increaseCommentCount());
         }
       } else {
         // New comment
-        const newCommentId = newComment.comment.id
-        setNewCommentIds((prevIds) => [...prevIds, newCommentId])
-        setComments((prevComments) => [newComment, ...prevComments])
-        inPiecesSlice
-          ? dispatch(piecesActions.increaseCommentCount({ id: piece.id }))
-          : dispatch(pieceActions.increaseCommentCount())
+        const newCommentId = newComment.comment.id;
+        setNewCommentIds((prevIds) => [...prevIds, newCommentId]);
+        setComments((prevComments) => [newComment, ...prevComments]);
+        dispatch(pieceActions.increaseCommentCount());
       }
 
-      setActiveComment(null)
+      setActiveComment(null);
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error submitting comment')
+      console.error('Error: ', error.message);
+      toast.error('Error submitting comment');
     }
-  }
+  };
 
   const deleteComment = (commentsArray, targetCommentId) => {
     return commentsArray.filter((comment) => {
       if (comment.comment.id === targetCommentId) {
-        return false
+        return false;
       } else if (comment.child_comments && comment.child_comments.length > 0) {
         comment.child_comments = deleteComment(
           comment.child_comments,
           targetCommentId
-        )
-        return true
+        );
+        return true;
       } else {
-        return !comment.deleted // Filter out deleted comments
+        return !comment.deleted; // Filter out deleted comments
       }
-    })
-  }
+    });
+  };
 
   const markCommentAsDeleted = (commentsArray, targetCommentId) => {
     return commentsArray.map((comment) => {
@@ -240,7 +238,7 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
         return {
           ...comment,
           deleted: true,
-        }
+        };
       } else if (comment.child_comments && comment.child_comments.length > 0) {
         // If there are child comments, recursively mark them as well
         return {
@@ -249,22 +247,22 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
             comment.child_comments,
             targetCommentId
           ),
-        }
+        };
       } else {
-        return comment
+        return comment;
       }
-    })
-  }
+    });
+  };
 
   const countComments = (comment) => {
-    let count = 1
+    let count = 1;
     if (comment.child_comments) {
       for (const childComment of comment.child_comments) {
-        count += countComments(childComment)
+        count += countComments(childComment);
       }
     }
-    return count
-  }
+    return count;
+  };
 
   const handleDeleteComment = async (commentId) => {
     try {
@@ -277,48 +275,39 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
             Authorization: `Bearer ${token}`,
           },
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to delete comment')
+        throw new Error('Failed to delete comment');
       }
 
-      setActiveComment(null)
+      setActiveComment(null);
 
       // Find the deleted comment and its children in the state
-      const commentToDelete = findCommentById(comments, commentId)
+      const commentToDelete = findCommentById(comments, commentId);
 
       if (!commentToDelete) {
-        return // Comment not found, nothing to delete
+        return; // Comment not found, nothing to delete
       }
 
-      const decreaseCommentCountBy = countComments(commentToDelete)
-      inPiecesSlice
-        ? dispatch(
-            piecesActions.decreaseCommentCount({
-              id: piece.id,
-              decreaseCommentCountBy,
-            })
-          )
-        : dispatch(
-            pieceActions.decreaseCommentCount({ decreaseCommentCountBy })
-          )
+      const decreaseCommentCountBy = countComments(commentToDelete);
+      dispatch(pieceActions.decreaseCommentCount({ decreaseCommentCountBy }));
 
       setComments((prevComments) => {
         return deleteComment(
           markCommentAsDeleted(prevComments, commentId),
           commentId
-        )
-      })
+        );
+      });
 
       if (newCommentIds.includes(commentId)) {
-        setNewCommentIds((prevIds) => prevIds.filter((id) => id !== commentId))
+        setNewCommentIds((prevIds) => prevIds.filter((id) => id !== commentId));
       }
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error deleting comment')
+      console.error('Error: ', error.message);
+      toast.error('Error deleting comment');
     }
-  }
+  };
 
   return (
     <>
@@ -391,7 +380,7 @@ const Comments = ({ piece, inPiecesSlice, pieceClassModalRef }) => {
         <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
       )}
     </>
-  )
-}
+  );
+};
 
-export default Comments
+export default Comments;

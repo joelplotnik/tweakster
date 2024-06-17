@@ -13,7 +13,6 @@ import { ToastContainer } from 'react-toastify';
 import { EXPIRED_TOKEN } from '../constants/constants';
 import { getTokenDuration } from '../util/auth';
 import { userActions } from '../store/user';
-import { selectPieceById } from '../store/pieces';
 import RefreshContext from '../context/refresh';
 import MainNavigation from '../components/Header/MainNavigation';
 import Footer from '../components/Footer/Footer';
@@ -51,11 +50,7 @@ const RootLayout = () => {
     location.pathname === `/main` ||
     location.pathname === `/`;
 
-  const pieceId = location.pathname.split('/')[4];
-  const piece = useSelector((state) => {
-    const selectedPiece = selectPieceById(state, pieceId);
-    return selectedPiece || state.piece.piece;
-  });
+  const piece = useSelector((state) => state.piece.piece);
 
   useEffect(() => {
     if (

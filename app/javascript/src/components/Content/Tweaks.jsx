@@ -1,18 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import { API_URL } from '../../constants/constants';
-import { selectAllTweaks, tweakActions } from '../../store/tweak';
 import Tweak from './Tweak';
 import SortDropdown from '../UI/SortDropdown';
 
 import classes from './Tweaks.module.css';
 
 const Tweaks = ({ piece, pieceClassModalRef }) => {
-  const dispatch = useDispatch();
-  const tweaks = useSelector(selectAllTweaks);
+  const [tweaks, setTweaks] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,13 +29,11 @@ const Tweaks = ({ piece, pieceClassModalRef }) => {
       if (option === selectedSortOptionRef.current) {
         return;
       }
-      dispatch(tweakActions.resetTweaks());
+      setTweaks([]); // Reset tweaks
       setSelectedSortOption(option);
       setPage(1);
       setHasMore(true);
     },
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedSortOptionRef]
   );
 
@@ -70,10 +65,10 @@ const Tweaks = ({ piece, pieceClassModalRef }) => {
         if (selectedSortOption !== selectedSortOptionRef.current) {
           // If the selectedSortOption has changed, reset tweaks
           selectedSortOptionRef.current = selectedSortOption;
-          dispatch(tweakActions.setTweaks(tweaksFromServer));
+          setTweaks(tweaksFromServer);
         } else {
           // If the selectedSortOption is the same, append fetched data to existing tweaks.
-          dispatch(tweakActions.setTweaks(tweaksFromServer));
+          setTweaks((prevTweaks) => [...prevTweaks, ...tweaksFromServer]);
         }
 
         if (tweaksFromServer.length === 0) {
@@ -87,41 +82,38 @@ const Tweaks = ({ piece, pieceClassModalRef }) => {
   };
 
   useEffect(() => {
-    dispatch(tweakActions.resetTweaks());
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <>
-      <div className={classes.tweaks}>
-        {tweaks.length > 0 && (
-          <SortDropdown
-            onSortChange={handleSortChange}
-            selectedSortOption={selectedSortOption}
-          />
-        )}
-        {isScrollableTargetAvailable && (
-          <div className={classes['tweak-layout']}>
-            {tweaks.length === 0 && (
-              <p className={classes.note}>Be the first to tweak this piece!</p>
-            )}
-            <InfiniteScroll
-              dataLength={tweaks.length}
-              next={fetchData}
-              hasMore={hasMore}
-              loader={<h4>Loading...</h4>}
-              scrollableTarget={pieceClassModalRef?.current}
-              endMessage={<span></span>}
-            >
-              {tweaks.map((tweak, index) => (
-                <Tweak key={tweak.id} tweak={tweak} />
-              ))}
-            </InfiniteScroll>
-          </div>
-        )}
-      </div>
-    </>
+    <div className={classes.tweaks}>
+      {tweaks.length > 0 && (
+        <SortDropdown
+          onSortChange={handleSortChange}
+          selectedSortOption={selectedSortOption}
+        />
+      )}
+      {isScrollableTargetAvailable && (
+        <div className={classes['tweak-layout']}>
+          {tweaks.length === 0 && (
+            <p className={classes.note}>Be the first to tweak this piece!</p>
+          )}
+          <InfiniteScroll
+            dataLength={tweaks.length}
+            next={fetchData}
+            hasMore={hasMore}
+            loader={<h4>Loading...</h4>}
+            scrollableTarget={pieceClassModalRef?.current}
+            endMessage={<span></span>}
+          >
+            {tweaks.map((tweak, index) => (
+              <Tweak key={tweak.id} tweak={tweak} />
+            ))}
+          </InfiniteScroll>
+        </div>
+      )}
+    </div>
   );
 };
 

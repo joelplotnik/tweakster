@@ -1,63 +1,90 @@
-import React, { useEffect, useState } from 'react'
-import { fetchPersonalPieces, fetchPieces } from '../../store/pieces-actions'
-import { piecesActions, selectAllPieces } from '../../store/pieces'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState, useEffect } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { throttle } from 'lodash';
 
-import { Error } from './Error'
-import InfiniteScroll from 'react-infinite-scroll-component'
-import NoPieces from './NoPieces'
-import Piece from './Piece'
-import PieceSkeleton from './Skeletons/PieceSkeleton'
-import classes from './PieceList.module.css'
-import { throttle } from 'lodash'
+import Piece from './Piece';
+import NoPieces from './NoPieces';
+import Error from './Error';
+import PieceSkeleton from './Skeletons/PieceSkeleton';
+
+import { API_URL } from '../../constants/constants';
+import classes from './PieceList.module.css';
+import { getAuthToken } from '../../util/auth';
 
 const PieceList = ({ isHomePage }) => {
-  const dispatch = useDispatch()
-  const pieces = useSelector(selectAllPieces)
-  const [hasMore, setHasMore] = useState(true)
-  const [page, setPage] = useState(1)
-  const [error, setError] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const throttledFetchData = throttle(() => fetchData(), 500)
+  const [pieces, setPieces] = useState([]);
+  const [pieceIds, setPieceIds] = useState(new Set());
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const throttledFetchData = throttle(() => fetchData(), 500);
+
+  const fetchPieces = async (currentPage) => {
+    try {
+      const fetchUrl = isHomePage
+        ? `${API_URL}/personal_feed?page=${currentPage}`
+        : `${API_URL}?page=${currentPage}`;
+
+      const token = isHomePage ? getAuthToken() : null;
+      const response = await fetch(fetchUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(isHomePage && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch pieces');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   const fetchData = async () => {
     if (!isLoading) {
-      setIsLoading(true)
+      setIsLoading(true);
 
-      const fetchThunk = isHomePage ? fetchPersonalPieces : fetchPieces
+      const piecesFromServer = await fetchPieces(page);
 
-      try {
-        const response = await dispatch(fetchThunk(page))
+      if (piecesFromServer) {
+        const newPieces = piecesFromServer.filter(
+          (piece) => !pieceIds.has(piece.id)
+        );
 
-        if (response) {
-          if (response.hasMore) {
-            setPage(page + 1)
-          } else {
-            setHasMore(false)
-          }
+        setPieces([...pieces, ...newPieces]);
+        setPieceIds(
+          new Set([...pieceIds, ...newPieces.map((piece) => piece.id)])
+        );
+
+        if (newPieces.length === 0) {
+          setHasMore(false);
         }
-      } catch (error) {
-        setError(error.message)
-      } finally {
-        setIsLoading(false)
+        setPage(page + 1);
       }
+
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    dispatch(piecesActions.resetPieces())
-    throttledFetchData()
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const fetchMoreData = () => {
     if (!isLoading && hasMore) {
-      throttledFetchData()
+      throttledFetchData();
     }
-  }
+  };
 
   if (error) {
-    return <Error message={`Error: ${error}`} />
+    return <Error message={`Error: ${error}`} />;
   }
 
   return (
@@ -85,7 +112,7 @@ const PieceList = ({ isHomePage }) => {
         </div>
       </InfiniteScroll>
     </>
-  )
-}
+  );
+};
 
-export default PieceList
+export default PieceList;

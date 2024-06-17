@@ -1,11 +1,25 @@
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Link,
   json,
   useLocation,
   useNavigate,
   useRouteLoaderData,
-} from 'react-router-dom'
-import React, { useContext, useEffect, useState } from 'react'
+} from 'react-router-dom';
+import Moment from 'react-moment';
+
+import { API_URL } from '../../constants/constants';
+import { getUserData } from '../../util/auth';
+import PieceModalContext from '../../context/piecemodal';
+import RefreshContext from '../../context/refresh';
+import PieceVote from '../UI/PieceVote';
+import SharePopover from '../UI/SharePopover';
+import ConfirmationModal from '../UI/Modals/ConfirmationModal';
+import AuthModal from '../UI/Modals/AuthModal';
+import ReportModal from '../UI/Modals/ReportModal';
+import PieceCarousel from '../UI/PieceCarousel';
+
+import classes from './Tweak.module.css';
 import {
   RiChat3Line,
   RiDeleteBin7Line,
@@ -14,62 +28,49 @@ import {
   RiFlaskFill,
   RiFlaskLine,
   RiMoreFill,
-} from 'react-icons/ri'
-
-import { API_URL } from '../../constants/constants'
-import { AuthModal } from '../UI/Modals/AuthModal'
-import ConfirmationModal from '../UI/Modals/ConfirmationModal'
-import Moment from 'react-moment'
-import PieceCarousel from '../UI/PieceCarousel'
-import PieceModalContext from '../../context/piecemodal'
-import PieceVote from '../UI/PieceVote'
-import RefreshContext from '../../context/refresh'
-import ReportModal from '../UI/Modals/ReportModal'
-import SharePopover from '../UI/SharePopover'
-import classes from './Tweak.module.css'
-import defaultAvatar from '../../assets/default-avatar.png'
-import { getUserData } from '../../util/auth'
+} from 'react-icons/ri';
+import defaultAvatar from '../../assets/default-avatar.png';
 
 const Tweak = ({ tweak }) => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const background = useContext(PieceModalContext)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const background = useContext(PieceModalContext);
 
-  const token = useRouteLoaderData('root')
-  const pieceUserID = tweak.user_id
-  const { userId, userRole } = getUserData() || {}
-  const currentUser = pieceUserID === userId
-  const setRefreshRoot = useContext(RefreshContext)
+  const token = useRouteLoaderData('root');
+  const pieceUserID = tweak.user_id;
+  const { userId, userRole } = getUserData() || {};
+  const currentUser = pieceUserID === userId;
+  const setRefreshRoot = useContext(RefreshContext);
 
-  const tweaked = !!tweak.tweak
+  const tweaked = !!tweak.tweak;
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal)
-  }
+    setShowReportModal(!showReportModal);
+  };
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
+    setShowAuthModal(!showAuthModal);
+  };
 
   const handleConfirmationModalToggle = () => {
-    setShowConfirmationModal(!showConfirmationModal)
-  }
+    setShowConfirmationModal(!showConfirmationModal);
+  };
 
   const handleDropdownToggle = (event) => {
-    event.stopPropagation()
-    setShowDropdown(!showDropdown)
-  }
+    event.stopPropagation();
+    setShowDropdown(!showDropdown);
+  };
 
   const handleEditClick = (event) => {
-    event.stopPropagation()
+    event.stopPropagation();
     if (tweak.tweaks_count > 0) {
-      navigate(`channels/${tweak.channel_id}/pieces/${tweak.id}/edit`)
+      navigate(`channels/${tweak.channel_id}/pieces/${tweak.id}/edit`);
     }
-  }
+  };
 
   const handleDeleteClick = async () => {
     const response = await fetch(
@@ -81,75 +82,75 @@ const Tweak = ({ tweak }) => {
           Authorization: `Bearer ${token}`,
         },
       }
-    )
+    );
 
     if (!response.ok) {
-      throw json({ message: 'Could not delete piece' }, { status: 500 })
+      throw json({ message: 'Could not delete piece' }, { status: 500 });
     }
 
-    window.location.reload()
-    setRefreshRoot(true)
-  }
+    window.location.reload();
+    setRefreshRoot(true);
+  };
 
   const handleReportClick = () => {
     if (!token) {
-      setShowDropdown(false)
-      setShowAuthModal(true)
+      setShowDropdown(false);
+      setShowAuthModal(true);
     } else {
-      setShowDropdown(false)
-      setShowReportModal(true)
+      setShowDropdown(false);
+      setShowReportModal(true);
     }
-  }
+  };
 
   useEffect(() => {
     const handleClickOutsideDropdown = (event) => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
-      )
+      );
 
       if (dropdownContainer && !dropdownContainer.contains(event.target)) {
-        setShowDropdown(false)
+        setShowDropdown(false);
       }
-    }
+    };
 
-    document.addEventListener('click', handleClickOutsideDropdown)
+    document.addEventListener('click', handleClickOutsideDropdown);
 
     return () => {
-      document.removeEventListener('click', handleClickOutsideDropdown)
-    }
-  }, [])
+      document.removeEventListener('click', handleClickOutsideDropdown);
+    };
+  }, []);
 
   const handlePieceLinkClick = (event) => {
-    const target = event.target
-    const isDeleteButton = target.classList.contains(classes.danger)
-    const isDropdown = target.closest(`.${classes.dropdown}`)
-    const isCarouselDiv = target.closest(`.${classes.carousel}`)
+    const target = event.target;
+    const isDeleteButton = target.classList.contains(classes.danger);
+    const isDropdown = target.closest(`.${classes.dropdown}`);
+    const isCarouselDiv = target.closest(`.${classes.carousel}`);
 
     if (!isDeleteButton && !isDropdown && !isCarouselDiv) {
-      event.preventDefault()
-      let url = ''
-      let param = ''
+      event.preventDefault();
+      let url = '';
+      let param = '';
 
       if (target.closest(`.${classes.tweak}`)) {
-        param = 'tweaks'
+        param = 'tweaks';
       } else if (target.closest(`.${classes.comms}`)) {
-        param = 'comments'
+        param = 'comments';
       }
 
       if (param) {
-        url = `/channels/${tweak.channel.id}/pieces/${tweak.id}`
-        navigate(url, { state: { tab: param, background: background } })
+        url = `/channels/${tweak.channel.id}/pieces/${tweak.id}`;
+        navigate(url, { state: { tab: param, background: background } });
       } else {
         navigate(`/channels/${tweak.channel_id}/pieces/${tweak.id}`, {
           state: { background: background },
-        })
+        });
       }
     }
-  }
+  };
 
   const stopPropagation = (event) => {
-    event.stopPropagation()
-  }
+    event.stopPropagation();
+  };
 
   return (
     <>
@@ -248,9 +249,12 @@ const Tweak = ({ tweak }) => {
             <div className={classes['footer-container']}>
               <div className={classes.vote}>
                 <PieceVote
+                  likes={tweak.likes}
+                  dislikes={tweak.dislikes}
                   channelId={tweak.channel_id}
-                  tweakId={tweak.id}
+                  pieceId={tweak.id}
                   userVotes={tweak.votes}
+                  background={background}
                   arrangement={'row'}
                 />
               </div>
@@ -320,7 +324,7 @@ const Tweak = ({ tweak }) => {
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default Tweak
+export default Tweak;

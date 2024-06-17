@@ -1,11 +1,24 @@
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Link,
   json,
   useLocation,
   useNavigate,
   useRouteLoaderData,
-} from 'react-router-dom'
-import React, { useContext, useEffect, useState } from 'react'
+} from 'react-router-dom';
+import Moment from 'react-moment';
+
+import { API_URL } from '../../constants/constants';
+import { getUserData } from '../../util/auth';
+import RefreshContext from '../../context/refresh';
+import PieceVote from '../UI/PieceVote';
+import SharePopover from '../UI/SharePopover';
+import ConfirmationModal from '../UI/Modals/ConfirmationModal';
+import AuthModal from '../UI/Modals/AuthModal';
+import ReportModal from '../UI/Modals/ReportModal';
+import PieceCarousel from '../UI/PieceCarousel';
+
+import classes from './Piece.module.css';
 import {
   RiChat3Line,
   RiDeleteBin7Line,
@@ -14,79 +27,58 @@ import {
   RiFlaskFill,
   RiFlaskLine,
   RiMoreFill,
-} from 'react-icons/ri'
-import { piecesActions, selectPieceById } from '../../store/pieces'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { API_URL } from '../../constants/constants'
-import { AuthModal } from '../UI/Modals/AuthModal'
-import ConfirmationModal from '../UI/Modals/ConfirmationModal'
-import Moment from 'react-moment'
-import PieceCarousel from '../UI/PieceCarousel'
-import PieceVote from '../UI/PieceVote'
-import RefreshContext from '../../context/refresh'
-import ReportModal from '../UI/Modals/ReportModal'
-import SharePopover from '../UI/SharePopover'
-import classes from './Piece.module.css'
-import defaultAvatar from '../../assets/default-avatar.png'
-import { getUserData } from '../../util/auth'
+} from 'react-icons/ri';
+import defaultAvatar from '../../assets/default-avatar.png';
+import { useSelector } from 'react-redux';
 
 const Piece = ({ piece }) => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const setRefreshRoot = useContext(RefreshContext)
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
-  const [showAuthModal, setShowAuthModal] = useState(false)
+  const activePiece = useSelector((state) => state.piece.piece);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const setRefreshRoot = useContext(RefreshContext);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const token = useRouteLoaderData('root')
-  const { userId, userRole } = getUserData() || {}
-  const pieceUserID = piece.user.id
-  const currentUser = pieceUserID === parseInt(userId, 10)
+  const token = useRouteLoaderData('root');
+  const { userId, userRole } = getUserData() || {};
+  const pieceUserID = piece.user.id;
+  const currentUser = pieceUserID === parseInt(userId, 10);
 
-  const updatedPiece = useSelector((state) => selectPieceById(state, piece.id))
-  const commentsCount = updatedPiece
-    ? updatedPiece.comments_count
-    : piece.comments_count
-  const tweaksCount = updatedPiece
-    ? updatedPiece.tweaks_count
-    : piece.tweaks_count
-
-  const tweaked = !!piece.tweak
+  const tweaked = !!piece.tweak;
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
+    setShowAuthModal(!showAuthModal);
+  };
 
   const handleConfirmationModalToggle = () => {
-    setShowConfirmationModal(!showConfirmationModal)
-  }
+    setShowConfirmationModal(!showConfirmationModal);
+  };
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal)
-  }
+    setShowReportModal(!showReportModal);
+  };
 
   const handleDropdownToggle = (event) => {
-    event.stopPropagation()
-    setShowDropdown(!showDropdown)
-  }
+    event.stopPropagation();
+    setShowDropdown(!showDropdown);
+  };
 
   const handleEditClick = (event) => {
-    event.stopPropagation()
-    if (tweaksCount === 0) {
-      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}/edit`)
+    event.stopPropagation();
+    if (piece.tweaks_count === 0) {
+      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}/edit`);
     }
-  }
+  };
 
   const handleParentPieceClick = (event) => {
-    event.stopPropagation()
+    event.stopPropagation();
     window.open(
       `/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`,
       '_blank'
-    )
-  }
+    );
+  };
 
   const handleDeleteClick = async () => {
     const response = await fetch(
@@ -98,92 +90,93 @@ const Piece = ({ piece }) => {
           Authorization: `Bearer ${token}`,
         },
       }
-    )
+    );
 
     if (!response.ok) {
-      throw json({ message: 'Could not delete piece' }, { status: 500 })
+      throw json({ message: 'Could not delete piece' }, { status: 500 });
     }
 
-    dispatch(piecesActions.removePiece({ id: piece.id }))
-    navigate(location.pathname)
-    setRefreshRoot(true)
-  }
+    navigate(location.pathname);
+    setRefreshRoot(true);
+  };
 
   const handleReportClick = () => {
     if (!token) {
-      setShowDropdown(false)
-      setShowAuthModal(true)
+      setShowDropdown(false);
+      setShowAuthModal(true);
     } else {
-      setShowDropdown(false)
-      setShowReportModal(true)
+      setShowDropdown(false);
+      setShowReportModal(true);
     }
-  }
+  };
 
   useEffect(() => {
     const handleClickOutsideDropdown = (event) => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
-      )
+      );
 
       if (dropdownContainer && !dropdownContainer.contains(event.target)) {
-        setShowDropdown(false)
+        setShowDropdown(false);
       }
-    }
+    };
 
-    document.addEventListener('click', handleClickOutsideDropdown)
+    document.addEventListener('click', handleClickOutsideDropdown);
 
     return () => {
-      document.removeEventListener('click', handleClickOutsideDropdown)
-    }
-  }, [])
+      document.removeEventListener('click', handleClickOutsideDropdown);
+    };
+  }, []);
 
   const handlePieceLinkClick = (event) => {
-    const target = event.target
-    const isDeleteButton = target.classList.contains(classes.danger)
-    const isDropdown = target.closest(`.${classes.dropdown}`)
-    const isCarouselDiv = target.closest(`.${classes.carousel}`)
+    const target = event.target;
+    const isDeleteButton = target.classList.contains(classes.danger);
+    const isDropdown = target.closest(`.${classes.dropdown}`);
+    const isCarouselDiv = target.closest(`.${classes.carousel}`);
 
     if (!isDeleteButton && !isDropdown && !isCarouselDiv) {
-      event.preventDefault()
-      let url = ''
-      let param = ''
+      event.preventDefault();
+      let url = '';
+      let param = '';
 
       if (target.closest(`.${classes.tweak}`)) {
-        param = 'tweaks'
+        param = 'tweaks';
       } else if (target.closest(`.${classes.comms}`)) {
-        param = 'comments'
+        param = 'comments';
       }
 
       if (param) {
         if (!token) {
-          url = `/channels/${piece.channel.id}/pieces/${piece.id}?tab=${param}`
-          window.open(url, '_blank')
+          url = `/channels/${piece.channel.id}/pieces/${piece.id}?tab=${param}`;
+          window.open(url, '_blank');
         } else {
-          url = `/channels/${piece.channel.id}/pieces/${piece.id}`
-          navigate(url, { state: { tab: param, background: location } })
+          url = `/channels/${piece.channel.id}/pieces/${piece.id}`;
+          navigate(url, { state: { tab: param, background: location } });
         }
       } else {
         if (!token) {
-          url = `/channels/${piece.channel.id}/pieces/${piece.id}`
-          window.open(url, '_blank')
+          url = `/channels/${piece.channel.id}/pieces/${piece.id}`;
+          window.open(url, '_blank');
         } else {
           navigate(`/channels/${piece.channel.id}/pieces/${piece.id}`, {
             state: { background: location },
-          })
+          });
         }
       }
     }
-  }
+  };
 
   const stopPropagation = (event) => {
-    event.stopPropagation()
-  }
+    event.stopPropagation();
+  };
 
   return (
     <>
       <div onClick={handlePieceLinkClick} className={classes.piece}>
         <div className={classes.vote}>
           <PieceVote
+            likes={piece.likes}
+            dislikes={piece.dislikes}
             channelId={piece.channel_id}
             pieceId={piece.id}
             userVotes={piece.votes}
@@ -294,11 +287,18 @@ const Piece = ({ piece }) => {
             <div className={classes['footer-container']}>
               <div className={`${classes.link} ${classes.tweak}`}>
                 <RiFlaskLine className={classes.icon} />
-                <span className={classes.text}>{tweaksCount} Tweaks</span>
+                <span className={classes.text}>
+                  {piece.tweaks_count} Tweaks
+                </span>
               </div>
               <div className={`${classes.link} ${classes.comms}`}>
                 <RiChat3Line className={classes.icon} />
-                <span className={classes.text}>{commentsCount} Comments</span>
+                <span className={classes.text}>
+                  {activePiece && activePiece.id === piece.id
+                    ? activePiece.comments_count
+                    : piece.comments_count}{' '}
+                  Comments
+                </span>
               </div>
               <SharePopover
                 url={`${window.location.href}channels/${piece.channel.id}/pieces/${piece.id}`}
@@ -317,7 +317,7 @@ const Piece = ({ piece }) => {
                       <>
                         <button
                           onClick={handleEditClick}
-                          disabled={tweaksCount > 0}
+                          disabled={piece.tweaks_count > 0}
                         >
                           <RiEditBoxLine /> Edit
                         </button>
@@ -357,7 +357,7 @@ const Piece = ({ piece }) => {
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default Piece
+export default Piece;

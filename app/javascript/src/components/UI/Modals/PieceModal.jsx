@@ -1,9 +1,31 @@
+import ReactDOM from 'react-dom';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Link,
   useLocation,
   useNavigate,
   useRouteLoaderData,
-} from 'react-router-dom'
+} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import Moment from 'react-moment';
+import { toast } from 'react-toastify';
+
+import { API_URL } from '../../../constants/constants';
+import { getUserData } from '../../../util/auth';
+import { pieceModalActions } from '../../../store/piece-modal';
+import PieceModalContext from '../../../context/piecemodal';
+import RefreshContext from '../../../context/refresh';
+import PieceVote from '../PieceVote';
+import Interactions from '../../Content/Interactions';
+import SharePopover from '../SharePopover';
+import AuthModal from './AuthModal';
+import ConfirmationModal from './ConfirmationModal';
+import Backdrop from './Backdrop';
+import PieceCarousel from '../PieceCarousel';
+import ReportModal from './ReportModal';
+import PopulateModal from './PopulateModal';
+
+import classes from './PieceModal.module.css';
 import {
   RiArrowLeftLine,
   RiDeleteBin7Line,
@@ -11,144 +33,118 @@ import {
   RiFlagLine,
   RiFlaskLine,
   RiMoreFill,
-} from 'react-icons/ri'
-import { piecesActions, selectPieceById } from '../../../store/pieces'
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { API_URL } from '../../../constants/constants'
-import { AuthModal } from './AuthModal'
-import { Backdrop } from './Backdrop'
-import ConfirmationModal from './ConfirmationModal'
-import Interactions from '../../Content/Interactions'
-import Moment from 'react-moment'
-import PieceCarousel from '../PieceCarousel'
-import PieceModalContext from '../../../context/piecemodal'
-import PieceVote from '../PieceVote'
-import PopulateModal from './PopulateModal'
-import ReactDOM from 'react-dom'
-import RefreshContext from '../../../context/refresh'
-import ReportModal from './ReportModal'
-import SharePopover from '../SharePopover'
-import { channelPageActions } from '../../../store/channel-page'
-import classes from './PieceModal.module.css'
-import defaultAvatar from '../../../assets/default-avatar.png'
-import { getUserData } from '../../../util/auth'
-import { pieceModalActions } from '../../../store/piece-modal'
-import { toast } from 'react-toastify'
+} from 'react-icons/ri';
+import defaultAvatar from '../../../assets/default-avatar.png';
+import { channelPageActions } from '../../../store/channel-page';
 
 const PieceModal = () => {
-  const loaderPiece = useRouteLoaderData('piece')
-  const piece = useSelector((state) => {
-    const selectedPiece = selectPieceById(state, loaderPiece.id)
-    return selectedPiece || state.piece.piece
-  })
-  const navigate = useNavigate()
-  const token = useRouteLoaderData('root')
-  const { userId, userRole } = getUserData() || {}
-  const pieceUserId = piece.user.id
-  const currentUser = pieceUserId === parseInt(userId, 10)
-  const channel = useSelector((state) => state.channelPage.channel)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-  const [showPopulateModal, setShowPopulateModal] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
-  const setRefreshRoot = useContext(RefreshContext)
-  const pieceClassModalRef = useRef(null)
-  const dispatch = useDispatch()
-  let location = useLocation()
-  let background = location.state && location.state.background
-  const interactionsRef = useRef(null)
+  const piece = useSelector((state) => state.piece.piece);
+  const navigate = useNavigate();
+  const token = useRouteLoaderData('root');
+  const { userId, userRole } = getUserData() || {};
+  const pieceUserId = piece.user.id;
+  const currentUser = pieceUserId === parseInt(userId, 10);
+  const channel = useSelector((state) => state.channelPage.channel);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showPopulateModal, setShowPopulateModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const setRefreshRoot = useContext(RefreshContext);
+  const pieceClassModalRef = useRef(null);
+  const dispatch = useDispatch();
+  let location = useLocation();
+  let background = location.state && location.state.background;
+  const interactionsRef = useRef(null);
   const [tweakData, setTweakData] = useState({
     channelId: piece.channel_id,
     pieceId: piece.id,
     text: false,
-  })
+  });
 
   useEffect(() => {
-    const tabParam = location.state && location.state.tab
+    const tabParam = location.state && location.state.tab;
 
     if (tabParam) {
-      interactionsRef.current.scrollIntoView({ top: 0, behavior: 'smooth' })
+      interactionsRef.current.scrollIntoView({ top: 0, behavior: 'smooth' });
     }
-  }, [location.state])
+  }, [location.state]);
 
   useEffect(() => {
-    dispatch(pieceModalActions.setPieceModalActive(true))
+    dispatch(pieceModalActions.setPieceModalActive(true));
 
     return () => {
-      dispatch(pieceModalActions.resetPieceModalState())
-    }
-  }, [dispatch])
+      dispatch(pieceModalActions.resetPieceModalState());
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     // Add the overlay class to the overlay-root element
-    const overlayRoot = document.getElementById('overlay-root')
+    const overlayRoot = document.getElementById('overlay-root');
     if (overlayRoot) {
-      overlayRoot.classList.add('overlay')
+      overlayRoot.classList.add('overlay');
     }
 
     // Cleanup function to remove the class when the component is unmounted
     return () => {
       if (overlayRoot) {
-        overlayRoot.classList.remove('overlay')
+        overlayRoot.classList.remove('overlay');
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const stopPropagation = (event) => {
-    event.stopPropagation()
-  }
+    event.stopPropagation();
+  };
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
+    setShowAuthModal(!showAuthModal);
+  };
 
   const handleConfirmationModalToggle = () => {
-    setShowConfirmationModal(!showConfirmationModal)
-  }
+    setShowConfirmationModal(!showConfirmationModal);
+  };
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal)
-  }
+    setShowReportModal(!showReportModal);
+  };
 
   const handleSubscriptionModalToggle = () => {
-    setShowSubscriptionModal(!showSubscriptionModal)
-  }
+    setShowSubscriptionModal(!showSubscriptionModal);
+  };
 
   const handlePopulateModalToggle = () => {
-    setShowPopulateModal(!showPopulateModal)
-  }
+    setShowPopulateModal(!showPopulateModal);
+  };
 
   const handleDropdownToggle = () => {
-    setShowDropdown(!showDropdown)
-  }
+    setShowDropdown(!showDropdown);
+  };
 
   useEffect(() => {
     const handleClickOutsideDropdown = (event) => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
-      )
+      );
 
       if (dropdownContainer && !dropdownContainer.contains(event.target)) {
-        setShowDropdown(false)
+        setShowDropdown(false);
       }
-    }
+    };
 
-    document.addEventListener('click', handleClickOutsideDropdown)
+    document.addEventListener('click', handleClickOutsideDropdown);
 
     return () => {
-      document.removeEventListener('click', handleClickOutsideDropdown)
-    }
-  }, [])
+      document.removeEventListener('click', handleClickOutsideDropdown);
+    };
+  }, []);
 
   const handleEditClick = () => {
     if (piece.tweaks_count === 0) {
-      navigate(`edit`)
+      navigate(`edit`);
     }
-  }
+  };
 
   const handleDeleteClick = async () => {
     try {
@@ -161,35 +157,34 @@ const PieceModal = () => {
             Authorization: `Bearer ${token}`,
           },
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error('Could not delete piece')
+        throw new Error('Could not delete piece');
       }
 
-      dispatch(piecesActions.removePiece({ id: piece.id }))
-      navigate(background.pathname)
-      setRefreshRoot(true)
+      navigate(background.pathname);
+      setRefreshRoot(true);
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error deleting piece')
+      console.error('Error: ', error.message);
+      toast.error('Error deleting piece');
     }
-  }
+  };
 
   const handleReportClick = () => {
     if (!token) {
-      setShowDropdown(false)
-      setShowAuthModal(true)
+      setShowDropdown(false);
+      setShowAuthModal(true);
     } else {
-      setShowDropdown(false)
-      setShowReportModal(true)
+      setShowDropdown(false);
+      setShowReportModal(true);
     }
-  }
+  };
 
   const handleTweakClick = async () => {
     try {
       if (!token) {
-        setShowAuthModal(true)
+        setShowAuthModal(true);
       } else {
         const response = await fetch(
           `${API_URL}/channels/${piece.channel_id}/check_channel_subscription`,
@@ -200,33 +195,33 @@ const PieceModal = () => {
               Authorization: `Bearer ${token}`,
             },
           }
-        )
+        );
 
         if (response.status === 403) {
           // User isn't subscribed to channel, show the subscription modal
-          setShowSubscriptionModal(true)
+          setShowSubscriptionModal(true);
         } else if (!response.ok) {
-          throw new Error('Failed to check channel subscription')
+          throw new Error('Failed to check channel subscription');
         } else {
           if (piece.content) {
-            setShowPopulateModal(true)
+            setShowPopulateModal(true);
           } else {
-            const queryParams = new URLSearchParams(tweakData).toString()
-            navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
+            const queryParams = new URLSearchParams(tweakData).toString();
+            navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`);
           }
         }
       }
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error handling tweak click')
+      console.error('Error: ', error.message);
+      toast.error('Error handling tweak click');
     }
-  }
+  };
 
   const handleSubscribeClick = async () => {
     try {
       const payload = {
         channel_id: piece.channel.id,
-      }
+      };
 
       const response = await fetch(
         `${API_URL}/channels/${piece.channel.id}/subscribe`,
@@ -238,55 +233,55 @@ const PieceModal = () => {
           },
           body: JSON.stringify(payload),
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to subscribe')
+        throw new Error('Failed to subscribe');
       }
 
       if (background.pathname.startsWith('/channels') && channel) {
-        dispatch(channelPageActions.updateSubscribedState(true))
+        dispatch(channelPageActions.updateSubscribedState(true));
         dispatch(
           channelPageActions.updateSubscriberCount(channel.subscriber_count + 1)
-        )
+        );
       }
 
-      setShowSubscriptionModal(false)
+      setShowSubscriptionModal(false);
 
       if (piece.content) {
-        setShowPopulateModal(true)
+        setShowPopulateModal(true);
       } else {
-        const queryParams = new URLSearchParams(tweakData).toString()
-        navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
+        const queryParams = new URLSearchParams(tweakData).toString();
+        navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`);
       }
     } catch (error) {
-      console.error(error)
-      toast.error('Error handling subscribe click')
+      console.error(error);
+      toast.error('Error handling subscribe click');
     }
-  }
+  };
 
   const handleParentPieceClick = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     navigate(
       `/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`,
       {
         state: { background: background },
       }
-    )
-  }
+    );
+  };
 
   const handleCheckboxChange = (event) => {
-    const { value, checked } = event.target
+    const { value, checked } = event.target;
     setTweakData((prevData) => ({
       ...prevData,
       [value]: checked,
-    }))
-  }
+    }));
+  };
 
   const handlePopulateClick = () => {
-    const queryParams = new URLSearchParams(tweakData).toString()
-    navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
-  }
+    const queryParams = new URLSearchParams(tweakData).toString();
+    navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`);
+  };
 
   return (
     <>
@@ -314,8 +309,11 @@ const PieceModal = () => {
                     </div>
                     <div className={classes['header-center']}>
                       <PieceVote
+                        likes={piece.likes}
+                        dislikes={piece.dislikes}
                         channelId={piece.channel_id}
                         pieceId={piece.id}
+                        userVotes={piece.votes}
                         arrangement={'header'}
                       />
                     </div>
@@ -326,8 +324,11 @@ const PieceModal = () => {
                   <div className={classes.piece} ref={pieceClassModalRef}>
                     <div className={classes.vote}>
                       <PieceVote
+                        likes={piece.likes}
+                        dislikes={piece.dislikes}
                         channelId={piece.channel_id}
                         pieceId={piece.id}
+                        userVotes={piece.votes}
                       />
                     </div>
                     <div className={classes['content-wrapper']}>
@@ -510,7 +511,7 @@ const PieceModal = () => {
         document.getElementById('overlay-root')
       )}
     </>
-  )
-}
+  );
+};
 
-export default PieceModal
+export default PieceModal;

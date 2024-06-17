@@ -12,7 +12,7 @@ Make sure you have the following software installed on your machine before proce
 
 ## Installation
 
-Follow the steps below to set up the Tweakster application on your local machine:
+Follow the steps below to set up Tweakster on your local machine:
 
 1. Clone the repository:
 
@@ -50,11 +50,11 @@ rails db:setup
 npm start
 ```
 
-You can now access the Tweakster application by visiting http://localhost:5100 in your browser.
+You can now access Tweakster by visiting http://localhost:5100 in your browser.
 
 ## Configuration
 
-The Tweakster API does not require any additional configuration beyond the standard Rails setup.
+Tweakster requires minimal configuration beyond the standard Rails setup.
 
 ## Usage
 
@@ -62,7 +62,7 @@ Once the Tweakster server is running, you can use the Tweakster web application 
 
 ## Troubleshooting
 
-If you encounter any issues during the setup or usage of the Tweakster application, consider the following troubleshooting steps:
+If you encounter any issues during the setup or usage of Tweakster, consider the following troubleshooting steps:
 
 - Make sure all the prerequisites are installed correctly.
 - Verify that the development server is running on port 5100.

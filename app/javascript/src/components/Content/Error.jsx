@@ -1,5 +1,5 @@
 import React from 'react';
-import classes from './Error.module.css'
+import classes from './Error.module.css';
 
 export function Error({ message }) {
   return (
@@ -7,5 +7,7 @@ export function Error({ message }) {
       <h3 className={classes.title}>Oops! Something went wrong...</h3>
       <p className={classes.message}>{message}</p>
     </div>
-  )
+  );
 }
+
+export default Error;
