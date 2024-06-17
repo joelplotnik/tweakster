@@ -1,21 +1,22 @@
-import { Link, useRouteLoaderData } from 'react-router-dom'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useRouteLoaderData } from 'react-router-dom';
+import Moment from 'react-moment';
+
+import CommentVote from '../UI/CommentVote';
+import CommentForm from './Forms/CommentForm';
+import AuthModal from '../UI/Modals/AuthModal';
+import ConfirmationModal from '../UI/Modals/ConfirmationModal';
+import { getUserData } from '../../util/auth';
+
+import classes from './Comment.module.css';
 import {
   RiDeleteBin7Line,
   RiEditBoxLine,
   RiFlagLine,
   RiMoreFill,
   RiReplyLine,
-} from 'react-icons/ri'
-
-import { AuthModal } from '../UI/Modals/AuthModal'
-import CommentForm from './Forms/CommentForm'
-import CommentVote from '../UI/CommentVote'
-import ConfirmationModal from '../UI/Modals/ConfirmationModal'
-import Moment from 'react-moment'
-import ReportModal from '../UI/Modals/ReportModal'
-import classes from './Comment.module.css'
-import { getUserData } from '../../util/auth'
+} from 'react-icons/ri';
+import ReportModal from '../UI/Modals/ReportModal';
 
 const Comment = ({
   comment,
@@ -27,79 +28,79 @@ const Comment = ({
   activeComment,
   setActiveComment,
 }) => {
-  const token = useRouteLoaderData('root')
-  const commentUserId = comment.user_id
-  const { userId, userRole } = getUserData() || {}
-  const currentUser = commentUserId === userId
-  const [isReplyFormOpen, setIsReplyFormOpen] = useState(false)
-  const [isEditFormOpen, setIsEditFormOpen] = useState(false)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-  const dropdownRef = useRef(null)
+  const token = useRouteLoaderData('root');
+  const commentUserId = comment.user_id;
+  const { userId, userRole } = getUserData() || {};
+  const currentUser = commentUserId === userId;
+  const [isReplyFormOpen, setIsReplyFormOpen] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleReplyClick = () => {
     if (!token) {
-      setShowAuthModal(true)
+      setShowAuthModal(true);
     } else {
-      setIsReplyFormOpen(!isReplyFormOpen)
-      setIsEditFormOpen(false)
+      setIsReplyFormOpen(!isReplyFormOpen);
+      setIsEditFormOpen(false);
     }
-  }
+  };
 
   const handleEditClick = () => {
-    setActiveComment(null)
-    setIsEditFormOpen(!isEditFormOpen)
-    setIsReplyFormOpen(false)
-  }
+    setActiveComment(null);
+    setIsEditFormOpen(!isEditFormOpen);
+    setIsReplyFormOpen(false);
+  };
 
   const handleDeleteClick = () => {
-    onDelete(comment.id)
-  }
+    onDelete(comment.id);
+  };
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
+    setShowAuthModal(!showAuthModal);
+  };
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal)
-  }
+    setShowReportModal(!showReportModal);
+  };
 
   const handleDropdownClick = (event) => {
     if (!token) {
-      setShowAuthModal(true)
-      return
+      setShowAuthModal(true);
+      return;
     }
 
-    event.stopPropagation()
-    setActiveComment(activeComment === comment.id ? null : comment.id)
-  }
+    event.stopPropagation();
+    setActiveComment(activeComment === comment.id ? null : comment.id);
+  };
 
   const handleReportClick = () => {
     if (!token) {
-      setShowAuthModal(true)
+      setShowAuthModal(true);
     } else {
-      setShowReportModal(true)
+      setShowReportModal(true);
     }
-  }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setActiveComment(null)
+        setActiveComment(null);
       }
-    }
+    };
 
-    document.addEventListener('click', handleClickOutside)
+    document.addEventListener('click', handleClickOutside);
 
     return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [setActiveComment])
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [setActiveComment]);
 
   const handleConfirmationModalToggle = () => {
-    setShowConfirmationModal(!showConfirmationModal)
-  }
+    setShowConfirmationModal(!showConfirmationModal);
+  };
 
   return (
     <>
@@ -169,7 +170,7 @@ const Comment = ({
         </div>
         {isReplyFormOpen && (
           <CommentForm
-            parentId={comment.id}
+            parentId={comment.parent_comment_id || comment.id}
             onCancel={() => setIsReplyFormOpen(false)}
             onSubmit={onReply}
             showCancel={true}
@@ -218,6 +219,6 @@ const Comment = ({
         />
       )}
     </>
-  )
-}
-export default Comment
+  );
+};
+export default Comment;

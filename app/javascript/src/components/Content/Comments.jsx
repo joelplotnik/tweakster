@@ -30,6 +30,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
   const [isScrollableTargetAvailable, setScrollableTargetAvailable] =
     useState(false);
   const dispatch = useDispatch();
+  const newCommentRef = useRef(null);
 
   useEffect(() => {
     if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
@@ -196,7 +197,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
         // Reply comment
         const parentComment = findCommentById(comments, parentCommentId);
         if (parentComment) {
-          parentComment.child_comments.unshift(newComment);
+          parentComment.child_comments.push(newComment);
           setComments((prevComments) => [...prevComments]);
           dispatch(pieceActions.increaseCommentCount());
         }
@@ -205,6 +206,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
         const newCommentId = newComment.comment.id;
         setNewCommentIds((prevIds) => [...prevIds, newCommentId]);
         setComments((prevComments) => [newComment, ...prevComments]);
+        newCommentRef.current = newCommentId;
         dispatch(pieceActions.increaseCommentCount());
       }
 
@@ -309,6 +311,28 @@ const Comments = ({ piece, pieceClassModalRef }) => {
     }
   };
 
+  useEffect(() => {
+    if (newCommentRef.current) {
+      const newCommentElement = document.getElementById(newCommentRef.current);
+
+      if (newCommentElement) {
+        if (pieceClassModalRef === 'page') {
+          const topOffset = 48;
+          const elementPosition = newCommentElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY - topOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth',
+          });
+        } else {
+          newCommentElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+      newCommentRef.current = null;
+    }
+  }, [comments, pieceClassModalRef]);
+
   return (
     <>
       <div className={classes.comments}>
@@ -347,31 +371,39 @@ const Comments = ({ piece, pieceClassModalRef }) => {
             {comments
               .filter((comment) => !comment.parent_comment_id)
               .map((comment) => (
-                <Comment
+                <div
                   key={comment.comment.id}
-                  comment={comment.comment}
-                  piece={piece}
-                  childComments={comment.child_comments}
-                  onReply={(message, parentCommentId) =>
-                    handleCommentSubmit(
-                      message,
-                      piece.id,
-                      parentCommentId,
-                      null
-                    )
+                  id={
+                    comment.comment.id === newCommentRef.current
+                      ? newCommentRef.current
+                      : undefined
                   }
-                  onEdit={(message, parentCommentId, commentId) =>
-                    handleCommentSubmit(
-                      message,
-                      piece.id,
-                      parentCommentId,
-                      commentId
-                    )
-                  }
-                  onDelete={(commentId) => handleDeleteComment(commentId)}
-                  activeComment={activeComment}
-                  setActiveComment={setActiveComment}
-                />
+                >
+                  <Comment
+                    comment={comment.comment}
+                    piece={piece}
+                    childComments={comment.child_comments}
+                    onReply={(message, parentCommentId) =>
+                      handleCommentSubmit(
+                        message,
+                        piece.id,
+                        parentCommentId,
+                        null
+                      )
+                    }
+                    onEdit={(message, parentCommentId, commentId) =>
+                      handleCommentSubmit(
+                        message,
+                        piece.id,
+                        parentCommentId,
+                        commentId
+                      )
+                    }
+                    onDelete={(commentId) => handleDeleteComment(commentId)}
+                    activeComment={activeComment}
+                    setActiveComment={setActiveComment}
+                  />
+                </div>
               ))}
           </InfiniteScroll>
         )}

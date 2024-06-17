@@ -1,8 +1,13 @@
-import { RiBookmark3Line, RiCloseCircleLine, RiCloseLine } from 'react-icons/ri'
+import React from 'react';
+import {
+  RiBookmark3Line,
+  RiCloseCircleLine,
+  RiCloseLine,
+} from 'react-icons/ri';
 
-import { Backdrop } from './Backdrop'
-import ReactDOM from 'react-dom'
-import classes from './ConfirmationModal.module.css'
+import { Backdrop } from './Backdrop';
+import ReactDOM from 'react-dom';
+import classes from './ConfirmationModal.module.css';
 
 const ConfirmationModal = ({
   type,
@@ -13,9 +18,9 @@ const ConfirmationModal = ({
   onConfirm,
 }) => {
   const handleConfirm = () => {
-    onClick()
-    onConfirm()
-  }
+    onClick();
+    onConfirm();
+  };
 
   return (
     <>
@@ -67,7 +72,7 @@ const ConfirmationModal = ({
         document.getElementById('overlay-root')
       )}
     </>
-  )
-}
+  );
+};
 
-export default ConfirmationModal
+export default ConfirmationModal;
