@@ -186,6 +186,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
       }
 
       const newComment = await response.json();
+      const newCommentId = newComment.comment.id;
 
       // Handle the state update based on the comment action
       if (commentId) {
@@ -198,12 +199,13 @@ const Comments = ({ piece, pieceClassModalRef }) => {
         const parentComment = findCommentById(comments, parentCommentId);
         if (parentComment) {
           parentComment.child_comments.push(newComment);
+          setNewCommentIds((prevIds) => [...prevIds, newCommentId]);
           setComments((prevComments) => [...prevComments]);
+          newCommentRef.current = newCommentId;
           dispatch(pieceActions.increaseCommentCount());
         }
       } else {
         // New comment
-        const newCommentId = newComment.comment.id;
         setNewCommentIds((prevIds) => [...prevIds, newCommentId]);
         setComments((prevComments) => [newComment, ...prevComments]);
         newCommentRef.current = newCommentId;
@@ -402,6 +404,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
                     onDelete={(commentId) => handleDeleteComment(commentId)}
                     activeComment={activeComment}
                     setActiveComment={setActiveComment}
+                    newCommentRef={newCommentRef}
                   />
                 </div>
               ))}

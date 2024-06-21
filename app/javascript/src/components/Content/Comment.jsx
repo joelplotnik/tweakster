@@ -27,6 +27,7 @@ const Comment = ({
   onDelete,
   activeComment,
   setActiveComment,
+  newCommentRef,
 }) => {
   const token = useRouteLoaderData('root');
   const commentUserId = comment.user_id;
@@ -188,17 +189,26 @@ const Comment = ({
         {childComments && childComments.length > 0 && (
           <div className={classes['comment-nested']}>
             {childComments.map((childComment) => (
-              <Comment
+              <div
                 key={childComment.comment.id}
-                comment={childComment.comment}
-                piece={piece}
-                childComments={childComment.child_comments}
-                onReply={onReply}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                activeComment={activeComment}
-                setActiveComment={setActiveComment}
-              />
+                id={
+                  childComment.comment.id === newCommentRef.current
+                    ? newCommentRef.current
+                    : undefined
+                }
+              >
+                <Comment
+                  key={childComment.comment.id}
+                  comment={childComment.comment}
+                  piece={piece}
+                  childComments={childComment.child_comments}
+                  onReply={onReply}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  activeComment={activeComment}
+                  setActiveComment={setActiveComment}
+                />
+              </div>
             ))}
           </div>
         )}
