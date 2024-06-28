@@ -1,4 +1,4 @@
-import { Link, NavLink, useRouteLoaderData, useSubmit } from 'react-router-dom'
+import { Link, NavLink, useRouteLoaderData, useSubmit } from 'react-router-dom';
 import {
   RiAddFill,
   RiArrowDownSLine,
@@ -11,46 +11,68 @@ import {
   RiNotification3Line,
   RiQuestionLine,
   RiUserLine,
-} from 'react-icons/ri'
-import { useDispatch, useSelector } from 'react-redux'
-import React, { useEffect, useRef, useState } from 'react'
+} from 'react-icons/ri';
+import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 
-import { AuthModal } from '../UI/Modals/AuthModal'
-import LoginButton from '../UI/Buttons/LoginButton'
-import Logo from '../../assets/logo.svg'
-import SearchBar from '../UI/SearchBar'
-import Sidebar from './Sidebar'
-import SignupButton from '../UI/Buttons/SignupButton'
-import classes from './MainNavigation.module.css'
-import defaultAvatar from '../../assets/default-avatar.png'
-import { getUserData } from '../../util/auth'
-import { userActions } from '../../store/user'
+import { AuthModal } from '../UI/Modals/AuthModal';
+import LoginButton from '../UI/Buttons/LoginButton';
+import Logo from '../../assets/logo.svg';
+import SearchBar from '../UI/SearchBar';
+import Sidebar from './Sidebar';
+import SignupButton from '../UI/Buttons/SignupButton';
+import classes from './MainNavigation.module.css';
+import defaultAvatar from '../../assets/default-avatar.png';
+import { getUserData } from '../../util/auth';
+import { userActions } from '../../store/user';
+import { CableContext } from '../../context/cable';
 
 const MainNavigation = () => {
-  const token = useRouteLoaderData('root')
-  const [showMenu, setShowMenu] = useState(false)
-  const [showModal, setShowModal] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(false)
-  const [authType, setAuthType] = useState('')
-  const dropdownRef = useRef(null)
-  const submit = useSubmit()
-  const user = useSelector((state) => state.user.user)
-  const { userId, userRole } = getUserData() || {}
+  const token = useRouteLoaderData('root');
+  const cableContext = useContext(CableContext);
+  const cable = cableContext ? cableContext.cable : null;
+  const [showMenu, setShowMenu] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [authType, setAuthType] = useState('');
+  const dropdownRef = useRef(null);
+  const submit = useSubmit();
+  const user = useSelector((state) => state.user.user);
+  const { userId, userRole } = getUserData() || {};
+  const dispatch = useDispatch();
+  const [hasNewNotifications, setHasNewNotifications] = useState(false);
 
-  const dispatch = useDispatch()
+  useEffect(() => {
+    if (!token) return;
+    // Subscribe to WebSocket channel when component mounts
+    const subscription = cable.subscriptions.create(
+      { channel: 'NotificationsChannel' },
+      {
+        received: () => {
+          // Handle incoming WebSocket message
+          setHasNewNotifications(true);
+        },
+      }
+    );
+
+    // Unsubscribe when component unmounts
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [cable, token]);
 
   const handleMenuToggle = () => {
-    setShowMenu(!showMenu)
-  }
+    setShowMenu(!showMenu);
+  };
 
   const handleModalToggle = (type) => {
-    setAuthType(type)
-    setShowModal(!showModal)
-  }
+    setAuthType(type);
+    setShowModal(!showModal);
+  };
 
   const handleSidebarToggle = () => {
-    setShowSidebar(!showSidebar)
-  }
+    setShowSidebar(!showSidebar);
+  };
 
   const handleClickOutside = (event) => {
     if (
@@ -59,22 +81,22 @@ const MainNavigation = () => {
         .querySelector(`.${classes['hamburger-button']}`)
         .contains(event.target)
     ) {
-      setShowMenu(false)
-      setShowSidebar(false)
+      setShowMenu(false);
+      setShowSidebar(false);
     }
-  }
+  };
 
   useEffect(() => {
-    document.addEventListener('click', handleClickOutside)
+    document.addEventListener('click', handleClickOutside);
     return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
-    dispatch(userActions.clearUser())
-    submit(null, { action: '/logout', method: 'POST' })
-  }
+    dispatch(userActions.clearUser());
+    submit(null, { action: '/logout', method: 'POST' });
+  };
 
   return (
     <>
@@ -105,19 +127,26 @@ const MainNavigation = () => {
         </div>
         <SearchBar />
         <nav className={classes['navbar-nav']}>
-          {token && (
+          {/* {token && (
             <NavLink to="messages" className={classes['icon-button']}>
               <RiChat3Line />
             </NavLink>
-          )}
+          )} */}
           {token && (
             <NavLink to="new" className={classes['icon-button']}>
               <RiAddFill />
             </NavLink>
           )}
           {token && (
-            <NavLink href="#" className={classes['icon-button']}>
+            <NavLink
+              to="notifications"
+              className={classes['icon-button']}
+              onClick={() => setHasNewNotifications(false)}
+            >
               <RiNotification3Line />
+              {hasNewNotifications && (
+                <span className={classes['notification-dot']}></span>
+              )}
             </NavLink>
           )}
           {!token && (
@@ -199,8 +228,8 @@ const MainNavigation = () => {
                 {!token && (
                   <button
                     onClick={() => {
-                      setShowMenu(false)
-                      handleModalToggle('login')
+                      setShowMenu(false);
+                      handleModalToggle('login');
                     }}
                   >
                     <RiLoginBoxLine />
@@ -210,8 +239,8 @@ const MainNavigation = () => {
                 {token && (
                   <button
                     onClick={() => {
-                      setShowMenu(false)
-                      handleLogout()
+                      setShowMenu(false);
+                      handleLogout();
                     }}
                   >
                     <RiLogoutBoxLine />
@@ -229,7 +258,7 @@ const MainNavigation = () => {
         <AuthModal authType={authType} onClick={handleModalToggle} />
       )}
     </>
-  )
-}
+  );
+};
 
-export default MainNavigation
+export default MainNavigation;

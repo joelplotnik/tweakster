@@ -14,6 +14,9 @@ class User < ApplicationRecord
   has_many :reports, foreign_key: 'reporter_id'
   has_many :sent_messages, class_name: 'Message', foreign_key: 'sender_id'
   has_many :received_messages, class_name: 'Message', foreign_key: 'receiver_id'
+  has_many :notifications, as: :recipient, dependent: :destroy, class_name: "Noticed::Notification"
+  has_many :notification_mentions, as: :record, dependent: :destroy, class_name: "Noticed::Event"
+
 
   serialize :favorite_users, Array
   serialize :favorite_channels, Array

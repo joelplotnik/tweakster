@@ -67,6 +67,12 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :notifications, only: [:index] do
+        collection do
+          post 'mark_as_seen'
+        end
+      end
+
       resources :conversations, only: [:index, :show, :create, :destroy], controller: 'messages'
       resources :reports, only: [:index, :create, :destroy]
     end
