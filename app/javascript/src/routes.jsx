@@ -161,7 +161,7 @@ const routes = [
       },
       {
         path: 'notifications',
-        element: <NotificationsPage forceRefresh={true} />,
+        element: <NotificationsPage />,
         loader: checkAuthLoader,
       },
       {
