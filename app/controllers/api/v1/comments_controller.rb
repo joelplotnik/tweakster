@@ -49,6 +49,10 @@ class Api::V1::CommentsController < ApplicationController
     end
   
     if comment.save
+      unless comment.user == comment.piece.user
+        CommentOnPieceNotifier.with(record: comment).deliver(comment.piece.user)
+      end
+      
       render json: build_comment_tree(comment), include: {
         user: { only: [:username] },
         votes: { only: [:user_id, :vote_type] },

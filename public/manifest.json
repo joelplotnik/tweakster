@@ -13,10 +13,9 @@
       "type": "image/svg+xml"
     }
   ],
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff",
-  "description": "Tweakster is a platform that brings people together to collaboratively refine content on diverse topics, ensuring accuracy and impact across various subjects.",
-  "scope": "/"
+  "description": "Tweakster is a platform that brings people together to collaboratively refine content on diverse topics, ensuring accuracy and impact across various subjects."
 }

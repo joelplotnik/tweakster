@@ -86,6 +86,13 @@ class Api::V1::PiecesController < ApplicationController
       piece.channel_id = params[:channel_id]
 
       if piece.save
+        if piece.parent_piece_id.present?
+          parent_piece = Piece.find_by(id: piece.parent_piece_id)
+          if parent_piece && parent_piece.user != current_user
+            TweakOfPieceNotifier.with(record: piece).deliver(parent_piece.user)
+          end
+        end
+
         render json: piece, include: { user: { only: [:id, :username] } }, status: :created
       else
         render json: { errors: piece.errors.full_messages }, status: :unprocessable_entity

@@ -1,41 +1,39 @@
-import React from 'react'
+import React from 'react';
 import ChannelPage, {
   loader as channelLoader,
-} from './pages/Channels/ChannelPage'
+} from './pages/Channels/ChannelPage';
 import EditChannelPage, {
   action as editChannelAction,
-} from './pages/Channels/EditChannelPage'
+} from './pages/Channels/EditChannelPage';
 import EditUserPage, {
   action as editUserAction,
-} from './pages/Users/EditUserPage'
+} from './pages/Users/EditUserPage';
 import NewChannelPage, {
   action as newChannelAction,
-} from './pages/Channels/NewChannelPage'
-import PiecePage, { loader as pieceLoader } from './pages/Pieces/PiecePage'
-import UserPage, { loader as userLoader } from './pages/Users/UserPage'
-import { checkAdminAccess, checkAuthLoader, tokenLoader } from './util/auth'
+} from './pages/Channels/NewChannelPage';
+import PiecePage, { loader as pieceLoader } from './pages/Pieces/PiecePage';
+import UserPage, { loader as userLoader } from './pages/Users/UserPage';
+import { checkAdminAccess, checkAuthLoader, tokenLoader } from './util/auth';
 
-import AboutPage from './pages/AboutPage'
-import AdminLayout from './pages/Admin/AdminLayout'
-import AdminPage from './pages/Admin/AdminPage'
-import ChannelsLayout from './pages/Channels/ChannelsLayout'
-import ChannelsPage from './pages/Channels/ChannelsPage'
-import ConversationPage from './pages/Conversations/ConversationPage'
-import ConversationsLayout from './pages/Conversations/ConversationsLayout'
-import ConversationsPage from './pages/Conversations/ConversationsPage'
-import EditPiecePage from './pages/Pieces/EditPiecePage'
-import ErrorPage from './pages/ErrorPage'
-import FollowingPage from './pages/Users/FollowingPage'
-import HomePage from './pages/HomePage'
-import MainPage from './pages/MainPage'
-import NewPiecePage from './pages/Pieces/NewPiecePage'
-import PiecesLayout from './pages/Pieces/PiecesLayout'
-import ReportsPage from './pages/Admin/ReportsPage'
-import RootLayout from './pages/RootLayout'
-import SubscriptionsPage from './pages/Users/SubscriptionsPage'
-import UsersLayout from './pages/Users/UsersLayout'
-import UsersPage from './pages/Users/UsersPage'
-import { action as logoutAction } from './pages/Logout'
+import AboutPage from './pages/AboutPage';
+import AdminLayout from './pages/Admin/AdminLayout';
+import AdminPage from './pages/Admin/AdminPage';
+import ChannelsLayout from './pages/Channels/ChannelsLayout';
+import ChannelsPage from './pages/Channels/ChannelsPage';
+import EditPiecePage from './pages/Pieces/EditPiecePage';
+import ErrorPage from './pages/ErrorPage';
+import FollowingPage from './pages/Users/FollowingPage';
+import HomePage from './pages/HomePage';
+import MainPage from './pages/MainPage';
+import NotificationsPage from './pages/NotificationsPage';
+import NewPiecePage from './pages/Pieces/NewPiecePage';
+import PiecesLayout from './pages/Pieces/PiecesLayout';
+import ReportsPage from './pages/Admin/ReportsPage';
+import RootLayout from './pages/RootLayout';
+import SubscriptionsPage from './pages/Users/SubscriptionsPage';
+import UsersLayout from './pages/Users/UsersLayout';
+import UsersPage from './pages/Users/UsersPage';
+import { action as logoutAction } from './pages/Logout';
 
 const routes = [
   {
@@ -162,25 +160,9 @@ const routes = [
         ],
       },
       {
-        path: 'messages',
-        element: <ConversationsLayout />,
+        path: 'notifications',
+        element: <NotificationsPage />,
         loader: checkAuthLoader,
-        children: [
-          {
-            index: true,
-            element: <ConversationsPage />,
-          },
-          {
-            path: ':id',
-            id: 'message',
-            children: [
-              {
-                index: true,
-                element: <ConversationPage />,
-              },
-            ],
-          },
-        ],
       },
       {
         path: 'main',
@@ -205,6 +187,6 @@ const routes = [
       },
     ],
   },
-]
+];
 
-export default routes
+export default routes;

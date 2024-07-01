@@ -118,6 +118,7 @@
 
 .icon-button {
   display: flex;
+  position: relative;
   align-items: center;
   border: none;
   border-radius: 20px;
@@ -248,4 +249,14 @@
   max-height: 10rem;
   object-fit: cover;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.notification-dot {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  background-color: #d92563;
+  border-radius: 50%;
 }

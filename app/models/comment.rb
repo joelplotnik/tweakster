@@ -5,6 +5,7 @@ class Comment < ApplicationRecord
     
     has_many :votes, as: :votable
     has_many :child_comments, class_name: 'Comment', foreign_key: 'parent_comment_id', dependent: :destroy
+    has_many :notification_mentions, as: :record, dependent: :destroy, class_name: "Noticed::Event"
   
     validates :user_id, presence: true
     validates :piece_id, presence: true

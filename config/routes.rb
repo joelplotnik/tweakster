@@ -63,11 +63,17 @@ Rails.application.routes.draw do
 
       resources :subscriptions, only: [:index] do
         collection do
-          get 'check_user_subscriptions', to: 'subscriptions#check_user_subscriptions'
+          get 'check_user_subscriptions'
         end
       end
 
-      resources :conversations, only: [:index, :show, :create, :destroy], controller: 'messages'
+      resources :notifications, only: [:index] do
+        collection do
+          get 'unseen'
+          post 'mark_as_seen'
+        end
+      end
+
       resources :reports, only: [:index, :create, :destroy]
     end
   end

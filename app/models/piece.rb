@@ -7,6 +7,7 @@ class Piece < ApplicationRecord
     has_many :votes, as: :votable, dependent: :destroy
     has_many :comments, dependent: :destroy
     has_many :child_pieces, class_name: 'Piece', foreign_key: 'parent_piece_id', dependent: :destroy
+    has_many :notification_mentions, as: :record, dependent: :destroy, class_name: "Noticed::Event"
   
     validates :title, presence: true, length: { minimum: 1, maximum: 300 }
     validate :has_material
