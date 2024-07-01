@@ -29,7 +29,9 @@ class Api::V1::NotificationsController < ApplicationController
           username: notification.event.record.user.username,
           piece_id: notification.event.record.id,
           piece_channel_id: notification.event.record.channel_id,
-          piece_title: notification.event.record.title
+          piece_title: notification.event.record.title,
+          parent_piece_id: notification.event.record.parent_piece&.id,
+          parent_piece_title: notification.event.record.parent_piece&.title
         }
       else
         {}

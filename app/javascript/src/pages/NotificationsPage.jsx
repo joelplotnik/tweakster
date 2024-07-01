@@ -109,6 +109,8 @@ const NotificationsPage = () => {
       piece_title,
       piece_channel_id,
       piece_id,
+      parent_piece_id,
+      parent_piece_title,
     } = notification;
 
     if (event.record_type === 'Comment') {
@@ -122,7 +124,7 @@ const NotificationsPage = () => {
           <div className={classes.notificationContent}>
             <span className={classes.username}>{username}</span> commented on{' '}
             <a
-              href={`/channels/${piece_channel_id}/pieces/${piece_id}`}
+              href={`/channels/${piece_channel_id}/pieces/${piece_id}?tab=comments`}
               className={classes.link}
             >
               {piece_title}
@@ -141,10 +143,10 @@ const NotificationsPage = () => {
           <div className={classes.notificationContent}>
             <span className={classes.username}>{username}</span> tweaked{' '}
             <a
-              href={`/channels/${piece_channel_id}/pieces/${piece_id}`}
+              href={`/channels/${piece_channel_id}/pieces/${parent_piece_id}?tab=tweaks`}
               className={classes.link}
             >
-              {piece_title}
+              {parent_piece_title}
             </a>
           </div>
         </li>
