@@ -31,7 +31,8 @@ const Comment = ({
 }) => {
   const token = useRouteLoaderData('root');
   const commentUserId = comment.user_id;
-  const { userId, userRole } = getUserData() || {};
+  const { userId: userIdStr, userRole } = getUserData() || {};
+  const userId = parseInt(userIdStr);
   const currentUser = commentUserId === userId;
   const [isReplyFormOpen, setIsReplyFormOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);

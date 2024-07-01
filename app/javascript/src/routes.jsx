@@ -20,9 +20,6 @@ import AdminLayout from './pages/Admin/AdminLayout';
 import AdminPage from './pages/Admin/AdminPage';
 import ChannelsLayout from './pages/Channels/ChannelsLayout';
 import ChannelsPage from './pages/Channels/ChannelsPage';
-import ConversationPage from './pages/Conversations/ConversationPage';
-import ConversationsLayout from './pages/Conversations/ConversationsLayout';
-import ConversationsPage from './pages/Conversations/ConversationsPage';
 import EditPiecePage from './pages/Pieces/EditPiecePage';
 import ErrorPage from './pages/ErrorPage';
 import FollowingPage from './pages/Users/FollowingPage';
@@ -163,29 +160,8 @@ const routes = [
         ],
       },
       {
-        path: 'messages',
-        element: <ConversationsLayout />,
-        loader: checkAuthLoader,
-        children: [
-          {
-            index: true,
-            element: <ConversationsPage />,
-          },
-          {
-            path: ':id',
-            id: 'message',
-            children: [
-              {
-                index: true,
-                element: <ConversationPage />,
-              },
-            ],
-          },
-        ],
-      },
-      {
         path: 'notifications',
-        element: <NotificationsPage />,
+        element: <NotificationsPage forceRefresh={true} />,
         loader: checkAuthLoader,
       },
       {

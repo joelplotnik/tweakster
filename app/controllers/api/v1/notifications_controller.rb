@@ -4,7 +4,9 @@ class Api::V1::NotificationsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    notifications = current_user.notifications.includes(event: { record: [:user, :piece] }).paginate(page: params[:page], per_page: 10)
+     notifications = current_user.notifications.includes(event: { record: [:user, :piece] })
+                        .order(created_at: :desc)
+                        .paginate(page: params[:page], per_page: 10)
 
     notifications_data = notifications.map do |notification|
       base_data = notification.as_json(include: {

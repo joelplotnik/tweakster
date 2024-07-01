@@ -172,7 +172,11 @@ const MainNavigation = () => {
             </NavLink>
           )}
           {token && (
-            <NavLink to="notifications" className={classes['icon-button']}>
+            <NavLink
+              reloadDocument
+              to="notifications"
+              className={classes['icon-button']}
+            >
               <RiNotification3Line />
               {hasNewNotifications && (
                 <span className={classes['notification-dot']}></span>
