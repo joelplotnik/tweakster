@@ -2,15 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useRouteLoaderData } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ClipLoader } from 'react-spinners';
+import { useDispatch } from 'react-redux';
 
-import classes from './NotificationsPage.module.css';
 import { API_URL } from '../constants/constants';
+import { notificationsActions } from '../store/notifications';
+import classes from './NotificationsPage.module.css';
 
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
   const token = useRouteLoaderData('root');
 
   const fetchNotifications = async (currentPage) => {
@@ -63,6 +66,13 @@ const NotificationsPage = () => {
       if (!response.ok) {
         throw new Error('Failed to mark notifications as seen');
       }
+
+      const responseData = await response.json();
+      const { has_more_notifications } = responseData;
+
+      dispatch(
+        notificationsActions.setHasNewNotifications(has_more_notifications)
+      );
     } catch (error) {
       console.error('Error marking notifications as seen:', error);
     }
@@ -112,7 +122,7 @@ const NotificationsPage = () => {
           <div className={classes.notificationContent}>
             <span className={classes.username}>{username}</span> commented on{' '}
             <a
-              href={`/channel/${piece_channel_id}/piece/${piece_id}`}
+              href={`/channels/${piece_channel_id}/pieces/${piece_id}`}
               className={classes.link}
             >
               {piece_title}
@@ -131,7 +141,7 @@ const NotificationsPage = () => {
           <div className={classes.notificationContent}>
             <span className={classes.username}>{username}</span> tweaked{' '}
             <a
-              href={`/channel/${piece_channel_id}/piece/${piece_id}`}
+              href={`/channels/${piece_channel_id}/pieces/${piece_id}`}
               className={classes.link}
             >
               {piece_title}

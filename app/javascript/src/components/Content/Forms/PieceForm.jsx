@@ -49,6 +49,23 @@ const PieceForm = ({ type, piece, tweakText }) => {
     }
   });
 
+  useEffect(() => {
+    // Temporary fix: Suppress findDOMNode deprecation warning
+    // This warning originates from ReactQuill which internally uses findDOMNode.
+    // Consider switching to another rich text editor that does not use findDOMNode.
+    // Remove this suppression once a permanent solution is implemented.
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (/findDOMNode is deprecated/.test(args[0])) {
+        return;
+      }
+      originalError.call(console, ...args);
+    };
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
+
   const handleModalToggle = () => {
     setShowModal(!showModal);
   };

@@ -21,10 +21,12 @@ import Logo from '../../assets/logo.svg';
 import SearchBar from '../UI/SearchBar';
 import Sidebar from './Sidebar';
 import SignupButton from '../UI/Buttons/SignupButton';
+import { API_URL } from '../../constants/constants';
 import classes from './MainNavigation.module.css';
 import defaultAvatar from '../../assets/default-avatar.png';
 import { getUserData } from '../../util/auth';
 import { userActions } from '../../store/user';
+import { notificationsActions } from '../../store/notifications';
 import { CableContext } from '../../context/cable';
 
 const MainNavigation = () => {
@@ -40,26 +42,58 @@ const MainNavigation = () => {
   const user = useSelector((state) => state.user.user);
   const { userId, userRole } = getUserData() || {};
   const dispatch = useDispatch();
-  const [hasNewNotifications, setHasNewNotifications] = useState(false);
+  const hasNewNotifications = useSelector(
+    (state) => state.notifications.hasNewNotifications
+  );
 
   useEffect(() => {
     if (!token) return;
-    // Subscribe to WebSocket channel when component mounts
+
     const subscription = cable.subscriptions.create(
       { channel: 'NotificationsChannel' },
       {
         received: () => {
-          // Handle incoming WebSocket message
-          setHasNewNotifications(true);
+          dispatch(notificationsActions.setHasNewNotifications(true));
         },
       }
     );
 
-    // Unsubscribe when component unmounts
     return () => {
       subscription.unsubscribe();
     };
-  }, [cable, token]);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const fetchUnseenNotifications = async () => {
+      try {
+        const response = await fetch(`${API_URL}/notifications/unseen`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch unseen notifications');
+        }
+
+        const data = await response.json();
+
+        dispatch(
+          notificationsActions.setHasNewNotifications(
+            data.has_unseen_notifications
+          )
+        );
+      } catch (error) {
+        console.error('Error fetching unseen notifications: ', error);
+      }
+    };
+
+    fetchUnseenNotifications();
+  }, [token]);
 
   const handleMenuToggle = () => {
     setShowMenu(!showMenu);
@@ -138,11 +172,7 @@ const MainNavigation = () => {
             </NavLink>
           )}
           {token && (
-            <NavLink
-              to="notifications"
-              className={classes['icon-button']}
-              onClick={() => setHasNewNotifications(false)}
-            >
+            <NavLink to="notifications" className={classes['icon-button']}>
               <RiNotification3Line />
               {hasNewNotifications && (
                 <span className={classes['notification-dot']}></span>

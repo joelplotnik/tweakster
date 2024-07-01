@@ -39,11 +39,19 @@ class Api::V1::NotificationsController < ApplicationController
     render json: notifications_data
   end
 
+  def unseen
+    has_unseen_notifications = current_user.notifications.exists?(seen_at: nil)
+    
+    render json: { has_unseen_notifications: has_unseen_notifications }
+  end
+
   def mark_as_seen
     notification_ids = params[:notification_ids]
     notifications = current_user.notifications.where(id: notification_ids)
     notifications.update_all(seen_at: Time.current, read_at: Time.current)
 
-    render json: { message: 'Notifications marked as seen' }, status: :ok
+    has_more_notifications = current_user.notifications.exists?(seen_at: nil)
+
+    render json: { message: 'Notifications marked as seen', has_more_notifications: has_more_notifications }, status: :ok
   end
 end

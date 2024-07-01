@@ -79,7 +79,7 @@ export function AuthModal({ authType, onClick }) {
     const authorization = headers.get('authorization');
     const token = authorization.replace('Bearer ', '');
     const expiration = new Date();
-    expiration.setMinutes(expiration.getMinutes() + 1);
+    expiration.setMinutes(expiration.getMinutes() + 120);
     localStorage.setItem('token', token);
     localStorage.setItem('expiration', expiration.toISOString());
   };

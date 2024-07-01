@@ -4,10 +4,12 @@ import pieceSlice from './piece';
 import pieceModalSlice from './piece-modal';
 import channelPageSlice from './channel-page';
 import userPageSlice from './user-page';
+import notificationsSlice from './notifications';
 
 const rootReducer = combineReducers({
   user: userSlice,
   piece: pieceSlice,
+  notifications: notificationsSlice,
   pieceModal: pieceModalSlice,
   channelPage: channelPageSlice,
   userPage: userPageSlice,

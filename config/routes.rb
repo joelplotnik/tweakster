@@ -70,6 +70,7 @@ Rails.application.routes.draw do
       resources :notifications, only: [:index] do
         collection do
           post 'mark_as_seen'
+          get 'unseen'
         end
       end
 
