@@ -7,7 +7,7 @@ import {
   RiSettings3Line,
 } from 'react-icons/ri';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, json, useParams, useRouteLoaderData } from 'react-router-dom';
 
 import defaultAvatar from '../../assets/default-avatar.png';
@@ -30,6 +30,7 @@ import classes from './UserPage.module.css';
 const UserPage = () => {
   const { id } = useParams();
   const token = useRouteLoaderData('root');
+  const dispatch = useDispatch();
   const { userId } = getUserData() || {};
   const user = useSelector((state) => state.userPage.user);
   const [pieces, setPieces] = useState([]);
@@ -97,7 +98,34 @@ const UserPage = () => {
   };
 
   useEffect(() => {
-    setIsUserLoading(true);
+    const fetchUserData = async () => {
+      if (!isUserLoading) {
+        setIsUserLoading(true);
+        try {
+          const response = await fetch(`${API_URL}/users/${id}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Could not find user');
+          }
+
+          const userData = await response.json();
+          dispatch(userPageActions.setUser(userData));
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          setError(error.message);
+        } finally {
+          setIsUserLoading(false);
+        }
+      }
+    };
+
+    !user && fetchUserData();
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -163,7 +191,7 @@ const UserPage = () => {
                 {pieces.length === 0 ? (
                   <NoPieces
                     listPage={'user'}
-                    owner={user.can_edit && id === userId}
+                    owner={user?.can_edit && id === userId}
                   />
                 ) : (
                   <></>
@@ -186,11 +214,11 @@ const UserPage = () => {
               <div className={classes['photo-container']}>
                 <img
                   className={classes.photo}
-                  src={user.avatar_url || defaultAvatar}
+                  src={user?.avatar_url || defaultAvatar}
                   alt="User"
                 />
               </div>
-              {token && user.can_edit ? (
+              {token && user?.can_edit ? (
                 <Link to={'edit'} className={classes['edit-button']}>
                   <RiSettings3Line />
                 </Link>
@@ -214,25 +242,25 @@ const UserPage = () => {
                   )}
                 </>
               )}
-              <p className={classes.username}>{user.username}</p>
+              <p className={classes.username}>{user?.username}</p>
               <hr className={classes.divider} />
               <div className={classes.stats}>
                 <div className={classes['stats-item']}>
                   <p>Pieces:</p>
                   <p className={classes['stats-number']}>
-                    {formatNumber(user.piece_count)}
+                    {formatNumber(user?.piece_count)}
                   </p>
                 </div>
                 <div className={classes['stats-item']}>
                   <p>Followers:</p>
                   <p className={classes['stats-number']}>
-                    {formatNumber(user.follower_count)}
+                    {formatNumber(user?.follower_count)}
                   </p>
                 </div>
                 <div className={classes['stats-item']}>
                   <p>Appeal:</p>
                   <p className={classes['stats-number']}>
-                    {Math.round(user.integrity)}%
+                    {Math.round(user?.integrity)}%
                   </p>
                 </div>
               </div>
@@ -240,43 +268,44 @@ const UserPage = () => {
             {token && userId !== id && (
               <div className={classes['button-container']}>
                 <FollowButton
-                  userId={user.id}
-                  isFollowing={user.following}
-                  followerCount={user.follower_count}
+                  userId={user?.id}
+                  isFollowing={user?.following}
+                  followerCount={user?.follower_count}
                 />
               </div>
             )}
             <div className={classes['user-details']}>
-              {user.url && (
+              {user?.url && (
                 <div className={classes.detail}>
                   <p className={classes['detail-title']}>Website</p>
                   <a
                     className={classes['user-url']}
-                    href={user.url}
+                    href={user?.url}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {user.url}
+                    {user?.url}
                   </a>
                 </div>
               )}
-              {user.bio && (
+              {user?.bio && (
                 <div className={classes.detail}>
                   <p className={classes['detail-title']}>Bio</p>
-                  <p className={classes['detail-data']}>{user.bio}</p>
+                  <p className={classes['detail-data']}>{user?.bio}</p>
                 </div>
               )}
-              {(user.favorite_channels && user.favorite_channels.length > 0) ||
-              (user.followees && user.followees.length > 0) ? (
+              {(user?.favorite_channels &&
+                user?.favorite_channels.length > 0) ||
+              (user?.followees && user?.followees.length > 0) ? (
                 <hr className={classes.divider} />
               ) : null}
-              {(user.can_edit ||
-                (user.favorite_channels &&
-                  user.favorite_channels.length > 0)) && (
+              {(user?.can_edit ||
+                (user?.favorite_channels &&
+                  user?.favorite_channels.length > 0)) && (
                 <div className={classes['personal-detail']}>
                   <div className={classes['personal-detail-container']}>
                     <p className={classes['detail-title']}>Subscriptions</p>
-                    {user.can_edit && (
+                    {user?.can_edit && (
                       <Link
                         to="subscriptions"
                         className={classes['view-all-link']}
@@ -286,14 +315,14 @@ const UserPage = () => {
                     )}
                   </div>
                   <div className={classes['images-row']}>
-                    {user.can_edit && user.favorite_channels.length === 0 && (
+                    {user?.can_edit && user?.favorite_channels.length === 0 && (
                       <Link to={'subscriptions'}>
                         <div className={classes['placeholder-circle']}>
                           <RiAddLine className={classes['add-icon']} />
                         </div>
                       </Link>
                     )}
-                    {user.favorite_channels.map((favorite_channel) => (
+                    {user?.favorite_channels.map((favorite_channel) => (
                       <div
                         key={favorite_channel.id}
                         className={classes['image-wrapper']}
@@ -310,26 +339,26 @@ const UserPage = () => {
                   </div>
                 </div>
               )}
-              {(user.can_edit ||
-                (user.favorite_users && user.favorite_users.length > 0)) && (
+              {(user?.can_edit ||
+                (user?.favorite_users && user?.favorite_users.length > 0)) && (
                 <div className={classes['personal-detail']}>
                   <div className={classes['personal-detail-container']}>
                     <p className={classes['detail-title']}>Following</p>
-                    {user.can_edit && (
+                    {user?.can_edit && (
                       <Link to="following" className={classes['view-all-link']}>
                         View all/ Edit
                       </Link>
                     )}
                   </div>
                   <div className={classes['images-row']}>
-                    {user.can_edit && user.favorite_users.length === 0 && (
+                    {user?.can_edit && user?.favorite_users.length === 0 && (
                       <Link to={'following'}>
                         <div className={classes['placeholder-circle']}>
                           <RiAddLine className={classes['add-icon']} />
                         </div>
                       </Link>
                     )}
-                    {user.favorite_users.map((favorite_user) => (
+                    {user?.favorite_users.map((favorite_user) => (
                       <div
                         key={favorite_user.id}
                         className={classes['image-wrapper']}
@@ -356,7 +385,7 @@ const UserPage = () => {
       {showReportModal && (
         <ReportModal
           onClick={handleReportModalToggle}
-          content={{ type: 'user', id: user.id }}
+          content={{ type: 'user', id: user?.id }}
         />
       )}
     </>
