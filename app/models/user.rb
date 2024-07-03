@@ -3,6 +3,7 @@ class User < ApplicationRecord
   include Userable
 
   before_save :calculate_integrity
+  before_validation :strip_whitespace
   
   has_one_attached :avatar
   has_many :subscriptions, dependent: :destroy
@@ -16,26 +17,25 @@ class User < ApplicationRecord
   has_many :received_messages, class_name: 'Message', foreign_key: 'receiver_id'
   has_many :notifications, as: :recipient, dependent: :destroy, class_name: "Noticed::Notification"
   has_many :notification_mentions, as: :record, dependent: :destroy, class_name: "Noticed::Event"
-
+   # Users you follow
+  has_many :followed_users, foreign_key: :follower_id,
+    class_name: 'Relationship', dependent: :destroy
+  has_many :followees, through: :followed_users, dependent: :destroy
+   # Users following you
+  has_many :following_users, foreign_key: :followee_id,
+    class_name: 'Relationship', dependent: :destroy
+  has_many :followers, through: :following_users, dependent: :destroy
 
   serialize :favorite_users, Array
   serialize :favorite_channels, Array
-
-  # Users you follow
-  has_many :followed_users, foreign_key: :follower_id,
-  class_name: 'Relationship', dependent: :destroy
-  has_many :followees, through: :followed_users, dependent: :destroy
-
-  # Users following you
-  has_many :following_users, foreign_key: :followee_id,
-  class_name: 'Relationship', dependent: :destroy
-  has_many :followers, through: :following_users, dependent: :destroy
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :database_authenticatable, :jwt_authenticatable, 
          jwt_revocation_strategy: self
 
+  
+  validate :validate_username
   validates :username, presence: true, 
          uniqueness: { case_sensitive: false }, 
          length: { minimum: 2, maximum: 25 },
@@ -55,7 +55,6 @@ class User < ApplicationRecord
   end
 
   attr_writer :login
-  validate :validate_username
 
   def login
     login || username || email
@@ -69,34 +68,17 @@ class User < ApplicationRecord
       where(conditions.to_h).first     
     end
   end
-
-  def validate_username
-    if User.where(email: username).exists?
-      errors.add(:username, :invalid)
-    end
-  end
          
   def jwt_payload
     super.merge({ username: self.username, role: self.role }) 
   end
 
-  before_validation :strip_whitespace
-
-  def conversations
-    User.where(id: received_messages.select(:sender_id))
-        .or(User.where(id: sent_messages.select(:receiver_id)))
-  end
-
-  def messages_with(other_user)
-    Message.where(sender: self, receiver: other_user)
-           .or(Message.where(sender: other_user, receiver: self))
-  end
-
   private
-  
-  def strip_whitespace
-    self.url&.strip!
-    self.bio&.strip!
+
+  def validate_username
+    if User.where(email: username).exists?
+      errors.add(:username, :invalid)
+    end
   end
 
   def validate_favorite_channels_count
@@ -105,5 +87,10 @@ class User < ApplicationRecord
 
   def validate_favorite_users_count
     errors.add(:favorite_users, "can't have more than 5 favorites") if favorite_users.size > 5
+  end
+
+  def strip_whitespace
+    self.url&.strip!
+    self.bio&.strip!
   end
 end

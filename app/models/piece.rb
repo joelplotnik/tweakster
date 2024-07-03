@@ -13,8 +13,11 @@ class Piece < ApplicationRecord
     validate :has_material
     validate :valid_youtube_url, if: -> { youtube_url.present? }
     validate :has_tweaks, on: :update
+    validate :parent_piece_depth
 
     after_destroy_commit :delete_attached_images
+
+    private
   
     def has_material
       unless images.attached? || content.present? || youtube_url.present?
@@ -35,6 +38,12 @@ class Piece < ApplicationRecord
     def has_tweaks
       if child_pieces.exists?
         errors.add(:base, 'Cannot update piece with child pieces')
+      end
+    end
+
+    def parent_piece_depth
+      if parent_piece.present? && parent_piece.parent_piece.present?
+        errors.add(:parent_piece, "can only be a top-level piece or a tweak of a top-level piece")
       end
     end
   end
