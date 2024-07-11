@@ -8,24 +8,29 @@ import classes from './Dropzone.module.css';
 const Dropzone = ({ onImagesChange }) => {
   const [images, setImages] = useState([]);
 
-  const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
-    if (acceptedFiles?.length) {
-      if (images.length < 3) {
-        const file = acceptedFiles[0];
-        const newImage = Object.assign(file, { preview: URL.createObjectURL(file) });
-        setImages([...images, newImage]);
-        onImagesChange([...images, newImage]);
-      } else {
-        toast.error('Maximum 3 images can be uploaded.');
+  const onDrop = useCallback(
+    (acceptedFiles, rejectedFiles) => {
+      if (acceptedFiles?.length) {
+        if (images.length < 3) {
+          const file = acceptedFiles[0];
+          const newImage = Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          });
+          setImages([...images, newImage]);
+          onImagesChange([...images, newImage]);
+        } else {
+          toast.error('Maximum 3 images can be uploaded.');
+        }
       }
-    }
 
-    if (rejectedFiles?.length) {
-      const file = rejectedFiles[0];
-      const errorMessage = file.errors[0].message;
-      toast.error(errorMessage);
-    }
-  }, [images, onImagesChange]);
+      if (rejectedFiles?.length) {
+        const file = rejectedFiles[0];
+        const errorMessage = file.errors[0].message;
+        toast.error(errorMessage);
+      }
+    },
+    [images, onImagesChange]
+  );
 
   const deleteImage = (index) => {
     URL.revokeObjectURL(images[index].preview);
@@ -40,7 +45,7 @@ const Dropzone = ({ onImagesChange }) => {
     accept: {
       'image/*': [],
     },
-    maxSize: 1024 * 1000,
+    maxSize: 10 * 1024 * 1024,
   });
 
   return (
@@ -49,7 +54,10 @@ const Dropzone = ({ onImagesChange }) => {
         {images.length > 0 && (
           <div className={classes['dropzone-row']}>
             {images.map((image, index) => (
-              <div key={index} className={classes['dropzone-container-wrapper']}>
+              <div
+                key={index}
+                className={classes['dropzone-container-wrapper']}
+              >
                 <div className={classes['dropzone-container']}>
                   <img
                     src={image.preview}
@@ -58,7 +66,7 @@ const Dropzone = ({ onImagesChange }) => {
                   />
                 </div>
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => deleteImage(index)}
                   className={classes['delete-button']}
                 >

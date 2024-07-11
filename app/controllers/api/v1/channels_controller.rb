@@ -88,6 +88,7 @@ class Api::V1::ChannelsController < ApplicationController
         rounded_popularity_percentage = popularity_percentage.round
 
         pieces_with_images = channel.pieces
+          .where(parent_piece_id: nil)
           .order(created_at: :desc)
           .paginate(page: params[:page], per_page: 10)
           .map do |piece|
@@ -112,8 +113,6 @@ class Api::V1::ChannelsController < ApplicationController
       
             piece_json
           end
-      
-        subscribed = !!current_user && channel.subscriptions.exists?(user_id: current_user.id)
 
         channel_data = {
           id: channel.id,
@@ -129,7 +128,7 @@ class Api::V1::ChannelsController < ApplicationController
           },
           subscriber_count: channel.subscribers.count,
           pieces: pieces_with_images,
-          piece_count: channel.pieces.count,
+          piece_count: channel.pieces.where(parent_piece_id: nil).count,
           popularity: rounded_popularity_percentage
         }
 

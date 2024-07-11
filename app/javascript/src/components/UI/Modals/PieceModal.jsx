@@ -451,13 +451,15 @@ const PieceModal = () => {
                       </div>
                       <div className={classes.footer}>
                         <div className={classes['footer-container']}>
-                          <button
-                            className={`${classes.link} ${classes.tweak}`}
-                            onClick={handleTweakClick}
-                          >
-                            <RiFlaskLine className={classes['tweak-icon']} />
-                            <span className={classes.text}>Tweak</span>
-                          </button>
+                          {!piece.parent_piece_id && (
+                            <button
+                              className={`${classes.link} ${classes.tweak}`}
+                              onClick={handleTweakClick}
+                            >
+                              <RiFlaskLine className={classes['tweak-icon']} />
+                              <span className={classes.text}>Tweak</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                       <div

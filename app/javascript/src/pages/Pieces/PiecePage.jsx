@@ -3,115 +3,115 @@ import {
   useLocation,
   useNavigate,
   useRouteLoaderData,
-} from 'react-router-dom'
-import React, { useEffect, useRef, useState } from 'react'
+} from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   RiDeleteBin7Line,
   RiEditBoxLine,
   RiFlagLine,
   RiFlaskLine,
   RiMoreFill,
-} from 'react-icons/ri'
+} from 'react-icons/ri';
 
-import { API_URL } from '../../constants/constants'
-import { AuthModal } from '../../components/UI/Modals/AuthModal'
-import ConfirmationModal from '../../components/UI/Modals/ConfirmationModal'
-import Interactions from '../../components/Content/Interactions'
-import Moment from 'react-moment'
-import PieceCarousel from '../../components/UI/PieceCarousel'
-import PieceVote from '../../components/UI/PieceVote'
-import PopulateModal from '../../components/UI/Modals/PopulateModal'
-import ReportModal from '../../components/UI/Modals/ReportModal'
-import SharePopover from '../../components/UI/SharePopover'
-import classes from './PiecePage.module.css'
-import defaultAvatar from '../../assets/default-avatar.png'
-import { getUserData } from '../../util/auth'
-import { pieceActions } from '../../store/piece'
-import store from '../../store/index'
-import { toast } from 'react-toastify'
-import { useSelector } from 'react-redux'
+import { API_URL } from '../../constants/constants';
+import { AuthModal } from '../../components/UI/Modals/AuthModal';
+import ConfirmationModal from '../../components/UI/Modals/ConfirmationModal';
+import Interactions from '../../components/Content/Interactions';
+import Moment from 'react-moment';
+import PieceCarousel from '../../components/UI/PieceCarousel';
+import PieceVote from '../../components/UI/PieceVote';
+import PopulateModal from '../../components/UI/Modals/PopulateModal';
+import ReportModal from '../../components/UI/Modals/ReportModal';
+import SharePopover from '../../components/UI/SharePopover';
+import classes from './PiecePage.module.css';
+import defaultAvatar from '../../assets/default-avatar.png';
+import { getUserData } from '../../util/auth';
+import { pieceActions } from '../../store/piece';
+import store from '../../store/index';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const PiecePage = () => {
-  const piece = useSelector((state) => state.piece.piece)
-  const token = useRouteLoaderData('root')
-  const { userId, userRole } = getUserData() || {}
-  const pieceUserId = piece.user.id
-  const currentUser = pieceUserId === parseInt(userId, 10)
-  const navigate = useNavigate()
-  let location = useLocation()
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-  const [showPopulateModal, setShowPopulateModal] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
-  const interactionsRef = useRef(null)
+  const piece = useSelector((state) => state.piece.piece);
+  const token = useRouteLoaderData('root');
+  const { userId, userRole } = getUserData() || {};
+  const pieceUserId = piece.user.id;
+  const currentUser = pieceUserId === parseInt(userId, 10);
+  const navigate = useNavigate();
+  let location = useLocation();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showPopulateModal, setShowPopulateModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const interactionsRef = useRef(null);
   const [tweakData, setTweakData] = useState({
     channelId: piece.channel_id,
     pieceId: piece.id,
     text: false,
-  })
+  });
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const tabParam = location.state && location.state.tab
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = location.state && location.state.tab;
 
     if (params.has('tab') || tabParam) {
-      interactionsRef.current.scrollIntoView({ top: 0, behavior: 'smooth' })
+      interactionsRef.current.scrollIntoView({ top: 0, behavior: 'smooth' });
     }
-  }, [location.state])
+  }, [location.state]);
 
   useEffect(() => {
     const handleClickOutsideDropdown = (event) => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
-      )
+      );
 
       if (dropdownContainer && !dropdownContainer.contains(event.target)) {
-        setShowDropdown(false)
+        setShowDropdown(false);
       }
-    }
+    };
 
-    document.addEventListener('click', handleClickOutsideDropdown)
+    document.addEventListener('click', handleClickOutsideDropdown);
 
     return () => {
-      document.removeEventListener('click', handleClickOutsideDropdown)
-    }
-  }, [])
+      document.removeEventListener('click', handleClickOutsideDropdown);
+    };
+  }, []);
 
   const stopPropagation = (event) => {
-    event.stopPropagation()
-  }
+    event.stopPropagation();
+  };
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
+    setShowAuthModal(!showAuthModal);
+  };
 
   const handleConfirmationModalToggle = () => {
-    setShowConfirmationModal(!showConfirmationModal)
-  }
+    setShowConfirmationModal(!showConfirmationModal);
+  };
 
   const handleSubscriptionModalToggle = () => {
-    setShowSubscriptionModal(!showSubscriptionModal)
-  }
+    setShowSubscriptionModal(!showSubscriptionModal);
+  };
 
   const handlePopulateModalToggle = () => {
-    setShowPopulateModal(!showPopulateModal)
-  }
+    setShowPopulateModal(!showPopulateModal);
+  };
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal)
-  }
+    setShowReportModal(!showReportModal);
+  };
 
   const handleDropdownToggle = () => {
-    setShowDropdown(!showDropdown)
-  }
+    setShowDropdown(!showDropdown);
+  };
 
   const handleEditClick = () => {
     if (piece.tweaks_count === 0) {
-      navigate(`edit`)
+      navigate(`edit`);
     }
-  }
+  };
 
   const handleDeleteClick = async () => {
     try {
@@ -124,23 +124,23 @@ const PiecePage = () => {
             Authorization: `Bearer ${token}`,
           },
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error('Could not delete piece')
+        throw new Error('Could not delete piece');
       }
 
-      return navigate('/')
+      return navigate('/');
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error deleting piece')
+      console.error('Error: ', error.message);
+      toast.error('Error deleting piece');
     }
-  }
+  };
 
   const handleTweakClick = async () => {
     try {
       if (!token) {
-        setShowAuthModal(true)
+        setShowAuthModal(true);
       } else {
         const response = await fetch(
           `${API_URL}/channels/${piece.channel_id}/check_channel_subscription`,
@@ -151,33 +151,33 @@ const PiecePage = () => {
               Authorization: `Bearer ${token}`,
             },
           }
-        )
+        );
 
         if (response.status === 403) {
           // User isn't subscribed to channel, show the subscription modal
-          setShowSubscriptionModal(true)
+          setShowSubscriptionModal(true);
         } else if (!response.ok) {
-          throw new Error('Failed to check channel subscription')
+          throw new Error('Failed to check channel subscription');
         } else {
           if (piece.content) {
-            setShowPopulateModal(true)
+            setShowPopulateModal(true);
           } else {
-            const queryParams = new URLSearchParams(tweakData).toString()
-            navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
+            const queryParams = new URLSearchParams(tweakData).toString();
+            navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`);
           }
         }
       }
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error handling tweak click')
+      console.error('Error: ', error.message);
+      toast.error('Error handling tweak click');
     }
-  }
+  };
 
   const handleSubscribeClick = async () => {
     try {
       const payload = {
         channel_id: piece.channel.id,
-      }
+      };
 
       const response = await fetch(
         `${API_URL}/channels/${piece.channel.id}/subscribe`,
@@ -189,48 +189,48 @@ const PiecePage = () => {
           },
           body: JSON.stringify(payload),
         }
-      )
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to subscribe')
+        throw new Error('Failed to subscribe');
       }
 
-      setShowSubscriptionModal(false)
+      setShowSubscriptionModal(false);
 
       if (piece.content) {
-        setShowPopulateModal(true)
+        setShowPopulateModal(true);
       } else {
-        const queryParams = new URLSearchParams(tweakData).toString()
-        navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
+        const queryParams = new URLSearchParams(tweakData).toString();
+        navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`);
       }
     } catch (error) {
-      console.error('Error: ', error)
-      toast.error('Error handling subscribe click')
+      console.error('Error: ', error);
+      toast.error('Error handling subscribe click');
     }
-  }
+  };
 
   const handleCheckboxChange = (event) => {
-    const { value, checked } = event.target
+    const { value, checked } = event.target;
     setTweakData((prevData) => ({
       ...prevData,
       [value]: checked,
-    }))
-  }
+    }));
+  };
 
   const handlePopulateClick = () => {
-    const queryParams = new URLSearchParams(tweakData).toString()
-    navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
-  }
+    const queryParams = new URLSearchParams(tweakData).toString();
+    navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`);
+  };
 
   const handleReportClick = () => {
     if (!token) {
-      setShowDropdown(false)
-      setShowAuthModal(true)
+      setShowDropdown(false);
+      setShowAuthModal(true);
     } else {
-      setShowDropdown(false)
-      setShowReportModal(true)
+      setShowDropdown(false);
+      setShowReportModal(true);
     }
-  }
+  };
 
   return (
     <>
@@ -353,13 +353,15 @@ const PiecePage = () => {
           <div className={classes.footer}>
             <div className={classes['footer-container']}>
               <SharePopover url={window.location.href} type={'page'} />
-              <button
-                className={`${classes.link} ${classes.tweak}`}
-                onClick={handleTweakClick}
-              >
-                <RiFlaskLine className={classes['tweak-icon']} />
-                <span className={classes.text}>Tweak</span>
-              </button>
+              {!piece.parent_piece_id && (
+                <button
+                  className={`${classes.link} ${classes.tweak}`}
+                  onClick={handleTweakClick}
+                >
+                  <RiFlaskLine className={classes['tweak-icon']} />
+                  <span className={classes.text}>Tweak</span>
+                </button>
+              )}
             </div>
           </div>
           <div
@@ -403,28 +405,28 @@ const PiecePage = () => {
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default PiecePage
+export default PiecePage;
 
 export async function loader({ params }) {
-  const { '*': url } = params
-  const urlParts = url.split('/')
-  const channel_id = urlParts[1]
-  const piece_id = urlParts[3]
+  const { '*': url } = params;
+  const urlParts = url.split('/');
+  const channel_id = urlParts[1];
+  const piece_id = urlParts[3];
 
   const response = await fetch(
     `${API_URL}/channels/${channel_id}/pieces/${piece_id}`
-  )
+  );
 
   if (!response.ok) {
-    throw new Error('Could not find piece')
+    throw new Error('Could not find piece');
   }
 
-  const data = await response.json()
+  const data = await response.json();
 
-  store.dispatch(pieceActions.setPiece(data))
+  store.dispatch(pieceActions.setPiece(data));
 
-  return data
+  return data;
 }

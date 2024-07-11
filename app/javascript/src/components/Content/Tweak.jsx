@@ -258,12 +258,6 @@ const Tweak = ({ tweak }) => {
                   arrangement={'row'}
                 />
               </div>
-              <div className={`${classes.link} ${classes.tweak}`}>
-                <RiFlaskLine className={classes.icon} />
-                <span className={classes.text}>
-                  {tweak.tweaks_count} Tweaks
-                </span>
-              </div>
               <div className={`${classes.link} ${classes.comms}`}>
                 <RiChat3Line className={classes.icon} />
                 <span className={classes.text}>
