@@ -3,7 +3,7 @@ default: &default
   encoding: utf8mb4
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: root
-  password: 
+  password:
   socket: /tmp/mysql.sock
 
 development:
@@ -13,3 +13,12 @@ development:
 test:
   <<: *default
   database: tweakster_test
+
+production:
+  adapter: mysql2
+  encoding: utf8
+  database: <%= ENV['RDS_DB_NAME'] %>
+  username: <%= ENV['RDS_USERNAME'] %>
+  password: <%= ENV['RDS_PASSWORD'] %>
+  host: <%= ENV['RDS_HOSTNAME'] %>
+  port: <%= ENV['RDS_PORT'] %>
