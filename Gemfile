@@ -75,3 +75,5 @@ gem "vite_rails", "~> 3.0"
 gem "noticed", "~> 2.3"
 
 gem "aws-sdk-s3", require: false
+
+gem "bugsnag"
