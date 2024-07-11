@@ -30,6 +30,23 @@ import { pieceActions } from '../../store/piece';
 import store from '../../store/index';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
+import { API_URL } from '../../constants/constants';
+import { AuthModal } from '../../components/UI/Modals/AuthModal';
+import ConfirmationModal from '../../components/UI/Modals/ConfirmationModal';
+import Interactions from '../../components/Content/Interactions';
+import PieceCarousel from '../../components/UI/PieceCarousel';
+import PieceVote from '../../components/UI/PieceVote';
+import PopulateModal from '../../components/UI/Modals/PopulateModal';
+import ReportModal from '../../components/UI/Modals/ReportModal';
+import SharePopover from '../../components/UI/SharePopover';
+import classes from './PiecePage.module.css';
+import defaultAvatar from '../../assets/default-avatar.png';
+import { getUserData } from '../../util/auth';
+import moment from 'moment';
+import { pieceActions } from '../../store/piece';
+import store from '../../store/index';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const PiecePage = () => {
   const piece = useSelector((state) => state.piece.piece);
@@ -279,7 +296,7 @@ const PiecePage = () => {
                 </Link>
               </p>
               <p className={classes.date}>
-                - <Moment fromNow>{piece.created_at}</Moment>
+                - {moment(piece.created_at).fromNow()}
               </p>
             </div>
             <div className={classes['flex-right']}>

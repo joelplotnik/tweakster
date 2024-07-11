@@ -1,24 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Link,
   json,
   useLocation,
   useNavigate,
   useRouteLoaderData,
-} from 'react-router-dom';
-import Moment from 'react-moment';
+} from 'react-router-dom'
+import moment from 'moment'
 
-import { API_URL } from '../../constants/constants';
-import { getUserData } from '../../util/auth';
-import RefreshContext from '../../context/refresh';
-import PieceVote from '../UI/PieceVote';
-import SharePopover from '../UI/SharePopover';
-import ConfirmationModal from '../UI/Modals/ConfirmationModal';
-import AuthModal from '../UI/Modals/AuthModal';
-import ReportModal from '../UI/Modals/ReportModal';
-import PieceCarousel from '../UI/PieceCarousel';
+import { API_URL } from '../../constants/constants'
+import { getUserData } from '../../util/auth'
+import RefreshContext from '../../context/refresh'
+import PieceVote from '../UI/PieceVote'
+import SharePopover from '../UI/SharePopover'
+import ConfirmationModal from '../UI/Modals/ConfirmationModal'
+import AuthModal from '../UI/Modals/AuthModal'
+import ReportModal from '../UI/Modals/ReportModal'
+import PieceCarousel from '../UI/PieceCarousel'
 
-import classes from './Piece.module.css';
+import classes from './Piece.module.css'
 import {
   RiChat3Line,
   RiDeleteBin7Line,
@@ -27,58 +27,58 @@ import {
   RiFlaskFill,
   RiFlaskLine,
   RiMoreFill,
-} from 'react-icons/ri';
-import defaultAvatar from '../../assets/default-avatar.png';
-import { useSelector } from 'react-redux';
+} from 'react-icons/ri'
+import defaultAvatar from '../../assets/default-avatar.png'
+import { useSelector } from 'react-redux'
 
 const Piece = ({ piece }) => {
-  const activePiece = useSelector((state) => state.piece.piece);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const setRefreshRoot = useContext(RefreshContext);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const activePiece = useSelector((state) => state.piece.piece)
+  const location = useLocation()
+  const navigate = useNavigate()
+  const setRefreshRoot = useContext(RefreshContext)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
-  const token = useRouteLoaderData('root');
-  const { userId, userRole } = getUserData() || {};
-  const pieceUserID = piece.user.id;
-  const currentUser = pieceUserID === parseInt(userId, 10);
+  const token = useRouteLoaderData('root')
+  const { userId, userRole } = getUserData() || {}
+  const pieceUserID = piece.user.id
+  const currentUser = pieceUserID === parseInt(userId, 10)
 
-  const tweaked = !!piece.tweak;
+  const tweaked = !!piece.tweak
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal);
-  };
+    setShowAuthModal(!showAuthModal)
+  }
 
   const handleConfirmationModalToggle = () => {
-    setShowConfirmationModal(!showConfirmationModal);
-  };
+    setShowConfirmationModal(!showConfirmationModal)
+  }
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal);
-  };
+    setShowReportModal(!showReportModal)
+  }
 
   const handleDropdownToggle = (event) => {
-    event.stopPropagation();
-    setShowDropdown(!showDropdown);
-  };
+    event.stopPropagation()
+    setShowDropdown(!showDropdown)
+  }
 
   const handleEditClick = (event) => {
-    event.stopPropagation();
+    event.stopPropagation()
     if (piece.tweaks_count === 0) {
-      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}/edit`);
+      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}/edit`)
     }
-  };
+  }
 
   const handleParentPieceClick = (event) => {
-    event.stopPropagation();
+    event.stopPropagation()
     window.open(
       `/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`,
       '_blank'
-    );
-  };
+    )
+  }
 
   const handleDeleteClick = async () => {
     const response = await fetch(
@@ -90,85 +90,85 @@ const Piece = ({ piece }) => {
           Authorization: `Bearer ${token}`,
         },
       }
-    );
+    )
 
     if (!response.ok) {
-      throw json({ message: 'Could not delete piece' }, { status: 500 });
+      throw json({ message: 'Could not delete piece' }, { status: 500 })
     }
 
-    navigate(location.pathname);
-    setRefreshRoot(true);
-  };
+    navigate(location.pathname)
+    setRefreshRoot(true)
+  }
 
   const handleReportClick = () => {
     if (!token) {
-      setShowDropdown(false);
-      setShowAuthModal(true);
+      setShowDropdown(false)
+      setShowAuthModal(true)
     } else {
-      setShowDropdown(false);
-      setShowReportModal(true);
+      setShowDropdown(false)
+      setShowReportModal(true)
     }
-  };
+  }
 
   useEffect(() => {
     const handleClickOutsideDropdown = (event) => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
-      );
+      )
 
       if (dropdownContainer && !dropdownContainer.contains(event.target)) {
-        setShowDropdown(false);
+        setShowDropdown(false)
       }
-    };
+    }
 
-    document.addEventListener('click', handleClickOutsideDropdown);
+    document.addEventListener('click', handleClickOutsideDropdown)
 
     return () => {
-      document.removeEventListener('click', handleClickOutsideDropdown);
-    };
-  }, []);
+      document.removeEventListener('click', handleClickOutsideDropdown)
+    }
+  }, [])
 
   const handlePieceLinkClick = (event) => {
-    const target = event.target;
-    const isDeleteButton = target.classList.contains(classes.danger);
-    const isDropdown = target.closest(`.${classes.dropdown}`);
-    const isCarouselDiv = target.closest(`.${classes.carousel}`);
+    const target = event.target
+    const isDeleteButton = target.classList.contains(classes.danger)
+    const isDropdown = target.closest(`.${classes.dropdown}`)
+    const isCarouselDiv = target.closest(`.${classes.carousel}`)
 
     if (!isDeleteButton && !isDropdown && !isCarouselDiv) {
-      event.preventDefault();
-      let url = '';
-      let param = '';
+      event.preventDefault()
+      let url = ''
+      let param = ''
 
       if (target.closest(`.${classes.tweak}`)) {
-        param = 'tweaks';
+        param = 'tweaks'
       } else if (target.closest(`.${classes.comms}`)) {
-        param = 'comments';
+        param = 'comments'
       }
 
       if (param) {
         if (!token) {
-          url = `/channels/${piece.channel.id}/pieces/${piece.id}?tab=${param}`;
-          window.open(url, '_blank');
+          url = `/channels/${piece.channel.id}/pieces/${piece.id}?tab=${param}`
+          window.open(url, '_blank')
         } else {
-          url = `/channels/${piece.channel.id}/pieces/${piece.id}`;
-          navigate(url, { state: { tab: param, background: location } });
+          url = `/channels/${piece.channel.id}/pieces/${piece.id}`
+          navigate(url, { state: { tab: param, background: location } })
         }
       } else {
         if (!token) {
-          url = `/channels/${piece.channel.id}/pieces/${piece.id}`;
-          window.open(url, '_blank');
+          url = `/channels/${piece.channel.id}/pieces/${piece.id}`
+          window.open(url, '_blank')
         } else {
           navigate(`/channels/${piece.channel.id}/pieces/${piece.id}`, {
             state: { background: location },
-          });
+          })
         }
       }
     }
-  };
+  }
 
   const stopPropagation = (event) => {
-    event.stopPropagation();
-  };
+    event.stopPropagation()
+  }
 
   return (
     <>
@@ -225,7 +225,7 @@ const Piece = ({ piece }) => {
               )}
             </div>
             <p className={classes.date}>
-              - <Moment fromNow>{piece.created_at}</Moment>
+              - {moment(piece.created_at).fromNow()}
             </p>
           </div>
           <div className={tweaked ? classes['tweak-effect'] : classes.main}>
@@ -359,7 +359,7 @@ const Piece = ({ piece }) => {
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default Piece;
+export default Piece

@@ -1,5 +1,3 @@
-import { esbuildCommonjs } from '@originjs/vite-plugin-commonjs'
-
 import ReactPlugin from '@vitejs/plugin-react'
 import RubyPlugin from 'vite-plugin-ruby'
 import { defineConfig } from 'vite'
@@ -11,11 +9,6 @@ export default defineConfig({
   resolve: {
     alias: {
       src: resolve(__dirname, 'app/javascript/src'),
-    },
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      plugins: [esbuildCommonjs(['react-moment'])],
     },
   },
 })

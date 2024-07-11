@@ -47,7 +47,7 @@ class Api::V1::UsersController < ApplicationController
     end
     
     if top_users.size < limit.to_i
-      remaining_users = User.limit(limit.to_i - top_users.size).order(follower_count: :desc)
+      remaining_users = User.limit(limit.to_i - top_users.size)
       remaining_users.each do |user|
         top_users << {
           id: user.id,
