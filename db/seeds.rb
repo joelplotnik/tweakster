@@ -103,7 +103,7 @@ end
 
 
 # Assign Pieces to Users and Channels
-piece_count = 50
+piece_count = 100
 youtube_urls = [
   "https://www.youtube.com/watch?v=C0DPdy98e4c",
   "https://www.youtube.com/watch?v=sZtCF_9pee4",
@@ -163,7 +163,7 @@ end
 # Create Comments
 pieces = Piece.all
 pieces.each do |piece|
-  num_comments = rand(0..10)
+  num_comments = rand(0..20)
   users.sample(num_comments).each do |comment_user|
     if piece.comments.where(parent_comment_id: nil).exists? && rand(2).zero?
       parent_comment = piece.comments.where(parent_comment_id: nil).sample
@@ -171,12 +171,16 @@ pieces.each do |piece|
       parent_comment = nil
     end
 
-    Comment.create!(
+    comment = Comment.create!(
       message: Faker::Lorem.sentence,
-      user_id: comment_user.id,
-      piece_id: piece.id, 
+      user: comment_user,
+      piece: piece, 
       parent_comment_id: parent_comment&.id 
     )
+
+    if comment.persisted? && comment_user != piece.user
+      CommentOnPieceNotifier.with(record: comment).deliver(piece.user)
+    end
   end
 end
 
@@ -226,43 +230,27 @@ users.each do |user|
   end
 end
 
-# Create Tweaks (75% chance)
+# Create Tweaks (50% chance)
+total_pieces = pieces.count
+desired_tweak_count = (total_pieces * 0.25).to_i 
+tweak_count = 0
+
 pieces.each do |piece|
-  if rand(4) >= 1 
-    parent_candidates = pieces.reject { |p| p == piece || p.parent_piece_id == piece.id }
-    parent_candidates.reject! { |p| p.id == piece.parent_piece_id } if piece.parent_piece_id.present?
-    parent_piece = parent_candidates.sample
-    if parent_piece.present? && parent_piece.parent_piece_id != piece.id
-      piece.update(parent_piece_id: parent_piece.id)
-    end
+  break if tweak_count >= desired_tweak_count  
+  
+  parent_candidates = Piece.where(channel_id: piece.channel_id, parent_piece_id: nil).where.not(id: piece.id)
+  
+  next if parent_candidates.empty? 
+  
+  parent_piece = parent_candidates.sample
+  success = piece.update(parent_piece_id: parent_piece.id)
+  
+  if success && parent_piece.user != piece.user
+    TweakOfPieceNotifier.with(record: piece).deliver(parent_piece.user)
+    tweak_count += 1
   end
 end
 
-# Create Messages
-users.each_with_index do |user, index|
-  conversation_users = users.reject { |u| u == user }.sample(2)
-
-  conversation_users.each do |other_user|
-    next if user.conversations.include?(other_user) || other_user.conversations.include?(user)
-
-    rand(5..20).times do
-      body = Faker::Lorem.paragraph(sentence_count: rand(1..5))
-      body2 = Faker::Lorem.paragraph(sentence_count: rand(1..5))
-      Message.create!(
-        sender_id: user.id,
-        receiver_id: other_user.id,
-        body: body,
-        read: false
-      )
-      Message.create!(
-        sender_id: other_user.id,
-        receiver_id: user.id,
-        body: body2,
-        read: false
-      )
-    end
-  end
-end
 
 # Create Reports
 users.each do |user|

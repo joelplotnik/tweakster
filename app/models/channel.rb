@@ -1,8 +1,9 @@
 class Channel < ApplicationRecord
     include Channelable
+
+    before_validation :strip_whitespace
   
     belongs_to :user
-  
     has_one_attached :visual
     has_many :pieces
     has_many :subscriptions, dependent: :destroy
@@ -19,15 +20,13 @@ class Channel < ApplicationRecord
     validates :summary, allow_blank: true,
       length: { minimum: 2, maximum: 280 }
   
-    before_validation :strip_whitespace
-  
     private
   
     def strip_whitespace
-    self.name&.strip!
-    self.url&.strip!
-    self.protocol&.strip!
-    self.summary&.strip!
+      self.name&.strip!
+      self.url&.strip!
+      self.protocol&.strip!
+      self.summary&.strip!
     end
   end
   

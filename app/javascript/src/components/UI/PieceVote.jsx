@@ -155,11 +155,7 @@ const PieceVote = ({
             : classes['vote-section']
         }`}
       >
-        <button
-          className={classes['vote-button']}
-          onClick={handleUpvote}
-          disabled={background}
-        >
+        <button className={classes['vote-button']} onClick={handleUpvote}>
           {userVote?.vote_type === 1 ? (
             <RiThumbUpFill className={classes['thumb-up-icon-filled']} />
           ) : (
@@ -169,11 +165,7 @@ const PieceVote = ({
         <span className={classes['vote-count']}>
           {localLikes - localDislikes}
         </span>
-        <button
-          className={classes['vote-button']}
-          onClick={handleDownvote}
-          disabled={background}
-        >
+        <button className={classes['vote-button']} onClick={handleDownvote}>
           {userVote?.vote_type === -1 ? (
             <RiThumbDownFill className={classes['thumb-down-icon-filled']} />
           ) : (

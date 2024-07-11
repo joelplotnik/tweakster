@@ -43,11 +43,6 @@ class Api::V1::CommentsController < ApplicationController
     comment = Comment.new(comment_params)
     comment.user = current_user
   
-    if comment.parent_comment && comment.parent_comment.parent_comment
-      render json: { error: 'Cannot comment on a comment of a comment' }, status: :unprocessable_entity
-      return
-    end
-  
     if comment.save
       unless comment.user == comment.piece.user
         CommentOnPieceNotifier.with(record: comment).deliver(comment.piece.user)

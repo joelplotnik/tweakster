@@ -269,11 +269,6 @@
   border: 8px solid transparent;
 }
 
-.tweak:hover .icon,
-.tweak:hover .text {
-  color: #53b781;
-}
-
 .comms:hover .icon,
 .comms:hover .text {
   color: #4a99e9;

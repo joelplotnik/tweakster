@@ -285,12 +285,14 @@ const Piece = ({ piece }) => {
           </div>
           <div className={classes.footer}>
             <div className={classes['footer-container']}>
-              <div className={`${classes.link} ${classes.tweak}`}>
-                <RiFlaskLine className={classes.icon} />
-                <span className={classes.text}>
-                  {piece.tweaks_count} Tweaks
-                </span>
-              </div>
+              {!piece.parent_piece_id && (
+                <div className={`${classes.link} ${classes.tweak}`}>
+                  <RiFlaskLine className={classes.icon} />
+                  <span className={classes.text}>
+                    {piece.tweaks_count} Tweaks
+                  </span>
+                </div>
+              )}
               <div className={`${classes.link} ${classes.comms}`}>
                 <RiChat3Line className={classes.icon} />
                 <span className={classes.text}>

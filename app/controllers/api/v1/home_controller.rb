@@ -5,7 +5,7 @@ class Api::V1::HomeController < ApplicationController
   include Pieceable
 
   def index
-    all_pieces = Piece.all
+    all_pieces = Piece.where(parent_piece_id: nil)
     sorted_pieces = if params[:sort] == 'new'
                       all_pieces.order(created_at: :desc)
                     else
