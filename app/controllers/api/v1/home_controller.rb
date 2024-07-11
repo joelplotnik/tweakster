@@ -93,7 +93,7 @@ class Api::V1::HomeController < ApplicationController
     current_day = Date.current
     days_to_look_back = 0
   
-    while pieces_with_images.length < 4
+    while pieces_with_images.length < 4 && days_to_look_back < 30
       target_day = current_day - days_to_look_back.days
   
       pieces = Piece
