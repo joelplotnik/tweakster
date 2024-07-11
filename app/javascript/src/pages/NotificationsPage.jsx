@@ -16,8 +16,6 @@ const NotificationsPage = () => {
   const dispatch = useDispatch();
   const token = useRouteLoaderData('root');
 
-  console.log(notifications);
-
   const fetchNotifications = async (currentPage) => {
     try {
       const response = await fetch(
