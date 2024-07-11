@@ -11,7 +11,7 @@ const Interactions = ({ pieceClassModalRef }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const piece = useSelector((state) => state.piece.piece);
-  const [activeTab, setActiveTab] = useState('tweaks');
+  const [activeTab, setActiveTab] = useState('comments');
 
   useEffect(() => {
     const tabState = location.state && location.state.tab;
@@ -22,10 +22,10 @@ const Interactions = ({ pieceClassModalRef }) => {
       const params = new URLSearchParams(location.search);
       const tabParam = params.get('tab');
 
-      if (tabParam === 'comments') {
-        setActiveTab('comments');
-      } else {
+      if (tabParam === 'tweaks') {
         setActiveTab('tweaks');
+      } else {
+        setActiveTab('comments');
       }
     }
   }, [location.state, location.search]);
@@ -41,14 +41,6 @@ const Interactions = ({ pieceClassModalRef }) => {
 
     setActiveTab(tab);
   };
-
-  if (piece.parent_piece_id) {
-    return (
-      <div>
-        <Comments piece={piece} pieceClassModalRef={pieceClassModalRef} />
-      </div>
-    );
-  }
 
   return (
     <>
