@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { useRouteLoaderData } from 'react-router-dom';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { ClipLoader } from 'react-spinners';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useDispatch } from 'react-redux'
+import { useRouteLoaderData } from 'react-router-dom'
+import { ClipLoader } from 'react-spinners'
 
-import { API_URL } from '../constants/constants';
-import { notificationsActions } from '../store/notifications';
-import classes from './NotificationsPage.module.css';
+import { API_URL } from '../constants/constants'
+import { notificationsActions } from '../store/notifications'
+import classes from './NotificationsPage.module.css'
 
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useDispatch();
-  const token = useRouteLoaderData('root');
+  const [notifications, setNotifications] = useState([])
+  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const dispatch = useDispatch()
+  const token = useRouteLoaderData('root')
 
-  const fetchNotifications = async (currentPage) => {
+  const fetchNotifications = async currentPage => {
     try {
       const response = await fetch(
         `${API_URL}/notifications?page=${currentPage}`,
@@ -27,32 +27,32 @@ const NotificationsPage = () => {
             Authorization: `Bearer ${token}`,
           },
         }
-      );
+      )
 
       if (!response.ok) {
-        throw new Error('Failed to fetch notifications');
+        throw new Error('Failed to fetch notifications')
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
       const unseenNotifications = data.filter(
-        (notification) => !notification.seen_at
-      );
+        notification => !notification.seen_at
+      )
 
       if (unseenNotifications.length > 0) {
         await markNotificationsAsSeen(
-          unseenNotifications.map((notification) => notification.id)
-        );
+          unseenNotifications.map(notification => notification.id)
+        )
       }
 
-      return data;
+      return data
     } catch (error) {
-      console.error('Error fetching notifications:', error);
-      return [];
+      console.error('Error fetching notifications:', error)
+      return []
     }
-  };
+  }
 
-  const markNotificationsAsSeen = async (notificationIds) => {
+  const markNotificationsAsSeen = async notificationIds => {
     try {
       const response = await fetch(`${API_URL}/notifications/mark_as_seen`, {
         method: 'POST',
@@ -61,46 +61,46 @@ const NotificationsPage = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ notification_ids: notificationIds }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to mark notifications as seen');
+        throw new Error('Failed to mark notifications as seen')
       }
 
-      const responseData = await response.json();
-      const { has_more_notifications } = responseData;
+      const responseData = await response.json()
+      const { has_more_notifications } = responseData
 
       dispatch(
         notificationsActions.setHasNewNotifications(has_more_notifications)
-      );
+      )
     } catch (error) {
-      console.error('Error marking notifications as seen:', error);
+      console.error('Error marking notifications as seen:', error)
     }
-  };
+  }
 
   const fetchData = async () => {
     if (!isLoading) {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      const notificationsFromServer = await fetchNotifications(page);
+      const notificationsFromServer = await fetchNotifications(page)
 
       if (notificationsFromServer.length > 0) {
-        setNotifications([...notifications, ...notificationsFromServer]);
-        setPage(page + 1);
+        setNotifications([...notifications, ...notificationsFromServer])
+        setPage(page + 1)
       } else {
-        setHasMore(false);
+        setHasMore(false)
       }
 
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchData();
+    fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
-  const renderNotification = (notification) => {
+  const renderNotification = notification => {
     const {
       id,
       event,
@@ -111,7 +111,7 @@ const NotificationsPage = () => {
       piece_id,
       parent_piece_id,
       parent_piece_title,
-    } = notification;
+    } = notification
 
     if (event.record_type === 'Comment') {
       return (
@@ -131,7 +131,7 @@ const NotificationsPage = () => {
             </a>
           </div>
         </li>
-      );
+      )
     } else if (event.record_type === 'Piece') {
       return (
         <li key={id} className={classes.notificationItem}>
@@ -150,10 +150,10 @@ const NotificationsPage = () => {
             </a>
           </div>
         </li>
-      );
+      )
     }
-    return null;
-  };
+    return null
+  }
 
   return (
     <div className={classes.container}>
@@ -179,7 +179,7 @@ const NotificationsPage = () => {
         </ul>
       </InfiniteScroll>
     </div>
-  );
-};
+  )
+}
 
-export default NotificationsPage;
+export default NotificationsPage

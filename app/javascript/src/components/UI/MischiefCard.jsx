@@ -1,6 +1,6 @@
+import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-import React from 'react'
 import classes from './MischiefCard.module.css'
 
 export function MischiefCard({ piece }) {
@@ -13,7 +13,7 @@ export function MischiefCard({ piece }) {
     navigate(`/channels/${piece.channel.id}/pieces/${piece.id}`)
   }
 
-  const stopPropagation = (event) => {
+  const stopPropagation = event => {
     event.stopPropagation()
   }
 

@@ -1,12 +1,13 @@
-import React from 'react';
-import classes from './Pagination.module.css';
+import React from 'react'
+
+import classes from './Pagination.module.css'
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const handlePageClick = (page) => {
-    onPageChange(page);
-  };
+  const handlePageClick = page => {
+    onPageChange(page)
+  }
 
-  const isDisabled = totalPages === 0;
+  const isDisabled = totalPages === 0
 
   return (
     <div className={classes.pagination}>
@@ -42,7 +43,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         Last
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default Pagination;
+export default Pagination

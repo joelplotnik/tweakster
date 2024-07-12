@@ -1,7 +1,9 @@
-import React from 'react';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import classes from './MischiefMakerSkeleton.module.css';
+import 'react-loading-skeleton/dist/skeleton.css'
+
+import React from 'react'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+
+import classes from './MischiefMakerSkeleton.module.css'
 
 const MischiefMakerSkeleton = () => {
   return (
@@ -17,7 +19,7 @@ const MischiefMakerSkeleton = () => {
         </div>
       </SkeletonTheme>
     </>
-  );
-};
+  )
+}
 
-export default MischiefMakerSkeleton;
+export default MischiefMakerSkeleton

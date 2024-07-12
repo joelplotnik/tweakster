@@ -1,5 +1,5 @@
-import React from 'react';
+import React from 'react'
 
-const PieceModalContext = React.createContext(null);
+const PieceModalContext = React.createContext(null)
 
-export default PieceModalContext;
+export default PieceModalContext

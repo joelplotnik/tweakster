@@ -1,4 +1,4 @@
-import { Link, useRouteLoaderData } from 'react-router-dom'
+import moment from 'moment'
 import React, { useEffect, useRef, useState } from 'react'
 import {
   RiDeleteBin7Line,
@@ -7,15 +7,15 @@ import {
   RiMoreFill,
   RiReplyLine,
 } from 'react-icons/ri'
+import { Link, useRouteLoaderData } from 'react-router-dom'
 
-import AuthModal from '../UI/Modals/AuthModal'
-import CommentForm from './Forms/CommentForm'
+import { getUserData } from '../../util/auth'
 import CommentVote from '../UI/CommentVote'
+import AuthModal from '../UI/Modals/AuthModal'
 import ConfirmationModal from '../UI/Modals/ConfirmationModal'
 import ReportModal from '../UI/Modals/ReportModal'
 import classes from './Comment.module.css'
-import { getUserData } from '../../util/auth'
-import moment from 'moment'
+import CommentForm from './Forms/CommentForm'
 
 const Comment = ({
   comment,
@@ -67,7 +67,7 @@ const Comment = ({
     setShowReportModal(!showReportModal)
   }
 
-  const handleDropdownClick = (event) => {
+  const handleDropdownClick = event => {
     if (!token) {
       setShowAuthModal(true)
       return
@@ -86,7 +86,7 @@ const Comment = ({
   }
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setActiveComment(null)
       }
@@ -188,7 +188,7 @@ const Comment = ({
         )}
         {childComments && childComments.length > 0 && (
           <div className={classes['comment-nested']}>
-            {childComments.map((childComment) => (
+            {childComments.map(childComment => (
               <div
                 key={childComment.comment.id}
                 id={

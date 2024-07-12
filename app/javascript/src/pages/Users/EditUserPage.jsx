@@ -1,17 +1,16 @@
-import React from 'react';
-import { useRouteLoaderData, json, redirect } from 'react-router-dom';
-import { getUserData, tokenLoader } from '../../util/auth';
-import { toast } from 'react-toastify';
+import React from 'react'
+import { json, redirect, useRouteLoaderData } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
-import { API_URL } from '../../constants/constants';
-import store from '../../store/index';
-import { userActions } from '../../store/user';
-import UserForm from '../../components/Content/Forms/UserForm';
-
-import classes from './EditUserPage.module.css';
+import UserForm from '../../components/Content/Forms/UserForm'
+import { API_URL } from '../../constants/constants'
+import store from '../../store/index'
+import { userActions } from '../../store/user'
+import { getUserData, tokenLoader } from '../../util/auth'
+import classes from './EditUserPage.module.css'
 
 const EditUserPage = () => {
-  const user = useRouteLoaderData('user');
+  const user = useRouteLoaderData('user')
 
   return (
     <div className={classes['edit-user-page']}>
@@ -19,31 +18,31 @@ const EditUserPage = () => {
       <hr className={classes.divider} />
       <UserForm method="PUT" user={user} />
     </div>
-  );
-};
+  )
+}
 
-export default EditUserPage;
+export default EditUserPage
 
 export const action = async ({ request, params }) => {
-  const { id } = params;
-  const userIdParam = parseInt(id);
+  const { id } = params
+  const userIdParam = parseInt(id)
 
-  const data = await request.formData();
+  const data = await request.formData()
 
-  data.append('user[avatar]', data.get('avatar'));
-  data.append('user[remove_avatar]', data.get('remove_avatar'));
-  data.append('user[username]', data.get('username'));
-  data.append('user[url]', data.get('url'));
-  data.append('user[bio]', data.get('bio'));
-  data.append('user[email]', data.get('email'));
-  data.append('user[password]', data.get('password'));
+  data.append('user[avatar]', data.get('avatar'))
+  data.append('user[remove_avatar]', data.get('remove_avatar'))
+  data.append('user[username]', data.get('username'))
+  data.append('user[url]', data.get('url'))
+  data.append('user[bio]', data.get('bio'))
+  data.append('user[email]', data.get('email'))
+  data.append('user[password]', data.get('password'))
 
-  const newPassword = data.get('newPassword');
+  const newPassword = data.get('newPassword')
   if (newPassword) {
-    data.append('user[new_password]', data.get('newPassword'));
+    data.append('user[new_password]', data.get('newPassword'))
   }
 
-  const token = tokenLoader();
+  const token = tokenLoader()
 
   const response = await fetch(`${API_URL}/users/${id}`, {
     method: 'PUT',
@@ -51,33 +50,33 @@ export const action = async ({ request, params }) => {
       Authorization: `Bearer ${token}`,
     },
     body: data,
-  });
+  })
 
   if (response.status === 401) {
-    toast.error('You are not authorized to perform this action');
-    return response;
+    toast.error('You are not authorized to perform this action')
+    return response
   }
 
   if (response.status === 422) {
-    const responseData = await response.json();
-    toast.error(responseData.message || 'Validation failed');
-    return response;
+    const responseData = await response.json()
+    toast.error(responseData.message || 'Validation failed')
+    return response
   }
 
   if (!response.ok) {
-    throw json({ message: 'Could not edit user' }, { status: 500 });
+    throw json({ message: 'Could not edit user' }, { status: 500 })
   }
 
-  const { userId, userRole } = getUserData() || {};
-  const userIdParsed = parseInt(userId);
+  const { userId, userRole } = getUserData() || {}
+  const userIdParsed = parseInt(userId)
 
-  const user = await response.json();
+  const user = await response.json()
 
   if (userRole === 'admin' && userIdParsed === userIdParam) {
-    store.dispatch(userActions.setUser(user));
+    store.dispatch(userActions.setUser(user))
   } else if (userRole !== 'admin' && userIdParsed === userIdParam) {
-    store.dispatch(userActions.setUser(user));
+    store.dispatch(userActions.setUser(user))
   }
 
-  return redirect(`/users/${user.id}`);
-};
+  return redirect(`/users/${user.id}`)
+}

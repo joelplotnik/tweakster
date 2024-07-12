@@ -1,15 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { RiCloseLine, RiFlaskLine } from 'react-icons/ri';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { RiCloseLine, RiFlaskLine } from 'react-icons/ri'
 
-import { Backdrop } from './Backdrop';
-import classes from './PopulateModal.module.css';
+import { Backdrop } from './Backdrop'
+import classes from './PopulateModal.module.css'
 
 const PopulateModal = ({ onClick, onConfirm, onCheckboxChange }) => {
   const handleConfirm = () => {
-    onClick();
-    onConfirm();
-  };
+    onClick()
+    onConfirm()
+  }
 
   return (
     <>
@@ -24,7 +24,7 @@ const PopulateModal = ({ onClick, onConfirm, onCheckboxChange }) => {
           </button>
           <div
             className={classes['modal-content']}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <RiFlaskLine className={classes['flask-icon']} />
             <h2 className={classes['modal-header']}>Include Content</h2>
@@ -58,7 +58,7 @@ const PopulateModal = ({ onClick, onConfirm, onCheckboxChange }) => {
         document.getElementById('overlay-root')
       )}
     </>
-  );
-};
+  )
+}
 
-export default PopulateModal;
+export default PopulateModal

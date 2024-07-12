@@ -1,9 +1,9 @@
-import React from 'react';
-import MischiefMakers from '../components/Content/MischiefMakers';
-import PieceList from '../components/Content/PieceList';
-import ChannelList from '../components/Content/ChannelList';
+import React from 'react'
 
-import classes from './MainPage.module.css';
+import ChannelList from '../components/Content/ChannelList'
+import MischiefMakers from '../components/Content/MischiefMakers'
+import PieceList from '../components/Content/PieceList'
+import classes from './MainPage.module.css'
 
 const MainPage = () => {
   return (
@@ -20,7 +20,7 @@ const MainPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MainPage;
+export default MainPage

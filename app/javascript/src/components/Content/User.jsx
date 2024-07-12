@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-import classes from './User.module.css';
-import defaultAvatar from '../../assets/default-avatar.png';
+import defaultAvatar from '../../assets/default-avatar.png'
+import classes from './User.module.css'
 
 const User = ({ user }) => {
   return (
@@ -23,7 +23,7 @@ const User = ({ user }) => {
         </div>
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export default User;
+export default User

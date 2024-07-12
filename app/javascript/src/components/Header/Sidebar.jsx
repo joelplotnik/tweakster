@@ -1,18 +1,17 @@
-import { Link, useRouteLoaderData } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
-
-import { API_URL } from '../../constants/constants'
-
-import classes from './Sidebar.module.css'
 import {
-  RiHome4Line,
-  RiThumbUpLine,
   RiHome4Fill,
+  RiHome4Line,
   RiThumbUpFill,
+  RiThumbUpLine,
 } from 'react-icons/ri'
-import defaultVisual from '../../assets/default-visual.png'
+import { Link, useRouteLoaderData } from 'react-router-dom'
+
 import defaultAvatar from '../../assets/default-avatar.png'
+import defaultVisual from '../../assets/default-visual.png'
+import { API_URL } from '../../constants/constants'
 import { getUserData } from '../../util/auth'
+import classes from './Sidebar.module.css'
 
 const Sidebar = ({ isOpen, onClose }) => {
   const token = useRouteLoaderData('root')
@@ -36,7 +35,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
-  const fetchChannels = async (limit) => {
+  const fetchChannels = async limit => {
     try {
       const response = await fetch(`${API_URL}/channels/popular?limit=${limit}`)
       const data = await response.json()
@@ -77,7 +76,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     }
   }
 
-  const fetchUsers = async (limit) => {
+  const fetchUsers = async limit => {
     try {
       const response = await fetch(`${API_URL}/users/popular?limit=${limit}`)
       const data = await response.json()
@@ -146,7 +145,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <div className={classes.header}>
             {isTopChannelsEmpty ? 'POPULAR CHANNELS' : 'TOP SUBSCRIPTIONS'}
           </div>
-          {channels?.map((channel) => (
+          {channels?.map(channel => (
             <Link
               key={channel.id}
               to={`/channels/${channel.id}`}
@@ -177,7 +176,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <div className={classes.header}>
             {isTopUsersEmpty ? 'ACTIVE USERS' : 'RECENT INTERACTIONS'}
           </div>
-          {users?.map((user) => (
+          {users?.map(user => (
             <Link
               key={user.id}
               to={`/users/${user.id}`}

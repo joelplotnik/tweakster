@@ -1,106 +1,104 @@
-import { throttle } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import { throttle } from 'lodash'
+import React, { useEffect, useState } from 'react'
 import {
   RiAddLine,
   RiFlagLine,
   RiMoreFill,
   RiSettings3Line,
-} from 'react-icons/ri';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, json, useParams, useRouteLoaderData } from 'react-router-dom';
+} from 'react-icons/ri'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, json, useParams, useRouteLoaderData } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png';
-import defaultVisual from '../../assets/default-visual.png';
-import Error from '../../components/Content/Error';
-import NoPieces from '../../components/Content/NoPieces';
-import Piece from '../../components/Content/Piece';
-import PieceSkeleton from '../../components/Content/Skeletons/PieceSkeleton';
-import ProfileSkeleton from '../../components/Content/Skeletons/ProfileSkeleton';
-import FollowButton from '../../components/UI/Buttons/FollowButton';
-import Card from '../../components/UI/Card';
-import AuthModal from '../../components/UI/Modals/AuthModal';
-import ReportModal from '../../components/UI/Modals/ReportModal';
-import { API_URL } from '../../constants/constants';
-import store from '../../store';
-import { userPageActions } from '../../store/user-page';
-import { getAuthToken, getUserData } from '../../util/auth';
-import classes from './UserPage.module.css';
+import defaultAvatar from '../../assets/default-avatar.png'
+import defaultVisual from '../../assets/default-visual.png'
+import Error from '../../components/Content/Error'
+import NoPieces from '../../components/Content/NoPieces'
+import Piece from '../../components/Content/Piece'
+import PieceSkeleton from '../../components/Content/Skeletons/PieceSkeleton'
+import ProfileSkeleton from '../../components/Content/Skeletons/ProfileSkeleton'
+import FollowButton from '../../components/UI/Buttons/FollowButton'
+import Card from '../../components/UI/Card'
+import AuthModal from '../../components/UI/Modals/AuthModal'
+import ReportModal from '../../components/UI/Modals/ReportModal'
+import { API_URL } from '../../constants/constants'
+import store from '../../store'
+import { userPageActions } from '../../store/user-page'
+import { getAuthToken, getUserData } from '../../util/auth'
+import classes from './UserPage.module.css'
 
 const UserPage = () => {
-  const { id } = useParams();
-  const token = useRouteLoaderData('root');
-  const dispatch = useDispatch();
-  const { userId } = getUserData() || {};
-  const user = useSelector((state) => state.userPage.user);
-  const [pieces, setPieces] = useState([]);
-  const [pieceIds, setPieceIds] = useState(new Set());
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isUserLoading, setIsUserLoading] = useState(false);
-  const throttledFetchData = throttle(() => fetchData(), 500);
+  const { id } = useParams()
+  const token = useRouteLoaderData('root')
+  const dispatch = useDispatch()
+  const { userId } = getUserData() || {}
+  const user = useSelector(state => state.userPage.user)
+  const [pieces, setPieces] = useState([])
+  const [pieceIds, setPieceIds] = useState(new Set())
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isUserLoading, setIsUserLoading] = useState(false)
+  const throttledFetchData = throttle(() => fetchData(), 500)
 
-  const fetchUserPieces = async (currentPage) => {
+  const fetchUserPieces = async currentPage => {
     try {
-      const fetchUrl = `${API_URL}/users/${id}?page=${currentPage}`;
+      const fetchUrl = `${API_URL}/users/${id}?page=${currentPage}`
       const response = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch pieces for this user');
+        throw new Error('Failed to fetch pieces for this user')
       }
 
-      const data = await response.json();
-      return data;
+      const data = await response.json()
+      return data
     } catch (error) {
-      setError(error.message);
-      return null;
+      setError(error.message)
+      return null
     } finally {
-      setIsUserLoading(false);
+      setIsUserLoading(false)
     }
-  };
+  }
 
   const fetchData = async () => {
     if (!isLoading && hasMore) {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      const userData = await fetchUserPieces(page);
+      const userData = await fetchUserPieces(page)
 
       if (userData) {
         const newPieces = userData.pieces.filter(
-          (piece) => !pieceIds.has(piece.id)
-        );
+          piece => !pieceIds.has(piece.id)
+        )
 
-        setPieces([...pieces, ...newPieces]);
-        setPieceIds(
-          new Set([...pieceIds, ...newPieces.map((piece) => piece.id)])
-        );
+        setPieces([...pieces, ...newPieces])
+        setPieceIds(new Set([...pieceIds, ...newPieces.map(piece => piece.id)]))
 
         if (newPieces.length === 0) {
-          setHasMore(false);
+          setHasMore(false)
         } else {
-          setPage(page + 1);
+          setPage(page + 1)
         }
       }
 
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (!isUserLoading) {
-        setIsUserLoading(true);
+        setIsUserLoading(true)
         try {
           const response = await fetch(`${API_URL}/users/${id}`, {
             method: 'GET',
@@ -108,73 +106,73 @@ const UserPage = () => {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${token}`,
             },
-          });
+          })
 
           if (!response.ok) {
-            throw new Error('Could not find user');
+            throw new Error('Could not find user')
           }
 
-          const userData = await response.json();
-          dispatch(userPageActions.setUser(userData));
+          const userData = await response.json()
+          dispatch(userPageActions.setUser(userData))
         } catch (error) {
-          console.error('Error fetching user data:', error);
-          setError(error.message);
+          console.error('Error fetching user data:', error)
+          setError(error.message)
         } finally {
-          setIsUserLoading(false);
+          setIsUserLoading(false)
         }
       }
-    };
+    }
 
-    !user && fetchUserData();
-    fetchData();
+    !user && fetchUserData()
+    fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const fetchMoreData = () => {
     if (!isLoading && hasMore) {
-      throttledFetchData();
+      throttledFetchData()
     }
-  };
+  }
 
-  const handleDropdownToggle = (event) => {
-    event.stopPropagation();
-    setShowDropdown(!showDropdown);
-  };
+  const handleDropdownToggle = event => {
+    event.stopPropagation()
+    setShowDropdown(!showDropdown)
+  }
 
   const handleReportClick = () => {
     if (!token) {
-      setShowDropdown(false);
-      setShowAuthModal(true);
+      setShowDropdown(false)
+      setShowAuthModal(true)
     } else {
-      setShowDropdown(false);
-      setShowReportModal(true);
+      setShowDropdown(false)
+      setShowReportModal(true)
     }
-  };
+  }
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal);
-  };
+    setShowReportModal(!showReportModal)
+  }
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal);
-  };
+    setShowAuthModal(!showAuthModal)
+  }
 
-  const formatNumber = (number) => {
+  const formatNumber = number => {
     if (number < 10000) {
-      return number.toLocaleString();
+      return number.toLocaleString()
     } else if (number < 100000) {
-      return (number / 1000).toFixed(1) + 'k';
+      return (number / 1000).toFixed(1) + 'k'
     } else if (number < 1000000) {
-      return (number / 1000).toFixed(0) + 'k';
+      return (number / 1000).toFixed(0) + 'k'
     } else if (number < 1000000000) {
-      return (number / 1000000).toFixed(1) + 'm';
+      return (number / 1000000).toFixed(1) + 'm'
     } else {
-      return (number / 1000000000).toFixed(1) + 'b';
+      return (number / 1000000000).toFixed(1) + 'b'
     }
-  };
+  }
 
   if (error) {
-    return <Error message={`Error: ${error}`} />;
+    return <Error message={`Error: ${error}`} />
   }
 
   return (
@@ -200,7 +198,7 @@ const UserPage = () => {
             }
           >
             <div className={classes.pieces}>
-              {pieces.map((piece) => (
+              {pieces.map(piece => (
                 <Piece key={`${piece.id}`} piece={piece} />
               ))}
             </div>
@@ -322,7 +320,7 @@ const UserPage = () => {
                         </div>
                       </Link>
                     )}
-                    {user?.favorite_channels.map((favorite_channel) => (
+                    {user?.favorite_channels.map(favorite_channel => (
                       <div
                         key={favorite_channel.id}
                         className={classes['image-wrapper']}
@@ -358,7 +356,7 @@ const UserPage = () => {
                         </div>
                       </Link>
                     )}
-                    {user?.favorite_users.map((favorite_user) => (
+                    {user?.favorite_users.map(favorite_user => (
                       <div
                         key={favorite_user.id}
                         className={classes['image-wrapper']}
@@ -389,14 +387,14 @@ const UserPage = () => {
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default UserPage;
+export default UserPage
 
 export async function loader({ params }) {
-  const { id } = params;
-  const token = getAuthToken();
+  const { id } = params
+  const token = getAuthToken()
 
   const response = await fetch(`${API_URL}/users/${id}`, {
     method: 'GET',
@@ -404,15 +402,15 @@ export async function loader({ params }) {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-  });
+  })
 
   if (!response.ok) {
-    throw json({ message: 'Could not find user' }, { status: 500 });
+    throw json({ message: 'Could not find user' }, { status: 500 })
   }
 
-  const data = await response.json();
+  const data = await response.json()
 
-  store.dispatch(userPageActions.setUser(data));
+  store.dispatch(userPageActions.setUser(data))
 
-  return data;
+  return data
 }

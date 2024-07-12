@@ -1,10 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { RiVipCrownLine } from 'react-icons/ri';
-import defaultVisual from '../../assets/default-visual.png';
+import React from 'react'
+import { RiVipCrownLine } from 'react-icons/ri'
+import { Link } from 'react-router-dom'
 
-import classes from './Entity.module.css';
-import TopFiveButton from '../UI/Buttons/TopFiveButton';
+import defaultVisual from '../../assets/default-visual.png'
+import TopFiveButton from '../UI/Buttons/TopFiveButton'
+import classes from './Entity.module.css'
 
 const Entity = ({
   entityType,
@@ -13,7 +13,7 @@ const Entity = ({
   favoriteCount,
   onTopFiveClick,
 }) => {
-  const isChannel = entityType === 'channel';
+  const isChannel = entityType === 'channel'
 
   return (
     <Link
@@ -59,7 +59,7 @@ const Entity = ({
         </div>
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export default Entity;
+export default Entity

@@ -1,6 +1,7 @@
-import React from 'react';
-import classes from './AboutPage.module.css';
-import Card from '../components/UI/Card';
+import React from 'react'
+
+import Card from '../components/UI/Card'
+import classes from './AboutPage.module.css'
 
 function AboutPage() {
   return (
@@ -34,7 +35,7 @@ function AboutPage() {
         </p>
       </div>
     </Card>
-  );
+  )
 }
 
-export default AboutPage;
+export default AboutPage

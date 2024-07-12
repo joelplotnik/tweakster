@@ -1,8 +1,8 @@
-import React from 'react';
-import PieceList from '../components/Content/PieceList';
-import ChannelList from '../components/Content/ChannelList';
+import React from 'react'
 
-import classes from './HomePage.module.css';
+import ChannelList from '../components/Content/ChannelList'
+import PieceList from '../components/Content/PieceList'
+import classes from './HomePage.module.css'
 
 const HomePage = () => {
   return (
@@ -16,7 +16,7 @@ const HomePage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

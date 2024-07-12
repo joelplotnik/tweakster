@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-
-import { API_URL } from '../../constants/constants'
-import Channel from '../../components/Content/Channel'
-import { ClipLoader } from 'react-spinners'
-import { Error } from '../../components/Content/Error'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { ClipLoader } from 'react-spinners'
+
+import Channel from '../../components/Content/Channel'
+import { Error } from '../../components/Content/Error'
+import { API_URL } from '../../constants/constants'
 import classes from './ChannelsPage.module.css'
 
 const ChannelsPage = () => {
@@ -14,7 +14,7 @@ const ChannelsPage = () => {
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchChannels = async (currentPage) => {
+  const fetchChannels = async currentPage => {
     try {
       const response = await fetch(`${API_URL}/channels?page=${currentPage}`)
 
@@ -73,7 +73,7 @@ const ChannelsPage = () => {
       endMessage={<></>}
     >
       <div className={classes['channel-list']}>
-        {channels.map((channel) => (
+        {channels.map(channel => (
           <Channel key={`${channel.id}`} channel={channel} />
         ))}
       </div>

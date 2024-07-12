@@ -1,10 +1,6 @@
-import {
-  Link,
-  useLocation,
-  useNavigate,
-  useRouteLoaderData,
-} from 'react-router-dom'
+import moment from 'moment'
 import React, { useContext, useEffect, useRef, useState } from 'react'
+import ReactDOM from 'react-dom'
 import {
   RiArrowLeftLine,
   RiDeleteBin7Line,
@@ -14,36 +10,40 @@ import {
   RiMoreFill,
 } from 'react-icons/ri'
 import { useDispatch, useSelector } from 'react-redux'
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useRouteLoaderData,
+} from 'react-router-dom'
+import { toast } from 'react-toastify'
 
+import defaultAvatar from '../../../assets/default-avatar.png'
 import { API_URL } from '../../../constants/constants'
+import PieceModalContext from '../../../context/piecemodal'
+import RefreshContext from '../../../context/refresh'
+import { channelPageActions } from '../../../store/channel-page'
+import { pieceModalActions } from '../../../store/piece-modal'
+import { getUserData } from '../../../util/auth'
+import Interactions from '../../Content/Interactions'
+import PieceCarousel from '../PieceCarousel'
+import PieceVote from '../PieceVote'
+import SharePopover from '../SharePopover'
 import AuthModal from './AuthModal'
 import Backdrop from './Backdrop'
 import ConfirmationModal from './ConfirmationModal'
-import Interactions from '../../Content/Interactions'
-import PieceCarousel from '../PieceCarousel'
-import PieceModalContext from '../../../context/piecemodal'
-import PieceVote from '../PieceVote'
-import PopulateModal from './PopulateModal'
-import ReactDOM from 'react-dom'
-import RefreshContext from '../../../context/refresh'
-import ReportModal from './ReportModal'
-import SharePopover from '../SharePopover'
-import { channelPageActions } from '../../../store/channel-page'
 import classes from './PieceModal.module.css'
-import defaultAvatar from '../../../assets/default-avatar.png'
-import { getUserData } from '../../../util/auth'
-import moment from 'moment'
-import { pieceModalActions } from '../../../store/piece-modal'
-import { toast } from 'react-toastify'
+import PopulateModal from './PopulateModal'
+import ReportModal from './ReportModal'
 
 const PieceModal = () => {
-  const piece = useSelector((state) => state.piece.piece)
+  const piece = useSelector(state => state.piece.piece)
   const navigate = useNavigate()
   const token = useRouteLoaderData('root')
   const { userId, userRole } = getUserData() || {}
   const pieceUserId = piece.user.id
   const currentUser = pieceUserId === parseInt(userId, 10)
-  const channel = useSelector((state) => state.channelPage.channel)
+  const channel = useSelector(state => state.channelPage.channel)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
@@ -93,7 +93,7 @@ const PieceModal = () => {
     }
   }, [])
 
-  const stopPropagation = (event) => {
+  const stopPropagation = event => {
     event.stopPropagation()
   }
 
@@ -122,7 +122,7 @@ const PieceModal = () => {
   }
 
   useEffect(() => {
-    const handleClickOutsideDropdown = (event) => {
+    const handleClickOutsideDropdown = event => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
       )
@@ -259,7 +259,7 @@ const PieceModal = () => {
     }
   }
 
-  const handleParentPieceClick = (event) => {
+  const handleParentPieceClick = event => {
     event.preventDefault()
     navigate(
       `/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`,
@@ -269,9 +269,9 @@ const PieceModal = () => {
     )
   }
 
-  const handleCheckboxChange = (event) => {
+  const handleCheckboxChange = event => {
     const { value, checked } = event.target
-    setTweakData((prevData) => ({
+    setTweakData(prevData => ({
       ...prevData,
       [value]: checked,
     }))

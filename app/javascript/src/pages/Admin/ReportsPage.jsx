@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useRouteLoaderData, Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from 'react'
+import { Link, useRouteLoaderData } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
-import { API_URL } from '../../constants/constants';
-import Pagination from '../../components/UI/Buttons/Pagination';
-
-import classes from './ReportsPage.module.css';
+import Pagination from '../../components/UI/Buttons/Pagination'
+import { API_URL } from '../../constants/constants'
+import classes from './ReportsPage.module.css'
 
 const ReportsPage = () => {
-  const token = useRouteLoaderData('root');
-  const [reports, setReports] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const token = useRouteLoaderData('root')
+  const [reports, setReports] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const pageParam = urlParams.get('page');
+    const urlParams = new URLSearchParams(window.location.search)
+    const pageParam = urlParams.get('page')
     if (pageParam) {
-      setCurrentPage(parseInt(pageParam));
+      setCurrentPage(parseInt(pageParam))
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -30,48 +29,47 @@ const ReportsPage = () => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-        });
+        })
 
         if (!response.ok) {
-          throw new Error('Failed to fetch reports');
+          throw new Error('Failed to fetch reports')
         }
-        const { reports: data, total_pages: totalPages } =
-          await response.json();
+        const { reports: data, total_pages: totalPages } = await response.json()
 
-        setReports(data);
-        setTotalPages(totalPages);
+        setReports(data)
+        setTotalPages(totalPages)
       } catch (error) {
-        console.error('Error fetching reports:', error);
+        console.error('Error fetching reports:', error)
       }
-    };
+    }
 
-    fetchReports();
-  }, [token, currentPage]);
+    fetchReports()
+  }, [token, currentPage])
 
   useEffect(() => {
     const handlePopState = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const pageParam = urlParams.get('page');
+      const urlParams = new URLSearchParams(window.location.search)
+      const pageParam = urlParams.get('page')
       if (pageParam) {
-        setCurrentPage(parseInt(pageParam));
+        setCurrentPage(parseInt(pageParam))
       } else {
-        setCurrentPage(1);
+        setCurrentPage(1)
       }
-    };
+    }
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handlePopState)
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, []);
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [])
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.history.pushState(null, '', `?page=${page}`);
-  };
+  const handlePageChange = page => {
+    setCurrentPage(page)
+    window.history.pushState(null, '', `?page=${page}`)
+  }
 
-  const handleDeleteReport = async (reportId) => {
+  const handleDeleteReport = async reportId => {
     try {
       const response = await fetch(`${API_URL}/reports/${reportId}`, {
         method: 'DELETE',
@@ -79,25 +77,25 @@ const ReportsPage = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to delete report');
+        throw new Error('Failed to delete report')
       }
 
       setReports(
-        reports.map((report) => {
+        reports.map(report => {
           if (report.report.id === reportId) {
-            return { ...report, deleted: true };
+            return { ...report, deleted: true }
           }
-          return report;
+          return report
         })
-      );
+      )
     } catch (error) {
-      console.error('Error deleting report:', error);
-      toast.error('Error deleting report');
+      console.error('Error deleting report:', error)
+      toast.error('Error deleting report')
     }
-  };
+  }
 
   return (
     <div className={classes['reports-container']}>
@@ -193,7 +191,7 @@ const ReportsPage = () => {
         onPageChange={handlePageChange}
       />
     </div>
-  );
-};
+  )
+}
 
-export default ReportsPage;
+export default ReportsPage

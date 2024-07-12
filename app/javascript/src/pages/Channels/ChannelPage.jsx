@@ -1,159 +1,156 @@
-import React, { useEffect, useState } from 'react';
-import { Link, json, useParams, useRouteLoaderData } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { throttle } from 'lodash';
-
-import { API_URL } from '../../constants/constants';
-import store from '../../store';
-import { channelPageActions } from '../../store/channel-page';
-import { getAuthToken, getUserData } from '../../util/auth';
-import Piece from '../../components/Content/Piece';
-import PieceSkeleton from '../../components/Content/Skeletons/PieceSkeleton';
-import Error from '../../components/Content/Error';
-import NoPieces from '../../components/Content/NoPieces';
-import SubscribeButton from '../../components/UI/Buttons/SubscribeButton';
-import Card from '../../components/UI/Card';
-import AuthModal from '../../components/UI/Modals/AuthModal';
-import ReportModal from '../../components/UI/Modals/ReportModal';
-
-import classes from './ChannelPage.module.css';
-import defaultVisual from '../../assets/default-visual.png';
+import { throttle } from 'lodash'
+import React, { useEffect, useState } from 'react'
 import {
   RiAddFill,
   RiFlagLine,
   RiMoreFill,
   RiSettings3Line,
-} from 'react-icons/ri';
-import ProfileSkeleton from '../../components/Content/Skeletons/ProfileSkeleton';
+} from 'react-icons/ri'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useSelector } from 'react-redux'
+import { Link, json, useParams, useRouteLoaderData } from 'react-router-dom'
+
+import defaultVisual from '../../assets/default-visual.png'
+import Error from '../../components/Content/Error'
+import NoPieces from '../../components/Content/NoPieces'
+import Piece from '../../components/Content/Piece'
+import PieceSkeleton from '../../components/Content/Skeletons/PieceSkeleton'
+import ProfileSkeleton from '../../components/Content/Skeletons/ProfileSkeleton'
+import SubscribeButton from '../../components/UI/Buttons/SubscribeButton'
+import Card from '../../components/UI/Card'
+import AuthModal from '../../components/UI/Modals/AuthModal'
+import ReportModal from '../../components/UI/Modals/ReportModal'
+import { API_URL } from '../../constants/constants'
+import store from '../../store'
+import { channelPageActions } from '../../store/channel-page'
+import { getAuthToken, getUserData } from '../../util/auth'
+import classes from './ChannelPage.module.css'
 
 const ChannelPage = () => {
-  const { id } = useParams();
-  const token = useRouteLoaderData('root');
-  const { userId } = getUserData() || {};
-  const userIdAsInt = parseInt(userId, 10);
-  const [pieces, setPieces] = useState([]);
-  const [pieceIds, setPieceIds] = useState(new Set());
-  const channel = useSelector((state) => state.channelPage.channel);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isChannelLoading, setIsChannelLoading] = useState(false);
-  const throttledFetchData = throttle(() => fetchData(), 500);
+  const { id } = useParams()
+  const token = useRouteLoaderData('root')
+  const { userId } = getUserData() || {}
+  const userIdAsInt = parseInt(userId, 10)
+  const [pieces, setPieces] = useState([])
+  const [pieceIds, setPieceIds] = useState(new Set())
+  const channel = useSelector(state => state.channelPage.channel)
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isChannelLoading, setIsChannelLoading] = useState(false)
+  const throttledFetchData = throttle(() => fetchData(), 500)
 
-  const fetchChannelPieces = async (currentPage) => {
+  const fetchChannelPieces = async currentPage => {
     try {
-      const fetchUrl = `${API_URL}/channels/${id}?page=${currentPage}`;
+      const fetchUrl = `${API_URL}/channels/${id}?page=${currentPage}`
       const response = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch pieces for this channel');
+        throw new Error('Failed to fetch pieces for this channel')
       }
 
-      const data = await response.json();
-      const newPieces = [...pieces, ...data.pieces];
-      setPieces(newPieces);
+      const data = await response.json()
+      const newPieces = [...pieces, ...data.pieces]
+      setPieces(newPieces)
 
       if (data.pieces.length === 0) {
-        setHasMore(false);
+        setHasMore(false)
       } else {
-        setPage(page + 1);
+        setPage(page + 1)
       }
     } catch (error) {
-      setError(error.message);
+      setError(error.message)
     } finally {
-      setIsChannelLoading(false);
+      setIsChannelLoading(false)
     }
-  };
+  }
 
   const fetchData = async () => {
     if (!isLoading && hasMore) {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      const channelData = await fetchChannelPieces(page);
+      const channelData = await fetchChannelPieces(page)
 
       if (channelData) {
         const newPieces = channelData.pieces.filter(
-          (piece) => !pieceIds.has(piece.id)
-        );
+          piece => !pieceIds.has(piece.id)
+        )
 
-        setPieces([...pieces, ...newPieces]);
-        setPieceIds(
-          new Set([...pieceIds, ...newPieces.map((piece) => piece.id)])
-        );
+        setPieces([...pieces, ...newPieces])
+        setPieceIds(new Set([...pieceIds, ...newPieces.map(piece => piece.id)]))
 
         if (newPieces.length === 0) {
-          setHasMore(false);
+          setHasMore(false)
         } else {
-          setPage(page + 1);
+          setPage(page + 1)
         }
       }
 
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    setIsChannelLoading(true);
-    fetchData();
+    setIsChannelLoading(true)
+    fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const fetchMoreData = () => {
     if (!isLoading && hasMore) {
-      throttledFetchData();
+      throttledFetchData()
     }
-  };
+  }
 
-  const handleDropdownToggle = (event) => {
-    event.stopPropagation();
-    setShowDropdown(!showDropdown);
-  };
+  const handleDropdownToggle = event => {
+    event.stopPropagation()
+    setShowDropdown(!showDropdown)
+  }
 
   const handleReportClick = () => {
     if (!token) {
-      setShowDropdown(false);
-      setShowAuthModal(true);
+      setShowDropdown(false)
+      setShowAuthModal(true)
     } else {
-      setShowDropdown(false);
-      setShowReportModal(true);
+      setShowDropdown(false)
+      setShowReportModal(true)
     }
-  };
+  }
 
   const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal);
-  };
+    setShowReportModal(!showReportModal)
+  }
 
   const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal);
-  };
+    setShowAuthModal(!showAuthModal)
+  }
 
-  const formatNumber = (number) => {
+  const formatNumber = number => {
     if (number < 10000) {
-      return number.toLocaleString(); // No formatting for numbers less than 10,000
+      return number.toLocaleString() // No formatting for numbers less than 10,000
     } else if (number < 100000) {
-      return (number / 1000).toFixed(1) + 'k'; // Format as X.Xk for 10,000 to 99,999
+      return (number / 1000).toFixed(1) + 'k' // Format as X.Xk for 10,000 to 99,999
     } else if (number < 1000000) {
-      return (number / 1000).toFixed(0) + 'k'; // Format as Xk for 100,000 to 999,999
+      return (number / 1000).toFixed(0) + 'k' // Format as Xk for 100,000 to 999,999
     } else if (number < 1000000000) {
-      return (number / 1000000).toFixed(1) + 'm'; // Format as X.Xm for millions
+      return (number / 1000000).toFixed(1) + 'm' // Format as X.Xm for millions
     } else {
-      return (number / 1000000000).toFixed(1) + 'b'; // Format as X.Xb for billions
+      return (number / 1000000000).toFixed(1) + 'b' // Format as X.Xb for billions
     }
-  };
+  }
 
   if (error) {
-    return <Error message={`Error: ${error}`} />;
+    return <Error message={`Error: ${error}`} />
   }
 
   return (
@@ -176,7 +173,7 @@ const ChannelPage = () => {
             }
           >
             <div className={classes.pieces}>
-              {pieces.map((piece) => (
+              {pieces.map(piece => (
                 <Piece key={`${piece.id}`} piece={piece} />
               ))}
             </div>
@@ -297,16 +294,16 @@ const ChannelPage = () => {
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default ChannelPage;
+export default ChannelPage
 
 export async function loader({ params }) {
-  const { '*': url } = params;
-  const urlParts = url.split('/');
-  const channel_id = urlParts[1];
-  const token = getAuthToken();
+  const { '*': url } = params
+  const urlParts = url.split('/')
+  const channel_id = urlParts[1]
+  const token = getAuthToken()
 
   const response = await fetch(`${API_URL}/channels/${channel_id}`, {
     method: 'GET',
@@ -314,15 +311,15 @@ export async function loader({ params }) {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-  });
+  })
 
   if (!response.ok) {
-    throw json({ message: 'Could not find channel' }, { status: 500 });
+    throw json({ message: 'Could not find channel' }, { status: 500 })
   }
 
-  const data = await response.json();
+  const data = await response.json()
 
-  store.dispatch(channelPageActions.setChannel(data));
+  store.dispatch(channelPageActions.setChannel(data))
 
-  return data;
+  return data
 }

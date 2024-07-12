@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-import classes from './SubscribePrompt.module.css';
+import classes from './SubscribePrompt.module.css'
 
 const SubscribePrompt = () => {
   return (
@@ -15,7 +15,7 @@ const SubscribePrompt = () => {
         </Link>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SubscribePrompt;
+export default SubscribePrompt

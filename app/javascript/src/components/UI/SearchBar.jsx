@@ -1,32 +1,31 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react'
+import { RiCloseLine, RiSearchLine } from 'react-icons/ri'
+import { Link } from 'react-router-dom'
 
-import { API_URL } from '../../constants/constants';
-
-import classes from './SearchBar.module.css';
-import { RiSearchLine, RiCloseLine } from 'react-icons/ri';
-import defaultAvatar from '../../assets/default-avatar.png';
-import defaultVisual from '../../assets/default-visual.png';
+import defaultAvatar from '../../assets/default-avatar.png'
+import defaultVisual from '../../assets/default-visual.png'
+import { API_URL } from '../../constants/constants'
+import classes from './SearchBar.module.css'
 
 function SearchBar() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [userResults, setUserResults] = useState([]);
-  const [channelResults, setChannelResults] = useState([]);
-  const [isFocused, setIsFocused] = useState(false);
-  const searchRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState('')
+  const [userResults, setUserResults] = useState([])
+  const [channelResults, setChannelResults] = useState([])
+  const [isFocused, setIsFocused] = useState(false)
+  const searchRef = useRef(null)
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setIsFocused(false);
+        setIsFocused(false)
       }
-    };
+    }
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -34,40 +33,40 @@ function SearchBar() {
         const [userResponse, channelResponse] = await Promise.all([
           fetch(`${API_URL}/users/search?search_term=${searchTerm}`),
           fetch(`${API_URL}/channels/search?search_term=${searchTerm}`),
-        ]);
+        ])
         if (!userResponse.ok || !channelResponse.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Network response was not ok')
         }
-        const userData = await userResponse.json();
-        const channelData = await channelResponse.json();
-        setUserResults(userData);
-        setChannelResults(channelData);
+        const userData = await userResponse.json()
+        const channelData = await channelResponse.json()
+        setUserResults(userData)
+        setChannelResults(channelData)
       } catch (error) {
-        console.error('Error: ', error.message);
+        console.error('Error: ', error.message)
       }
-    };
+    }
 
     if (searchTerm && isFocused) {
-      fetchResults();
+      fetchResults()
     } else {
-      setUserResults([]);
-      setChannelResults([]);
+      setUserResults([])
+      setChannelResults([])
     }
-  }, [searchTerm, isFocused]);
+  }, [searchTerm, isFocused])
 
-  const handleInputChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
+  const handleInputChange = event => {
+    setSearchTerm(event.target.value)
+  }
 
   const clearInput = () => {
-    setSearchTerm('');
-  };
+    setSearchTerm('')
+  }
 
   const handleInputFocus = () => {
-    setIsFocused(true);
-  };
+    setIsFocused(true)
+  }
 
-  const hasResults = userResults.length !== 0 || channelResults.length !== 0;
+  const hasResults = userResults.length !== 0 || channelResults.length !== 0
 
   return (
     <div className={classes['search-bar']} ref={searchRef}>
@@ -102,7 +101,7 @@ function SearchBar() {
                 <p>Users:</p>
               </>
 
-              {userResults.map((result) => (
+              {userResults.map(result => (
                 <Link
                   to={`/users/${result.id}`}
                   key={result.id}
@@ -128,7 +127,7 @@ function SearchBar() {
                 <p>Channels:</p>
               </>
 
-              {channelResults.map((result) => (
+              {channelResults.map(result => (
                 <Link
                   to={`/channels/${result.id}`}
                   key={result.id}
@@ -150,7 +149,7 @@ function SearchBar() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default SearchBar;
+export default SearchBar

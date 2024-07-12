@@ -1,37 +1,36 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react'
+import { RiImageAddLine } from 'react-icons/ri'
+import { useDispatch } from 'react-redux'
 import {
   Form,
-  useNavigation,
-  useActionData,
   Link,
+  useActionData,
   useNavigate,
+  useNavigation,
   useRouteLoaderData,
-} from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
+} from 'react-router-dom'
+import { toast } from 'react-toastify'
 
-import { API_URL } from '../../../constants/constants';
-import { getUserData } from '../../../util/auth';
-import useInput from '../../../hooks/use-input';
-import ConfirmationModal from '../../UI/Modals/ConfirmationModal';
-import { userActions } from '../../../store/user';
-
-import classes from './UserForm.module.css';
-import { RiImageAddLine } from 'react-icons/ri';
-import defaultAvatar from '../../../assets/default-avatar.png';
+import defaultAvatar from '../../../assets/default-avatar.png'
+import { API_URL } from '../../../constants/constants'
+import useInput from '../../../hooks/use-input'
+import { userActions } from '../../../store/user'
+import { getUserData } from '../../../util/auth'
+import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
+import classes from './UserForm.module.css'
 
 const UserForm = ({ method, user }) => {
-  const data = useActionData();
-  const navigate = useNavigate();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === 'submitting';
-  const [avatar, setAvatar] = useState(user?.avatar_url || defaultAvatar);
-  const fileInput = useRef(null);
-  const [showModal, setShowModal] = useState(false);
-  const dispatch = useDispatch();
-  const token = useRouteLoaderData('root');
-  const { userId, userRole } = getUserData() || {};
-  const [removeAvatar, setRemoveAvatar] = useState(false);
+  const data = useActionData()
+  const navigate = useNavigate()
+  const navigation = useNavigation()
+  const isSubmitting = navigation.state === 'submitting'
+  const [avatar, setAvatar] = useState(user?.avatar_url || defaultAvatar)
+  const fileInput = useRef(null)
+  const [showModal, setShowModal] = useState(false)
+  const dispatch = useDispatch()
+  const token = useRouteLoaderData('root')
+  const { userId, userRole } = getUserData() || {}
+  const [removeAvatar, setRemoveAvatar] = useState(false)
 
   const {
     value: enteredUsername,
@@ -39,16 +38,16 @@ const UserForm = ({ method, user }) => {
     valueChangeHandler: handleUsernameChange,
     handleInputBlur: handleUsernameBlur,
   } = useInput(
-    (value) => {
+    value => {
       const isValid =
         value.trim() !== '' &&
         value.length >= 2 &&
         value.length <= 25 &&
-        /^[a-zA-Z0-9_.]+$/.test(value);
-      return isValid;
+        /^[a-zA-Z0-9_.]+$/.test(value)
+      return isValid
     },
     user ? user.username : ''
-  );
+  )
 
   const {
     value: enteredEmail,
@@ -56,76 +55,74 @@ const UserForm = ({ method, user }) => {
     valueChangeHandler: handleEmailChange,
     handleInputBlur: handleEmailBlur,
   } = useInput(
-    (value) => {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(value);
+    value => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return emailRegex.test(value)
     },
     user ? user.email : ''
-  );
+  )
 
   const {
     hasError: passwordInputHasError,
     valueChangeHandler: handlePasswordChange,
     handleInputBlur: handlePasswordBlur,
-  } = useInput((value) => {
+  } = useInput(value => {
     const passwordRegex =
-      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-    return passwordRegex.test(value);
-  });
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/
+    return passwordRegex.test(value)
+  })
 
   const {
     value: enteredNewPassword,
     hasError: newPasswordInputHasError,
     valueChangeHandler: handleNewPasswordChange,
     handleInputBlur: handleNewPasswordBlur,
-  } = useInput((value) => {
+  } = useInput(value => {
     const passwordRegex =
-      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-    return passwordRegex.test(value);
-  });
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/
+    return passwordRegex.test(value)
+  })
 
   const {
     hasError: confirmPasswordInputHasError,
     valueChangeHandler: handleConfirmPasswordChange,
     handleInputBlur: handleConfirmPasswordBlur,
-  } = useInput((value) => value === enteredNewPassword);
+  } = useInput(value => value === enteredNewPassword)
 
-  const emailInvalidClass = emailInputHasError ? `${classes.invalid}` : '';
-  const usernameInvalidClass = usernameInputHasError
-    ? `${classes.invalid}`
-    : '';
-  const passwordInvalid = passwordInputHasError ? `${classes.invalid}` : '';
+  const emailInvalidClass = emailInputHasError ? `${classes.invalid}` : ''
+  const usernameInvalidClass = usernameInputHasError ? `${classes.invalid}` : ''
+  const passwordInvalid = passwordInputHasError ? `${classes.invalid}` : ''
   const newPasswordInvalid = newPasswordInputHasError
     ? `${classes.invalid}`
-    : '';
+    : ''
   const confirmPasswordInvalidClass = confirmPasswordInputHasError
     ? `${classes.invalid}`
-    : '';
+    : ''
 
-  const handleAvatarUpload = (event) => {
-    const uploadedAvatar = event.target.files[0];
+  const handleAvatarUpload = event => {
+    const uploadedAvatar = event.target.files[0]
 
     if (uploadedAvatar) {
-      setAvatar(URL.createObjectURL(uploadedAvatar));
+      setAvatar(URL.createObjectURL(uploadedAvatar))
     }
 
-    setRemoveAvatar(false);
-  };
+    setRemoveAvatar(false)
+  }
 
-  const handleRemoveAvatar = (event) => {
-    event.preventDefault();
-    setAvatar(defaultAvatar);
-    setRemoveAvatar(true);
-    fileInput.current.value = null;
-  };
+  const handleRemoveAvatar = event => {
+    event.preventDefault()
+    setAvatar(defaultAvatar)
+    setRemoveAvatar(true)
+    fileInput.current.value = null
+  }
 
   const handleModalToggle = () => {
-    setShowModal(!showModal);
-  };
+    setShowModal(!showModal)
+  }
 
   const handleDelete = async () => {
     try {
-      const userIdInt = parseInt(userId, 10);
+      const userIdInt = parseInt(userId, 10)
 
       if (userRole === 'admin' || userIdInt === user.id) {
         const response = await fetch(`${API_URL}/users/${user.id}`, {
@@ -134,26 +131,26 @@ const UserForm = ({ method, user }) => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-        });
+        })
 
         if (!response.ok) {
-          throw new Error('Could not delete user');
+          throw new Error('Could not delete user')
         }
 
         if (userRole === 'admin' && userIdInt === user.id) {
-          dispatch(userActions.clearUser());
-          localStorage.clear();
+          dispatch(userActions.clearUser())
+          localStorage.clear()
         } else if (userRole !== 'admin' && userIdInt === user.id) {
-          dispatch(userActions.clearUser());
-          localStorage.clear();
+          dispatch(userActions.clearUser())
+          localStorage.clear()
         }
       }
-      return navigate('/');
+      return navigate('/')
     } catch (error) {
-      console.error('Error: ', error.message);
-      toast.error('Error deleting user');
+      console.error('Error: ', error.message)
+      toast.error('Error deleting user')
     }
-  };
+  }
 
   return (
     <>
@@ -177,9 +174,9 @@ const UserForm = ({ method, user }) => {
           />
           <button
             className={classes['upload-avatar-btn']}
-            onClick={(event) => {
-              event.preventDefault();
-              fileInput.current.click();
+            onClick={event => {
+              event.preventDefault()
+              fileInput.current.click()
             }}
           >
             <RiImageAddLine />
@@ -331,7 +328,7 @@ const UserForm = ({ method, user }) => {
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default UserForm;
+export default UserForm

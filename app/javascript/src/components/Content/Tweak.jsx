@@ -1,10 +1,4 @@
-import {
-  Link,
-  json,
-  useLocation,
-  useNavigate,
-  useRouteLoaderData,
-} from 'react-router-dom'
+import moment from 'moment'
 import React, { useContext, useEffect, useState } from 'react'
 import {
   RiChat3Line,
@@ -15,20 +9,26 @@ import {
   RiFlaskLine,
   RiMoreFill,
 } from 'react-icons/ri'
+import {
+  Link,
+  json,
+  useLocation,
+  useNavigate,
+  useRouteLoaderData,
+} from 'react-router-dom'
 
+import defaultAvatar from '../../assets/default-avatar.png'
 import { API_URL } from '../../constants/constants'
+import PieceModalContext from '../../context/piecemodal'
+import RefreshContext from '../../context/refresh'
+import { getUserData } from '../../util/auth'
 import AuthModal from '../UI/Modals/AuthModal'
 import ConfirmationModal from '../UI/Modals/ConfirmationModal'
-import PieceCarousel from '../UI/PieceCarousel'
-import PieceModalContext from '../../context/piecemodal'
-import PieceVote from '../UI/PieceVote'
-import RefreshContext from '../../context/refresh'
 import ReportModal from '../UI/Modals/ReportModal'
+import PieceCarousel from '../UI/PieceCarousel'
+import PieceVote from '../UI/PieceVote'
 import SharePopover from '../UI/SharePopover'
 import classes from './Tweak.module.css'
-import defaultAvatar from '../../assets/default-avatar.png'
-import { getUserData } from '../../util/auth'
-import moment from 'moment'
 
 const Tweak = ({ tweak }) => {
   const location = useLocation()
@@ -59,12 +59,12 @@ const Tweak = ({ tweak }) => {
     setShowConfirmationModal(!showConfirmationModal)
   }
 
-  const handleDropdownToggle = (event) => {
+  const handleDropdownToggle = event => {
     event.stopPropagation()
     setShowDropdown(!showDropdown)
   }
 
-  const handleEditClick = (event) => {
+  const handleEditClick = event => {
     event.stopPropagation()
     if (tweak.tweaks_count > 0) {
       navigate(`channels/${tweak.channel_id}/pieces/${tweak.id}/edit`)
@@ -102,7 +102,7 @@ const Tweak = ({ tweak }) => {
   }
 
   useEffect(() => {
-    const handleClickOutsideDropdown = (event) => {
+    const handleClickOutsideDropdown = event => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
       )
@@ -119,7 +119,7 @@ const Tweak = ({ tweak }) => {
     }
   }, [])
 
-  const handlePieceLinkClick = (event) => {
+  const handlePieceLinkClick = event => {
     const target = event.target
     const isDeleteButton = target.classList.contains(classes.danger)
     const isDropdown = target.closest(`.${classes.dropdown}`)
@@ -147,7 +147,7 @@ const Tweak = ({ tweak }) => {
     }
   }
 
-  const stopPropagation = (event) => {
+  const stopPropagation = event => {
     event.stopPropagation()
   }
 

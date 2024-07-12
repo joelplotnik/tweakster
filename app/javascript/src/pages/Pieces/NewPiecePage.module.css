@@ -5,13 +5,13 @@
 
 .heading {
   font-size: 24px;
-  margin-bottom:0;
+  margin-bottom: 0;
   text-align: left;
 }
 
 .divider {
-  border: none; 
-  height: 1.5px; 
+  border: none;
+  height: 1.5px;
   background-color: #333;
   margin-top: 10px;
   margin-bottom: 20px;

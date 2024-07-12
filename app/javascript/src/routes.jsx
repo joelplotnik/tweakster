@@ -1,39 +1,39 @@
-import React from 'react';
+import React from 'react'
+
+import AboutPage from './pages/AboutPage'
+import AdminLayout from './pages/Admin/AdminLayout'
+import AdminPage from './pages/Admin/AdminPage'
+import ReportsPage from './pages/Admin/ReportsPage'
 import ChannelPage, {
   loader as channelLoader,
-} from './pages/Channels/ChannelPage';
+} from './pages/Channels/ChannelPage'
+import ChannelsLayout from './pages/Channels/ChannelsLayout'
+import ChannelsPage from './pages/Channels/ChannelsPage'
 import EditChannelPage, {
   action as editChannelAction,
-} from './pages/Channels/EditChannelPage';
-import EditUserPage, {
-  action as editUserAction,
-} from './pages/Users/EditUserPage';
+} from './pages/Channels/EditChannelPage'
 import NewChannelPage, {
   action as newChannelAction,
-} from './pages/Channels/NewChannelPage';
-import PiecePage, { loader as pieceLoader } from './pages/Pieces/PiecePage';
-import UserPage, { loader as userLoader } from './pages/Users/UserPage';
-import { checkAdminAccess, checkAuthLoader, tokenLoader } from './util/auth';
-
-import AboutPage from './pages/AboutPage';
-import AdminLayout from './pages/Admin/AdminLayout';
-import AdminPage from './pages/Admin/AdminPage';
-import ChannelsLayout from './pages/Channels/ChannelsLayout';
-import ChannelsPage from './pages/Channels/ChannelsPage';
-import EditPiecePage from './pages/Pieces/EditPiecePage';
-import ErrorPage from './pages/ErrorPage';
-import FollowingPage from './pages/Users/FollowingPage';
-import HomePage from './pages/HomePage';
-import MainPage from './pages/MainPage';
-import NotificationsPage from './pages/NotificationsPage';
-import NewPiecePage from './pages/Pieces/NewPiecePage';
-import PiecesLayout from './pages/Pieces/PiecesLayout';
-import ReportsPage from './pages/Admin/ReportsPage';
-import RootLayout from './pages/RootLayout';
-import SubscriptionsPage from './pages/Users/SubscriptionsPage';
-import UsersLayout from './pages/Users/UsersLayout';
-import UsersPage from './pages/Users/UsersPage';
-import { action as logoutAction } from './pages/Logout';
+} from './pages/Channels/NewChannelPage'
+import ErrorPage from './pages/ErrorPage'
+import HomePage from './pages/HomePage'
+import { action as logoutAction } from './pages/Logout'
+import MainPage from './pages/MainPage'
+import NotificationsPage from './pages/NotificationsPage'
+import EditPiecePage from './pages/Pieces/EditPiecePage'
+import NewPiecePage from './pages/Pieces/NewPiecePage'
+import PiecePage, { loader as pieceLoader } from './pages/Pieces/PiecePage'
+import PiecesLayout from './pages/Pieces/PiecesLayout'
+import RootLayout from './pages/RootLayout'
+import EditUserPage, {
+  action as editUserAction,
+} from './pages/Users/EditUserPage'
+import FollowingPage from './pages/Users/FollowingPage'
+import SubscriptionsPage from './pages/Users/SubscriptionsPage'
+import UserPage, { loader as userLoader } from './pages/Users/UserPage'
+import UsersLayout from './pages/Users/UsersLayout'
+import UsersPage from './pages/Users/UsersPage'
+import { checkAdminAccess, checkAuthLoader, tokenLoader } from './util/auth'
 
 const routes = [
   {
@@ -187,6 +187,6 @@ const routes = [
       },
     ],
   },
-];
+]
 
-export default routes;
+export default routes

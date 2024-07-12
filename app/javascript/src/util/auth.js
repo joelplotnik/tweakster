@@ -1,78 +1,78 @@
-import { json, redirect } from 'react-router-dom';
-import jwt_decode from 'jwt-decode';
+import jwt_decode from 'jwt-decode'
+import { json, redirect } from 'react-router-dom'
 
-import { API_URL, EXPIRED_TOKEN } from '../constants/constants';
+import { API_URL, EXPIRED_TOKEN } from '../constants/constants'
 
 export function getTokenDuration() {
-  const storedExpirationDate = localStorage.getItem('expiration');
-  const expirationDate = new Date(storedExpirationDate);
-  const now = new Date();
-  const duration = expirationDate.getTime() - now.getTime();
+  const storedExpirationDate = localStorage.getItem('expiration')
+  const expirationDate = new Date(storedExpirationDate)
+  const now = new Date()
+  const duration = expirationDate.getTime() - now.getTime()
 
-  return duration;
+  return duration
 }
 
 export function getAuthToken() {
-  const token = localStorage.getItem('token');
-  const tokenDuration = getTokenDuration();
+  const token = localStorage.getItem('token')
+  const tokenDuration = getTokenDuration()
 
   if (!token) {
-    return null;
+    return null
   }
 
   if (tokenDuration < 0) {
-    return EXPIRED_TOKEN;
+    return EXPIRED_TOKEN
   }
 
-  return token;
+  return token
 }
 
 export function tokenLoader() {
-  return getAuthToken();
+  return getAuthToken()
 }
 
 export function getUserData() {
-  const token = getAuthToken();
-  const tokenDuration = getTokenDuration();
+  const token = getAuthToken()
+  const tokenDuration = getTokenDuration()
 
   if (!token) {
-    return null;
+    return null
   }
 
   if (tokenDuration < 0) {
-    return EXPIRED_TOKEN;
+    return EXPIRED_TOKEN
   }
 
   try {
-    const decodedToken = jwt_decode(token);
-    const userId = decodedToken.sub;
-    const username = decodedToken.username;
-    const userRole = decodedToken.role;
+    const decodedToken = jwt_decode(token)
+    const userId = decodedToken.sub
+    const username = decodedToken.username
+    const userRole = decodedToken.role
 
-    return { userId, username, userRole };
+    return { userId, username, userRole }
   } catch (error) {
-    console.error('Error decoding token:', error);
-    return null;
+    console.error('Error decoding token:', error)
+    return null
   }
 }
 
 export async function checkAuthLoader({ params }) {
-  const token = getAuthToken();
+  const token = getAuthToken()
 
   if (!token) {
-    return redirect('/');
+    return redirect('/')
   }
 
-  const { id } = params;
-  const parsedID = parseInt(id, 10);
+  const { id } = params
+  const parsedID = parseInt(id, 10)
 
-  const path = params['*'];
-  const splitPath = path.split('/');
-  const page = splitPath[0];
-  const pageID = splitPath[1];
-  const piecePage = splitPath[2] === 'pieces';
-  const hasPieceID = !isNaN(splitPath[3]);
-  const newPiece = splitPath[3] === 'new';
+  const path = params['*']
+  const splitPath = path.split('/')
+  const page = splitPath[0]
+  const pageID = splitPath[1]
+  const piecePage = splitPath[2] === 'pieces'
+  const hasPieceID = !isNaN(splitPath[3])
+  const newPiece = splitPath[3] === 'new'
 
   // User attempting to edit a piece
   if (hasPieceID && page === 'channels' && piecePage) {
@@ -85,15 +85,15 @@ export async function checkAuthLoader({ params }) {
           Authorization: `Bearer ${token}`,
         },
       }
-    );
+    )
 
     if (!response.ok) {
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.status === 401 || !data.belongs_to_user) {
-        return redirect('/');
+        return redirect('/')
       } else {
-        throw json({ message: 'Could not make request.' }, { status: 500 });
+        throw json({ message: 'Could not make request.' }, { status: 500 })
       }
     }
   }
@@ -109,15 +109,15 @@ export async function checkAuthLoader({ params }) {
           Authorization: `Bearer ${token}`,
         },
       }
-    );
+    )
 
     if (!response.ok) {
-      await response.json();
+      await response.json()
 
       if (response.status === 403) {
-        return redirect('/');
+        return redirect('/')
       } else {
-        throw json({ message: 'Could not make request.' }, { status: 500 });
+        throw json({ message: 'Could not make request.' }, { status: 500 })
       }
     }
   }
@@ -133,34 +133,34 @@ export async function checkAuthLoader({ params }) {
           Authorization: `Bearer ${token}`,
         },
       }
-    );
+    )
 
     if (!response.ok) {
-      const data = await response.json();
+      const data = await response.json()
 
       if (response.status === 401 || !data.belongs_to_user) {
-        return redirect('/');
+        return redirect('/')
       } else {
-        throw json({ message: 'Could not make request.' }, { status: 500 });
+        throw json({ message: 'Could not make request.' }, { status: 500 })
       }
     }
   }
 
-  return null;
+  return null
 }
 
 export async function checkAdminAccess() {
-  const token = getAuthToken();
+  const token = getAuthToken()
 
   if (!token) {
-    return false;
+    return false
   }
 
-  const { userRole } = getUserData() || {};
+  const { userRole } = getUserData() || {}
 
   if (userRole !== 'admin') {
-    return redirect('/');
+    return redirect('/')
   }
 
-  return null;
+  return null
 }
