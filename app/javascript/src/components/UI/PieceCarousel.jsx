@@ -1,14 +1,16 @@
-import React from 'react';
-import { useNavigate, useRouteLoaderData } from 'react-router-dom';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+import 'swiper/css/scrollbar'
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/scrollbar';
-import classes from './PieceCarousel.module.css';
-import './Swiper.css';
+import './Swiper.css'
+
+import React from 'react'
+import { useNavigate, useRouteLoaderData } from 'react-router-dom'
+import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
+
+import classes from './PieceCarousel.module.css'
 
 const PieceCarousel = ({
   pieceUrl,
@@ -18,27 +20,27 @@ const PieceCarousel = ({
   images,
   youtubeUrl,
 }) => {
-  const token = useRouteLoaderData('root');
-  const navigate = useNavigate();
-  const youtubeVideoId = youtubeUrl ? extractYouTubeVideoId(youtubeUrl) : '';
+  const token = useRouteLoaderData('root')
+  const navigate = useNavigate()
+  const youtubeVideoId = youtubeUrl ? extractYouTubeVideoId(youtubeUrl) : ''
 
   const handleSlideClick = () => {
     if (pieceUrl && !tweak) {
       if (!token) {
-        window.open(pieceUrl, '_blank');
+        window.open(pieceUrl, '_blank')
       } else {
         navigate(pieceUrl, {
           state: { background: background },
-        });
+        })
       }
     }
 
     if (tweak) {
       navigate(pieceUrl, {
         state: { background: background },
-      });
+      })
     }
-  };
+  }
 
   return (
     <div className={classes['carousel-container']}>
@@ -91,14 +93,14 @@ const PieceCarousel = ({
         )}
       </Swiper>
     </div>
-  );
-};
+  )
+}
 
-const extractYouTubeVideoId = (url) => {
+const extractYouTubeVideoId = url => {
   const match = url.match(
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/
-  );
-  return match ? match[1] : '';
-};
+  )
+  return match ? match[1] : ''
+}
 
-export default PieceCarousel;
+export default PieceCarousel

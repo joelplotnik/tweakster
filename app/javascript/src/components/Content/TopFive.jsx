@@ -1,13 +1,14 @@
-import React from 'react';
-import { RiAddLine } from 'react-icons/ri';
-import classes from './TopFive.module.css';
-import defaultAvatar from '../../assets/default-avatar.png';
-import defaultVisual from '../../assets/default-visual.png';
+import React from 'react'
+import { RiAddLine } from 'react-icons/ri'
+
+import defaultAvatar from '../../assets/default-avatar.png'
+import defaultVisual from '../../assets/default-visual.png'
+import classes from './TopFive.module.css'
 
 const TopFive = ({ entityType, favorites }) => {
-  const isChannel = entityType === 'channel';
-  const placeholdersCount = 5 - favorites.length;
-  const placeholders = Array.from({ length: placeholdersCount }).fill(null);
+  const isChannel = entityType === 'channel'
+  const placeholdersCount = 5 - favorites.length
+  const placeholders = Array.from({ length: placeholdersCount }).fill(null)
 
   return (
     <div className={classes['top-five-container']}>
@@ -33,7 +34,7 @@ const TopFive = ({ entityType, favorites }) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default TopFive;
+export default TopFive

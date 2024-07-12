@@ -1,10 +1,11 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import userSlice from './user';
-import pieceSlice from './piece';
-import pieceModalSlice from './piece-modal';
-import channelPageSlice from './channel-page';
-import userPageSlice from './user-page';
-import notificationsSlice from './notifications';
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
+
+import channelPageSlice from './channel-page'
+import notificationsSlice from './notifications'
+import pieceSlice from './piece'
+import pieceModalSlice from './piece-modal'
+import userSlice from './user'
+import userPageSlice from './user-page'
 
 const rootReducer = combineReducers({
   user: userSlice,
@@ -13,11 +14,11 @@ const rootReducer = combineReducers({
   pieceModal: pieceModalSlice,
   channelPage: channelPageSlice,
   userPage: userPageSlice,
-});
+})
 
 const store = configureStore({
   reducer: rootReducer,
   devTools: false,
-});
+})
 
-export default store;
+export default store

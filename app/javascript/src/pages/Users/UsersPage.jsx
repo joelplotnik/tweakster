@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-
-import { API_URL } from '../../constants/constants'
-import { ClipLoader } from 'react-spinners'
-import { Error } from '../../components/Content/Error'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { ClipLoader } from 'react-spinners'
+
+import { Error } from '../../components/Content/Error'
 import User from '../../components/Content/User'
+import { API_URL } from '../../constants/constants'
 import classes from './UsersPage.module.css'
 
 const UsersPage = () => {
@@ -14,7 +14,7 @@ const UsersPage = () => {
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchUsers = async (currentPage) => {
+  const fetchUsers = async currentPage => {
     try {
       const response = await fetch(`${API_URL}/users?page=${currentPage}`)
 
@@ -73,7 +73,7 @@ const UsersPage = () => {
       endMessage={<></>}
     >
       <div className={classes['user-list']}>
-        {users.map((user) => (
+        {users.map(user => (
           <User key={user.id} user={user} />
         ))}
       </div>

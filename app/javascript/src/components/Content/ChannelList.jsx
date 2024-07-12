@@ -1,12 +1,12 @@
-import { Link, useRouteLoaderData } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
-
-import { API_URL } from '../../constants/constants'
-import ChannelListSkeleton from './Skeletons/ChannelListSkeleton'
-import { Error } from './Error'
 import { RiAddFill } from 'react-icons/ri'
-import classes from './ChannelList.module.css'
+import { Link, useRouteLoaderData } from 'react-router-dom'
+
 import defaultVisual from '../../assets/default-visual.png'
+import { API_URL } from '../../constants/constants'
+import classes from './ChannelList.module.css'
+import { Error } from './Error'
+import ChannelListSkeleton from './Skeletons/ChannelListSkeleton'
 
 const ChannelList = () => {
   const token = useRouteLoaderData('root')
@@ -51,7 +51,7 @@ const ChannelList = () => {
         </div>
       )}
       <ul className={classes['channel-list']}>
-        {channels.map((channel) => (
+        {channels.map(channel => (
           <Link key={channel.id} to={`/channels/${channel.id}`}>
             <li className={classes['channel-item']}>
               <div className={classes['channel-info']}>

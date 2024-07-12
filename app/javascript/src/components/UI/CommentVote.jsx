@@ -5,13 +5,13 @@ import {
   RiThumbUpFill,
   RiThumbUpLine,
 } from 'react-icons/ri'
+import { useSelector } from 'react-redux'
+import { useRouteLoaderData } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 import { API_URL } from '../../constants/constants'
-import { AuthModal } from './Modals/AuthModal'
 import classes from './CommentVote.module.css'
-import { toast } from 'react-toastify'
-import { useRouteLoaderData } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { AuthModal } from './Modals/AuthModal'
 
 const CommentVote = ({
   likes,
@@ -22,7 +22,7 @@ const CommentVote = ({
   userVotes,
 }) => {
   const token = useRouteLoaderData('root')
-  const userId = useSelector((state) => state.user.user?.id)
+  const userId = useSelector(state => state.user.user?.id)
   const [score, setScore] = useState(likes - dislikes)
   const [voteType, setVoteType] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -33,7 +33,7 @@ const CommentVote = ({
   }, [voteType])
 
   useEffect(() => {
-    const userVote = userVotes.find((vote) => vote.user_id === userId)
+    const userVote = userVotes.find(vote => vote.user_id === userId)
 
     if (userVote) {
       setVoteType(userVote.vote_type)
@@ -44,7 +44,7 @@ const CommentVote = ({
     setShowModal(!showModal)
   }
 
-  const handleVote = async (voteType) => {
+  const handleVote = async voteType => {
     try {
       if (!token) {
         setShowModal(true)
@@ -111,13 +111,13 @@ const CommentVote = ({
     }
   }
 
-  const handleUpvote = (event) => {
+  const handleUpvote = event => {
     event.preventDefault()
     event.stopPropagation()
     handleVote(1)
   }
 
-  const handleDownvote = (event) => {
+  const handleDownvote = event => {
     event.preventDefault()
     event.stopPropagation()
     handleVote(-1)

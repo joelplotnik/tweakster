@@ -1,34 +1,33 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react'
+import { RiImageAddLine } from 'react-icons/ri'
 import {
   Form,
-  useNavigation,
-  useActionData,
   Link,
+  useActionData,
   useNavigate,
+  useNavigation,
   useRouteLoaderData,
-} from 'react-router-dom';
-import { toast } from 'react-toastify';
+} from 'react-router-dom'
+import { toast } from 'react-toastify'
 
-import { API_URL } from '../../../constants/constants';
-import { getUserData } from '../../../util/auth';
-import useInput from '../../../hooks/use-input';
-import ConfirmationModal from '../../UI/Modals/ConfirmationModal';
-
-import classes from './ChannelForm.module.css';
-import { RiImageAddLine } from 'react-icons/ri';
-import defaultVisual from '../../../assets/default-visual.png';
+import defaultVisual from '../../../assets/default-visual.png'
+import { API_URL } from '../../../constants/constants'
+import useInput from '../../../hooks/use-input'
+import { getUserData } from '../../../util/auth'
+import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
+import classes from './ChannelForm.module.css'
 
 const ChannelForm = ({ method, channel, type }) => {
-  const { userRole } = getUserData() || {};
-  const data = useActionData();
-  const navigate = useNavigate();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === 'submitting';
-  const [visual, setVisual] = useState(channel?.visual_url || defaultVisual);
-  const fileInput = useRef(null);
-  const [showModal, setShowModal] = useState(false);
-  const token = useRouteLoaderData('root');
-  const [removeVisual, setRemoveVisual] = useState(false);
+  const { userRole } = getUserData() || {}
+  const data = useActionData()
+  const navigate = useNavigate()
+  const navigation = useNavigation()
+  const isSubmitting = navigation.state === 'submitting'
+  const [visual, setVisual] = useState(channel?.visual_url || defaultVisual)
+  const fileInput = useRef(null)
+  const [showModal, setShowModal] = useState(false)
+  const token = useRouteLoaderData('root')
+  const [removeVisual, setRemoveVisual] = useState(false)
 
   const {
     value: enteredName,
@@ -36,37 +35,37 @@ const ChannelForm = ({ method, channel, type }) => {
     valueChangeHandler: handleNameChange,
     handleInputBlur: handleNameBlur,
   } = useInput(
-    (value) => {
+    value => {
       const isValid =
         value.trim() !== '' &&
         value.length >= 2 &&
         value.length <= 25 &&
-        /^[a-zA-Z0-9_.]+$/.test(value);
-      return isValid;
+        /^[a-zA-Z0-9_.]+$/.test(value)
+      return isValid
     },
     channel ? channel.name : ''
-  );
+  )
 
-  const handleVisualUpload = (event) => {
-    const uploadedVisual = event.target.files[0];
+  const handleVisualUpload = event => {
+    const uploadedVisual = event.target.files[0]
 
     if (uploadedVisual) {
-      setVisual(URL.createObjectURL(uploadedVisual));
+      setVisual(URL.createObjectURL(uploadedVisual))
     }
 
-    setRemoveVisual(false);
-  };
+    setRemoveVisual(false)
+  }
 
-  const handleRemoveVisual = (event) => {
-    event.preventDefault();
-    setVisual(defaultVisual);
-    setRemoveVisual(true);
-    fileInput.current.value = null;
-  };
+  const handleRemoveVisual = event => {
+    event.preventDefault()
+    setVisual(defaultVisual)
+    setRemoveVisual(true)
+    fileInput.current.value = null
+  }
 
   const handleModalToggle = () => {
-    setShowModal(!showModal);
-  };
+    setShowModal(!showModal)
+  }
 
   const handleDelete = async () => {
     try {
@@ -76,20 +75,20 @@ const ChannelForm = ({ method, channel, type }) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Could not delete channel');
+        throw new Error('Could not delete channel')
       }
 
-      return navigate('/');
+      return navigate('/')
     } catch (error) {
-      console.error('Error: ', error.message);
-      toast.error('Error deleting channel');
+      console.error('Error: ', error.message)
+      toast.error('Error deleting channel')
     }
-  };
+  }
 
-  const nameInvalidClass = nameInputHasError ? `${classes.invalid}` : '';
+  const nameInvalidClass = nameInputHasError ? `${classes.invalid}` : ''
 
   return (
     <>
@@ -100,7 +99,7 @@ const ChannelForm = ({ method, channel, type }) => {
       >
         {data && data.errors && (
           <ul className={classes['form-error-list']}>
-            {Object.values(data.errors).map((err) => (
+            {Object.values(data.errors).map(err => (
               <li className={classes['form-error']} key={err}>
                 {err}
               </li>
@@ -122,9 +121,9 @@ const ChannelForm = ({ method, channel, type }) => {
           />
           <button
             className={classes['upload-visual-btn']}
-            onClick={(event) => {
-              event.preventDefault();
-              fileInput.current.click();
+            onClick={event => {
+              event.preventDefault()
+              fileInput.current.click()
             }}
           >
             <RiImageAddLine />
@@ -216,7 +215,7 @@ const ChannelForm = ({ method, channel, type }) => {
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default ChannelForm;
+export default ChannelForm

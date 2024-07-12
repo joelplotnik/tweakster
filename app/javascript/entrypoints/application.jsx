@@ -1,11 +1,11 @@
 import 'src/index.css'
 
-import App from 'src/App'
 import Bugsnag from '@bugsnag/js'
 import BugsnagPluginReact from '@bugsnag/plugin-react'
-import { Provider } from 'react-redux'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { Provider } from 'react-redux'
+import App from 'src/App'
 import store from 'src/store/index'
 
 Bugsnag.start({

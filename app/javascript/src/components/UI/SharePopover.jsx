@@ -1,45 +1,45 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { RiShareBoxLine, RiShareForwardLine } from 'react-icons/ri';
+import React, { useEffect, useRef, useState } from 'react'
+import { RiShareBoxLine, RiShareForwardLine } from 'react-icons/ri'
+import { Link } from 'react-router-dom'
 
-import classes from './SharePopover.module.css';
-import { Link } from 'react-router-dom';
+import classes from './SharePopover.module.css'
 
 const SharePopover = ({ url, type }) => {
-  const [showPopover, setShowPopover] = useState(false);
-  const popoverRef = useRef(null);
+  const [showPopover, setShowPopover] = useState(false)
+  const popoverRef = useRef(null)
 
-  const handleCopyClick = (event) => {
-    event.stopPropagation();
-    navigator.clipboard.writeText(url);
-    setShowPopover(false);
-  };
+  const handleCopyClick = event => {
+    event.stopPropagation()
+    navigator.clipboard.writeText(url)
+    setShowPopover(false)
+  }
 
-  const handlePopoverClick = (event) => {
-    event.stopPropagation();
-  };
+  const handlePopoverClick = event => {
+    event.stopPropagation()
+  }
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (popoverRef.current && !popoverRef.current.contains(event.target)) {
-        setShowPopover(false);
+        setShowPopover(false)
       }
-    };
+    }
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleClickOutside)
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [])
 
   return (
     <div className={classes['share-popover-container']}>
       {type === 'modal' && (
         <button
           className={classes['share-button']}
-          onClick={(event) => {
-            event.stopPropagation();
-            setShowPopover(!showPopover);
+          onClick={event => {
+            event.stopPropagation()
+            setShowPopover(!showPopover)
           }}
         >
           <RiShareBoxLine />
@@ -47,9 +47,9 @@ const SharePopover = ({ url, type }) => {
       )}
       {type === 'piece' && (
         <Link
-          onClick={(event) => {
-            event.stopPropagation();
-            setShowPopover(!showPopover);
+          onClick={event => {
+            event.stopPropagation()
+            setShowPopover(!showPopover)
           }}
           className={`${classes.link} ${classes.share}`}
         >
@@ -59,9 +59,9 @@ const SharePopover = ({ url, type }) => {
       )}
       {type === 'page' && (
         <Link
-          onClick={(event) => {
-            event.stopPropagation();
-            setShowPopover(!showPopover);
+          onClick={event => {
+            event.stopPropagation()
+            setShowPopover(!showPopover)
           }}
           className={`${classes.link}`}
         >
@@ -87,7 +87,7 @@ const SharePopover = ({ url, type }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default SharePopover;
+export default SharePopover

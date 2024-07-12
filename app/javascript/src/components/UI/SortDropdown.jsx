@@ -1,32 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
-import classes from './SortDropdown.module.css';
+import React, { useEffect, useRef, useState } from 'react'
+
+import classes from './SortDropdown.module.css'
 
 const SortDropdown = ({ onSortChange, selectedSortOption }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const options = ['top', 'new'];
-  const dropdownRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const options = ['top', 'new']
+  const dropdownRef = useRef(null)
 
-  const handleSortChange = (option) => {
-    setIsOpen(false);
-    onSortChange(option);
-  };
+  const handleSortChange = option => {
+    setIsOpen(false)
+    onSortChange(option)
+  }
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+    setIsOpen(!isOpen)
+  }
 
-  const handleClickOutside = (event) => {
+  const handleClickOutside = event => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
+      setIsOpen(false)
     }
-  };
+  }
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   return (
     <div className={classes.container}>
@@ -41,7 +42,7 @@ const SortDropdown = ({ onSortChange, selectedSortOption }) => {
         </div>
         {isOpen && (
           <div className={classes['dropdown-menu']}>
-            {options.map((option) => (
+            {options.map(option => (
               <div
                 key={option}
                 className={classes['dropdown-option']}
@@ -54,7 +55,7 @@ const SortDropdown = ({ onSortChange, selectedSortOption }) => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SortDropdown;
+export default SortDropdown

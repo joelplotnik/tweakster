@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-import classes from './ConvoUser.module.css';
-import defaultAvatar from '../../assets/default-avatar.png';
+import defaultAvatar from '../../assets/default-avatar.png'
+import classes from './ConvoUser.module.css'
 
 const ConvoUser = ({ user }) => {
   return (
@@ -27,7 +27,7 @@ const ConvoUser = ({ user }) => {
         </div>
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export default ConvoUser;
+export default ConvoUser

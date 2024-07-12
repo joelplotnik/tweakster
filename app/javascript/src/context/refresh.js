@@ -1,5 +1,5 @@
-import React from 'react';
+import React from 'react'
 
-const RefreshContext = React.createContext(null);
+const RefreshContext = React.createContext(null)
 
-export default RefreshContext;
+export default RefreshContext

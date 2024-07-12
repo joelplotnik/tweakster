@@ -1,7 +1,9 @@
-import React from 'react';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import classes from './PieceSkeleton.module.css';
+import 'react-loading-skeleton/dist/skeleton.css'
+
+import React from 'react'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+
+import classes from './PieceSkeleton.module.css'
 
 const PieceSkeleton = () => {
   return (
@@ -29,7 +31,7 @@ const PieceSkeleton = () => {
         ))}
       </div>
     </SkeletonTheme>
-  );
-};
+  )
+}
 
-export default PieceSkeleton;
+export default PieceSkeleton

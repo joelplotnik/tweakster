@@ -1,11 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-import classes from './AdminPage.module.css';
+import classes from './AdminPage.module.css'
 
 const AdminPage = () => {
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector(state => state.user.user)
 
   return (
     <div className={classes['admin-container']}>
@@ -21,7 +21,7 @@ const AdminPage = () => {
         </ul>
       </nav>
     </div>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage

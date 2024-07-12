@@ -1,90 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { throttle } from 'lodash';
+import { throttle } from 'lodash'
+import React, { useEffect, useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
-import Piece from './Piece';
-import NoPieces from './NoPieces';
-import Error from './Error';
-import PieceSkeleton from './Skeletons/PieceSkeleton';
-
-import { API_URL } from '../../constants/constants';
-import classes from './PieceList.module.css';
-import { getAuthToken } from '../../util/auth';
+import { API_URL } from '../../constants/constants'
+import { getAuthToken } from '../../util/auth'
+import Error from './Error'
+import NoPieces from './NoPieces'
+import Piece from './Piece'
+import classes from './PieceList.module.css'
+import PieceSkeleton from './Skeletons/PieceSkeleton'
 
 const PieceList = ({ isHomePage }) => {
-  const [pieces, setPieces] = useState([]);
-  const [pieceIds, setPieceIds] = useState(new Set());
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const throttledFetchData = throttle(() => fetchData(), 500);
+  const [pieces, setPieces] = useState([])
+  const [pieceIds, setPieceIds] = useState(new Set())
+  const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const throttledFetchData = throttle(() => fetchData(), 500)
 
-  const fetchPieces = async (currentPage) => {
+  const fetchPieces = async currentPage => {
     try {
       const fetchUrl = isHomePage
         ? `${API_URL}/personal_feed?page=${currentPage}`
-        : `${API_URL}?page=${currentPage}`;
+        : `${API_URL}?page=${currentPage}`
 
-      const token = isHomePage ? getAuthToken() : null;
+      const token = isHomePage ? getAuthToken() : null
       const response = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           ...(isHomePage && { Authorization: `Bearer ${token}` }),
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch pieces');
+        throw new Error('Failed to fetch pieces')
       }
 
-      const data = await response.json();
-      return data;
+      const data = await response.json()
+      return data
     } catch (error) {
-      setError(error.message);
+      setError(error.message)
     }
-  };
+  }
 
   const fetchData = async () => {
     if (!isLoading) {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      const piecesFromServer = await fetchPieces(page);
+      const piecesFromServer = await fetchPieces(page)
 
       if (piecesFromServer) {
         const newPieces = piecesFromServer.filter(
-          (piece) => !pieceIds.has(piece.id)
-        );
+          piece => !pieceIds.has(piece.id)
+        )
 
-        setPieces([...pieces, ...newPieces]);
-        setPieceIds(
-          new Set([...pieceIds, ...newPieces.map((piece) => piece.id)])
-        );
+        setPieces([...pieces, ...newPieces])
+        setPieceIds(new Set([...pieceIds, ...newPieces.map(piece => piece.id)]))
 
         if (newPieces.length === 0) {
-          setHasMore(false);
+          setHasMore(false)
         }
-        setPage(page + 1);
+        setPage(page + 1)
       }
 
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
-    fetchData();
+    fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const fetchMoreData = () => {
     if (!isLoading && hasMore) {
-      throttledFetchData();
+      throttledFetchData()
     }
-  };
+  }
 
   if (error) {
-    return <Error message={`Error: ${error}`} />;
+    return <Error message={`Error: ${error}`} />
   }
 
   return (
@@ -106,13 +103,13 @@ const PieceList = ({ isHomePage }) => {
         }
       >
         <div className={classes['piece-list']}>
-          {pieces.map((piece) => (
+          {pieces.map(piece => (
             <Piece key={piece.id} piece={piece} />
           ))}
         </div>
       </InfiniteScroll>
     </>
-  );
-};
+  )
+}
 
-export default PieceList;
+export default PieceList

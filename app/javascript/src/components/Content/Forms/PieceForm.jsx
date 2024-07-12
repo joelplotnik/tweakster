@@ -1,99 +1,100 @@
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import 'react-quill/dist/quill.snow.css'
+
+import './Quill.css'
+
+import React, { useEffect, useState } from 'react'
+import ReactQuill from 'react-quill'
 import {
   Form,
-  useNavigation,
-  useActionData,
   Link,
+  useActionData,
   useNavigate,
-  useRouteLoaderData,
+  useNavigation,
   useRevalidator,
-} from 'react-router-dom';
-import ReactQuill from 'react-quill';
-import Select from 'react-select';
+  useRouteLoaderData,
+} from 'react-router-dom'
+import Select from 'react-select'
+import { toast } from 'react-toastify'
 
-import { API_URL } from '../../../constants/constants';
-import ConfirmationModal from '../../UI/Modals/ConfirmationModal';
-import Dropzone from '../../UI/Dropzone';
-import ImagesPreview from '../../UI/ImagesPreview';
-import SubscribePrompt from '../../UI/SubscribePrompt';
-
-import classes from './PieceForm.module.css';
-import 'react-quill/dist/quill.snow.css';
-import './Quill.css';
+import { API_URL } from '../../../constants/constants'
+import Dropzone from '../../UI/Dropzone'
+import ImagesPreview from '../../UI/ImagesPreview'
+import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
+import SubscribePrompt from '../../UI/SubscribePrompt'
+import classes from './PieceForm.module.css'
 
 const PieceForm = ({ type, piece, tweakText }) => {
-  const data = useActionData();
-  const navigate = useNavigate();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === 'submitting';
-  const [showModal, setShowModal] = useState(false);
-  const [channels, setChannels] = useState([]);
-  const [selectedChannel, setSelectedChannel] = useState(null);
+  const data = useActionData()
+  const navigate = useNavigate()
+  const navigation = useNavigation()
+  const isSubmitting = navigation.state === 'submitting'
+  const [showModal, setShowModal] = useState(false)
+  const [channels, setChannels] = useState([])
+  const [selectedChannel, setSelectedChannel] = useState(null)
   const [isTitleValid, setIsTitleValid] = useState(
     piece && piece.title ? true : false
-  );
-  const token = useRouteLoaderData('root');
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [youtubePreview, setYoutubePreview] = useState('');
-  const [images, setImages] = useState([]);
-  const submissionMethod = type === 'new' || type === 'tweak' ? 'POST' : 'PUT';
-  const revalidator = useRevalidator();
+  )
+  const token = useRouteLoaderData('root')
+  const [youtubeUrl, setYoutubeUrl] = useState('')
+  const [youtubePreview, setYoutubePreview] = useState('')
+  const [images, setImages] = useState([])
+  const submissionMethod = type === 'new' || type === 'tweak' ? 'POST' : 'PUT'
+  const revalidator = useRevalidator()
   const [quillContent, setQuillContent] = useState(() => {
     if (type === 'edit' && piece && piece.content) {
-      return piece.content;
+      return piece.content
     } else if (type === 'tweak' && piece && piece.content && tweakText) {
-      return piece.content;
+      return piece.content
     } else {
-      return '';
+      return ''
     }
-  });
+  })
 
   useEffect(() => {
     // Temporary fix: Suppress findDOMNode deprecation warning
     // This warning originates from ReactQuill which internally uses findDOMNode.
     // Consider switching to another rich text editor that does not use findDOMNode.
     // Remove this suppression once a permanent solution is implemented.
-    const originalError = console.error;
+    const originalError = console.error
     console.error = (...args) => {
       if (/findDOMNode is deprecated/.test(args[0])) {
-        return;
+        return
       }
-      originalError.call(console, ...args);
-    };
+      originalError.call(console, ...args)
+    }
     return () => {
-      console.error = originalError;
-    };
-  }, []);
+      console.error = originalError
+    }
+  }, [])
 
   const handleModalToggle = () => {
-    setShowModal(!showModal);
-  };
+    setShowModal(!showModal)
+  }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async event => {
+    event.preventDefault()
 
-    const formData = new FormData(event.target);
+    const formData = new FormData(event.target)
 
-    formData.append('piece[title]', formData.get('title'));
-    formData.append('piece[content]', quillContent);
-    formData.append('piece[youtube_url]', formData.get('youtubeUrl'));
+    formData.append('piece[title]', formData.get('title'))
+    formData.append('piece[content]', quillContent)
+    formData.append('piece[youtube_url]', formData.get('youtubeUrl'))
 
     for (let i = 0; i < images.length; i++) {
-      formData.append('piece[images][]', images[i]);
+      formData.append('piece[images][]', images[i])
     }
 
     if (type === 'tweak' && piece) {
-      formData.append('piece[parent_piece_id]', piece.id);
+      formData.append('piece[parent_piece_id]', piece.id)
     }
 
-    let requestUrl;
+    let requestUrl
 
     if (submissionMethod === 'PUT') {
-      const piece_id = piece.id;
-      requestUrl = `${API_URL}/channels/${selectedChannel}/pieces/${piece_id}`;
+      const piece_id = piece.id
+      requestUrl = `${API_URL}/channels/${selectedChannel}/pieces/${piece_id}`
     } else {
-      requestUrl = `${API_URL}/channels/${selectedChannel}/pieces`;
+      requestUrl = `${API_URL}/channels/${selectedChannel}/pieces`
     }
 
     try {
@@ -103,29 +104,29 @@ const PieceForm = ({ type, piece, tweakText }) => {
           Authorization: `Bearer ${token}`,
         },
         body: formData,
-      });
+      })
 
       if (response.status === 422) {
-        const errorData = await response.json();
-        toast.error(errorData.errors[0]);
-        return response;
+        const errorData = await response.json()
+        toast.error(errorData.errors[0])
+        return response
       }
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Could not create piece');
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Could not create piece')
       }
 
-      const newPiece = await response.json();
+      const newPiece = await response.json()
 
-      revalidator.revalidate();
+      revalidator.revalidate()
 
-      return navigate(`/channels/${selectedChannel}/pieces/${newPiece.id}`);
+      return navigate(`/channels/${selectedChannel}/pieces/${newPiece.id}`)
     } catch (error) {
-      console.error('Error: ', error.message);
-      toast.error('Error submitting piece');
+      console.error('Error: ', error.message)
+      toast.error('Error submitting piece')
     }
-  };
+  }
 
   const handleDelete = async () => {
     try {
@@ -138,18 +139,18 @@ const PieceForm = ({ type, piece, tweakText }) => {
             Authorization: `Bearer ${token}`,
           },
         }
-      );
+      )
 
       if (!response.ok) {
-        throw new Error('Could not delete piece');
+        throw new Error('Could not delete piece')
       }
 
-      return navigate('/');
+      return navigate('/')
     } catch (error) {
-      console.error('Error: ', error.message);
-      toast.error('Error deleting piece');
+      console.error('Error: ', error.message)
+      toast.error('Error deleting piece')
     }
-  };
+  }
 
   useEffect(() => {
     const fetchChannels = async () => {
@@ -160,49 +161,49 @@ const PieceForm = ({ type, piece, tweakText }) => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-        });
+        })
 
         if (!response.ok) {
-          throw new Error('Failed to fetch channels');
+          throw new Error('Failed to fetch channels')
         }
 
-        const channelsData = await response.json();
-        setChannels(channelsData);
+        const channelsData = await response.json()
+        setChannels(channelsData)
       } catch (error) {
-        console.error('Error: ', error.message);
-        toast.error('Error fetching channels');
+        console.error('Error: ', error.message)
+        toast.error('Error fetching channels')
       }
-    };
+    }
 
-    fetchChannels();
-  }, [token]);
+    fetchChannels()
+  }, [token])
 
-  const onSelectChangeHandler = (event) => {
-    const selectedId = event.value;
-    const newUrl = `/channels/${selectedId}/pieces/new`;
-    window.history.replaceState(null, null, newUrl);
-    setSelectedChannel(selectedId);
-  };
+  const onSelectChangeHandler = event => {
+    const selectedId = event.value
+    const newUrl = `/channels/${selectedId}/pieces/new`
+    window.history.replaceState(null, null, newUrl)
+    setSelectedChannel(selectedId)
+  }
 
-  const handleTitleChange = (event) => {
-    const title = event.target.value;
-    setIsTitleValid(!!title);
-  };
+  const handleTitleChange = event => {
+    const title = event.target.value
+    setIsTitleValid(!!title)
+  }
 
-  const convertToAbsoluteLinks = (content) => {
+  const convertToAbsoluteLinks = content => {
     return content.replace(/<a href="(.*?)"/g, (match, p1) => {
       if (!p1.startsWith('http://') && !p1.startsWith('https://')) {
-        return `<a href="https://${p1}" target="_blank"`;
+        return `<a href="https://${p1}" target="_blank"`
       }
-      return match;
-    });
-  };
+      return match
+    })
+  }
 
   useEffect(() => {
     // Convert relative links to absolute links before rendering
-    const contentWithAbsoluteLinks = convertToAbsoluteLinks(quillContent);
-    setQuillContent(contentWithAbsoluteLinks);
-  }, [quillContent]);
+    const contentWithAbsoluteLinks = convertToAbsoluteLinks(quillContent)
+    setQuillContent(contentWithAbsoluteLinks)
+  }, [quillContent])
 
   let toolbarOptions = [
     ['bold', 'italic', 'underline', 'strike'], // toggled buttons
@@ -214,39 +215,39 @@ const PieceForm = ({ type, piece, tweakText }) => {
     [{ list: 'ordered' }, { list: 'bullet' }], // lists
     [],
     ['clean'], // remove formatting button
-  ];
+  ]
 
   const modules = {
     toolbar: toolbarOptions,
-  };
+  }
 
-  const handleYoutubeUrlChange = (event) => {
-    setYoutubeUrl(event.target.value);
-    updateYoutubePreview(event.target.value);
-  };
+  const handleYoutubeUrlChange = event => {
+    setYoutubeUrl(event.target.value)
+    updateYoutubePreview(event.target.value)
+  }
 
-  const updateYoutubePreview = (url) => {
-    const videoId = url.match(/[?&]v=([^?&]+)/);
+  const updateYoutubePreview = url => {
+    const videoId = url.match(/[?&]v=([^?&]+)/)
 
     if (videoId && videoId[1]) {
-      const videoPreviewUrl = `https://www.youtube.com/embed/${videoId[1]}`;
-      setYoutubePreview(videoPreviewUrl);
+      const videoPreviewUrl = `https://www.youtube.com/embed/${videoId[1]}`
+      setYoutubePreview(videoPreviewUrl)
     } else {
-      setYoutubePreview('');
+      setYoutubePreview('')
     }
-  };
+  }
 
   useEffect(() => {
-    const urlParts = window.location.pathname.split('/');
-    const channel_id = urlParts[2];
+    const urlParts = window.location.pathname.split('/')
+    const channel_id = urlParts[2]
 
-    setSelectedChannel(channel_id);
+    setSelectedChannel(channel_id)
 
     if (type === 'edit' && piece && piece.youtube_url) {
-      setYoutubeUrl(piece.youtube_url);
-      updateYoutubePreview(piece.youtube_url);
+      setYoutubeUrl(piece.youtube_url)
+      updateYoutubePreview(piece.youtube_url)
     }
-  }, [piece, type]);
+  }, [piece, type])
 
   const customSelectStyles = {
     control: (baseStyles, state) => ({
@@ -261,9 +262,9 @@ const PieceForm = ({ type, piece, tweakText }) => {
         outline: 'none',
       },
     }),
-  };
+  }
 
-  const customSelectTheme = (theme) => ({
+  const customSelectTheme = theme => ({
     ...theme,
     borderRadius: 5,
     colors: {
@@ -273,7 +274,7 @@ const PieceForm = ({ type, piece, tweakText }) => {
       primary50: 'lightgrey',
       primary25: 'lightgrey',
     },
-  });
+  })
 
   return (
     <>
@@ -286,7 +287,7 @@ const PieceForm = ({ type, piece, tweakText }) => {
           >
             {data && data.errors && (
               <ul className={classes['form-error-list']}>
-                {Object.values(data.errors).map((err) => (
+                {Object.values(data.errors).map(err => (
                   <li className={classes['form-error']} key={err}>
                     {err}
                   </li>
@@ -300,7 +301,7 @@ const PieceForm = ({ type, piece, tweakText }) => {
                   theme={customSelectTheme}
                   styles={customSelectStyles}
                   id="channelSelect"
-                  options={channels.map((channel) => ({
+                  options={channels.map(channel => ({
                     value: channel.id,
                     label: channel.name,
                   }))}
@@ -311,7 +312,7 @@ const PieceForm = ({ type, piece, tweakText }) => {
                       ? {
                           value: selectedChannel,
                           label: channels.find(
-                            (channel) =>
+                            channel =>
                               channel.id === parseInt(selectedChannel, 10)
                           ).name,
                         }
@@ -339,8 +340,8 @@ const PieceForm = ({ type, piece, tweakText }) => {
               id="content"
               name="content"
               value={quillContent}
-              onChange={(value) => {
-                setQuillContent(value);
+              onChange={value => {
+                setQuillContent(value)
               }}
               placeholder="Text"
             />
@@ -373,7 +374,7 @@ const PieceForm = ({ type, piece, tweakText }) => {
                 <ImagesPreview imageUrls={piece.images} />
               </>
             ) : (
-              <Dropzone onImagesChange={(newImages) => setImages(newImages)} />
+              <Dropzone onImagesChange={newImages => setImages(newImages)} />
             )}
             <button
               type="submit"
@@ -413,7 +414,7 @@ const PieceForm = ({ type, piece, tweakText }) => {
       )}
       {channels.length === 0 && isSubmitting && <SubscribePrompt />}
     </>
-  );
-};
+  )
+}
 
-export default PieceForm;
+export default PieceForm

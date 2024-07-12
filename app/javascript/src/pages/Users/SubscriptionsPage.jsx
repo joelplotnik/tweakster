@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useRouteLoaderData } from 'react-router-dom'
-
-import { API_URL } from '../../constants/constants'
 import { ClipLoader } from 'react-spinners'
+
 import Entity from '../../components/Content/Entity'
 import { Error } from '../../components/Content/Error'
-import InfiniteScroll from 'react-infinite-scroll-component'
 import TopFive from '../../components/Content/TopFive'
-import classes from './SubscriptionsPage.module.css'
+import { API_URL } from '../../constants/constants'
 import { userPageActions } from '../../store/user-page'
+import classes from './SubscriptionsPage.module.css'
 
 const SubscriptionsPage = () => {
-  const user = useSelector((state) => state.userPage.user)
+  const user = useSelector(state => state.userPage.user)
   const dispatch = useDispatch()
   const favoriteChannels = user.favorite_channels
   const [subscriptions, setSubscriptions] = useState([])
@@ -23,7 +23,7 @@ const SubscriptionsPage = () => {
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const fetchSubscriptions = async (currentPage) => {
+  const fetchSubscriptions = async currentPage => {
     try {
       const response = await fetch(
         `${API_URL}/users/${id}/subscriptions/?page=${currentPage}`,
@@ -66,7 +66,7 @@ const SubscriptionsPage = () => {
     }
   }
 
-  const updateFavoriteChannels = async (updatedFavoriteChannelIds) => {
+  const updateFavoriteChannels = async updatedFavoriteChannelIds => {
     try {
       const response = await fetch(
         `${API_URL}/users/${id}/update_favorite_channels`,
@@ -100,18 +100,18 @@ const SubscriptionsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleTopFiveClick = (channel) => {
+  const handleTopFiveClick = channel => {
     const isChannelInFavorites = favoriteChannels.some(
-      (favChannel) => favChannel.id === channel.id
+      favChannel => favChannel.id === channel.id
     )
 
     let updatedFavoriteChannelIds = [...favoriteChannels].map(
-      (favChannel) => favChannel.id
+      favChannel => favChannel.id
     )
 
     if (isChannelInFavorites) {
       updatedFavoriteChannelIds = updatedFavoriteChannelIds.filter(
-        (id) => id !== channel.id
+        id => id !== channel.id
       )
     } else {
       if (favoriteChannels.length < 5) {
@@ -123,7 +123,7 @@ const SubscriptionsPage = () => {
 
     if (
       JSON.stringify(updatedFavoriteChannelIds) !==
-      JSON.stringify(favoriteChannels.map((channel) => channel.id))
+      JSON.stringify(favoriteChannels.map(channel => channel.id))
     ) {
       updateFavoriteChannels(updatedFavoriteChannelIds)
     }
@@ -154,13 +154,13 @@ const SubscriptionsPage = () => {
         endMessage={<></>}
       >
         <div className={classes['user-list']}>
-          {subscriptions.map((channel) => (
+          {subscriptions.map(channel => (
             <Entity
               key={channel.id}
               entityType={'channel'}
               item={channel}
               isFavorite={favoriteChannels.some(
-                (favChannel) => favChannel.id === channel.id
+                favChannel => favChannel.id === channel.id
               )}
               favoriteCount={favoriteChannels.length}
               onTopFiveClick={handleTopFiveClick}

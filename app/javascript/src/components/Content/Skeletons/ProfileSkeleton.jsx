@@ -1,7 +1,9 @@
-import React from 'react';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import classes from './ProfileSkeleton.module.css';
+import 'react-loading-skeleton/dist/skeleton.css'
+
+import React from 'react'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+
+import classes from './ProfileSkeleton.module.css'
 
 const ProfileSkeleton = () => {
   return (
@@ -22,7 +24,7 @@ const ProfileSkeleton = () => {
         </div>
       </div>
     </SkeletonTheme>
-  );
-};
+  )
+}
 
-export default ProfileSkeleton;
+export default ProfileSkeleton

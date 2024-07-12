@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useRouteLoaderData } from 'react-router-dom';
+import React, { useEffect } from 'react'
+import { useNavigate, useRouteLoaderData } from 'react-router-dom'
 
-import PieceForm from '../../components/Content/Forms/PieceForm';
-
-import classes from './EditPiecePage.module.css';
+import PieceForm from '../../components/Content/Forms/PieceForm'
+import classes from './EditPiecePage.module.css'
 
 const EditPiecePage = () => {
-  const piece = useRouteLoaderData('piece');
-  const navigate = useNavigate();
+  const piece = useRouteLoaderData('piece')
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (piece && piece.tweaks_count > 0) {
-      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}`);
+      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}`)
     }
-  }, [piece, navigate]);
+  }, [piece, navigate])
 
   return (
     <div className={classes['edit-piece-page']}>
@@ -21,7 +20,7 @@ const EditPiecePage = () => {
       <hr className={classes.divider} />
       <PieceForm type="edit" piece={piece} />
     </div>
-  );
-};
+  )
+}
 
-export default EditPiecePage;
+export default EditPiecePage

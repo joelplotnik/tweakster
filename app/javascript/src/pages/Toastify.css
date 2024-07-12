@@ -1,20 +1,20 @@
 .Toastify__toast-theme--colored.Toastify__toast--default {
-    background-color: #424242;
-    color: white;
+  background-color: #424242;
+  color: white;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--info {
-    background-color: #1F75C3;
+  background-color: #1f75c3;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--success {
-    background-color: #53b781;
+  background-color: #53b781;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--warning {
-    background-color: #FAC42E;
+  background-color: #fac42e;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--error {
-    background-color: #d92563;
+  background-color: #d92563;
 }

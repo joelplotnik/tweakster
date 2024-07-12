@@ -1,105 +1,106 @@
+import 'react-toastify/dist/ReactToastify.css'
+
+import './Toastify.css'
+
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Outlet,
-  useLocation,
-  Routes,
   Route,
+  Routes,
   useLoaderData,
+  useLocation,
   useSubmit,
-} from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import React, { useEffect, useState } from 'react';
-import { ToastContainer } from 'react-toastify';
+} from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
 
-import { EXPIRED_TOKEN } from '../constants/constants';
-import { getTokenDuration } from '../util/auth';
-import { userActions } from '../store/user';
-import RefreshContext from '../context/refresh';
-import MainNavigation from '../components/Header/MainNavigation';
-import Footer from '../components/Footer/Footer';
-import PieceModal from '../components/UI/Modals/PieceModal';
-import MainPage from './MainPage';
-import ChannelPage from './Channels/ChannelPage';
-import UserPage from './Users/UserPage';
-import ChannelsPage from './Channels/ChannelsPage';
-import ChannelsLayout from './Channels/ChannelsLayout';
-import UsersLayout from './Users/UsersLayout';
-import UsersPage from './Users/UsersPage';
-import ScrollToTop from '../components/ScrollToTop';
-import NewChannelPage from './Channels/NewChannelPage';
-
-import 'react-toastify/dist/ReactToastify.css';
-import './Toastify.css';
-import HomePage from './HomePage';
-import { CableProvider } from '../context/cable';
+import Footer from '../components/Footer/Footer'
+import MainNavigation from '../components/Header/MainNavigation'
+import ScrollToTop from '../components/ScrollToTop'
+import PieceModal from '../components/UI/Modals/PieceModal'
+import { EXPIRED_TOKEN } from '../constants/constants'
+import { CableProvider } from '../context/cable'
+import RefreshContext from '../context/refresh'
+import { userActions } from '../store/user'
+import { getTokenDuration } from '../util/auth'
+import ChannelPage from './Channels/ChannelPage'
+import ChannelsLayout from './Channels/ChannelsLayout'
+import ChannelsPage from './Channels/ChannelsPage'
+import NewChannelPage from './Channels/NewChannelPage'
+import HomePage from './HomePage'
+import MainPage from './MainPage'
+import UserPage from './Users/UserPage'
+import UsersLayout from './Users/UsersLayout'
+import UsersPage from './Users/UsersPage'
 
 const RootLayout = () => {
-  const [refreshRoot, setRefreshRoot] = useState(false);
-  const [userKey, setUserKey] = useState(null);
-  const token = useLoaderData();
-  const submit = useSubmit();
-  const dispatch = useDispatch();
-  let location = useLocation();
-  let background = location.state && location.state.background;
+  const [refreshRoot, setRefreshRoot] = useState(false)
+  const [userKey, setUserKey] = useState(null)
+  const token = useLoaderData()
+  const submit = useSubmit()
+  const dispatch = useDispatch()
+  let location = useLocation()
+  let background = location.state && location.state.background
 
-  const isUserLocalStorageChange = (key) => key === 'user';
+  const isUserLocalStorageChange = key => key === 'user'
 
-  const id = location.pathname.split('/')[2];
+  const id = location.pathname.split('/')[2]
   const pieceListPage =
     location.pathname === `/channels/${id}` ||
     location.pathname === `/users/${id}` ||
     location.pathname === `/main` ||
-    location.pathname === `/`;
+    location.pathname === `/`
 
-  const piece = useSelector((state) => state.piece.piece);
+  const piece = useSelector(state => state.piece.piece)
 
   useEffect(() => {
     if (
       location.pathname === `/users/${id}` ||
       location.pathname === `/channels/${id}`
     ) {
-      setUserKey(id);
+      setUserKey(id)
     }
-  }, [location.pathname, id]);
+  }, [location.pathname, id])
 
   useEffect(() => {
     if (!token) {
-      return;
+      return
     }
 
     if (token === EXPIRED_TOKEN) {
-      dispatch(userActions.clearUser());
-      submit(null, { action: '/logout', method: 'POST' });
-      return;
+      dispatch(userActions.clearUser())
+      submit(null, { action: '/logout', method: 'POST' })
+      return
     }
 
-    const tokenDuration = getTokenDuration();
+    const tokenDuration = getTokenDuration()
 
     setTimeout(async () => {
-      dispatch(userActions.clearUser());
-      submit(null, { action: '/logout', method: 'POST' });
-    }, tokenDuration); // set to 2 hours in AuthModal.js
-  }, [token, submit, dispatch]);
+      dispatch(userActions.clearUser())
+      submit(null, { action: '/logout', method: 'POST' })
+    }, tokenDuration) // set to 2 hours in AuthModal.js
+  }, [token, submit, dispatch])
 
   useEffect(() => {
-    const handleStorageChange = (event) => {
+    const handleStorageChange = event => {
       if (isUserLocalStorageChange(event.key)) {
-        setRefreshRoot(true);
+        setRefreshRoot(true)
       }
-    };
+    }
 
-    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('storage', handleStorageChange)
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])
 
   useEffect(() => {
     if (refreshRoot) {
-      setRefreshRoot(false);
-      window.location.reload();
+      setRefreshRoot(false)
+      window.location.reload()
     }
-  }, [refreshRoot]);
+  }, [refreshRoot])
 
   return (
     <RefreshContext.Provider value={setRefreshRoot}>
@@ -176,7 +177,7 @@ const RootLayout = () => {
         <Footer />
       </CableProvider>
     </RefreshContext.Provider>
-  );
-};
+  )
+}
 
-export default RootLayout;
+export default RootLayout

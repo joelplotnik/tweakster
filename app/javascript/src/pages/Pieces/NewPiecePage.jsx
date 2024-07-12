@@ -1,40 +1,39 @@
-import { useLocation, useRouteLoaderData } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react'
+import { useLocation, useRouteLoaderData } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
-import PieceForm from '../../components/Content/Forms/PieceForm';
-import NoPieces from '../../components/Content/NoPieces';
-
-import classes from './NewPiecePage.module.css';
-import { API_URL } from '../../constants/constants';
-import React, { useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
+import PieceForm from '../../components/Content/Forms/PieceForm'
+import NoPieces from '../../components/Content/NoPieces'
+import { API_URL } from '../../constants/constants'
+import classes from './NewPiecePage.module.css'
 
 const NewPiecePage = () => {
-  const token = useRouteLoaderData('root');
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const channelId = queryParams.get('channelId');
-  const pieceId = queryParams.get('pieceId');
-  const tweakText = queryParams.get('text') === 'true';
-  const [pieceData, setPieceData] = useState(null);
-  const [hasSubscriptions, setHasSubscriptions] = useState(false);
-  const [dataReady, setDataReady] = useState(false);
-  const typeRef = useRef('new');
+  const token = useRouteLoaderData('root')
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const channelId = queryParams.get('channelId')
+  const pieceId = queryParams.get('pieceId')
+  const tweakText = queryParams.get('text') === 'true'
+  const [pieceData, setPieceData] = useState(null)
+  const [hasSubscriptions, setHasSubscriptions] = useState(false)
+  const [dataReady, setDataReady] = useState(false)
+  const typeRef = useRef('new')
 
   useEffect(() => {
     async function fetchData() {
       if (channelId && pieceId) {
-        typeRef.current = 'tweak';
+        typeRef.current = 'tweak'
 
         const response = await fetch(
           `${API_URL}/channels/${channelId}/pieces/${pieceId}`
-        );
+        )
 
         if (!response.ok) {
-          throw new Error('Could not find piece');
+          throw new Error('Could not find piece')
         }
 
-        const data = await response.json();
-        setPieceData(data);
+        const data = await response.json()
+        setPieceData(data)
       }
     }
 
@@ -46,28 +45,28 @@ const NewPiecePage = () => {
             Authorization: `Bearer ${token}`,
           },
         }
-      );
+      )
 
       if (!response.ok) {
-        throw new Error('Could not check user subscriptions');
+        throw new Error('Could not check user subscriptions')
       }
 
-      const data = await response.json();
-      setHasSubscriptions(data.hasSubscriptions);
+      const data = await response.json()
+      setHasSubscriptions(data.hasSubscriptions)
     }
 
     async function fetchDataAndSubscriptions() {
       try {
-        await Promise.all([fetchData(), checkSubscriptions()]);
-        setDataReady(true);
+        await Promise.all([fetchData(), checkSubscriptions()])
+        setDataReady(true)
       } catch (error) {
-        console.error('Error:', error.message);
-        toast.error('Error creating new piece');
+        console.error('Error:', error.message)
+        toast.error('Error creating new piece')
       }
     }
 
-    fetchDataAndSubscriptions();
-  }, [channelId, pieceId, token]);
+    fetchDataAndSubscriptions()
+  }, [channelId, pieceId, token])
 
   return (
     <div className={classes['new-piece-page']}>
@@ -92,7 +91,7 @@ const NewPiecePage = () => {
       ) : null}
       {dataReady && !hasSubscriptions && <NoPieces listPage={'new'} />}
     </div>
-  );
-};
+  )
+}
 
-export default NewPiecePage;
+export default NewPiecePage

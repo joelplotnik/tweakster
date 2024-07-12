@@ -1,17 +1,16 @@
-import { useRouteLoaderData } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import React, { useState } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { useRouteLoaderData } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
-import { API_URL } from '../../../constants/constants';
-import { userPageActions } from '../../../store/user-page';
-
-import classes from './FollowButton.module.css';
+import { API_URL } from '../../../constants/constants'
+import { userPageActions } from '../../../store/user-page'
+import classes from './FollowButton.module.css'
 
 const FollowButton = ({ userId, isFollowing, followerCount }) => {
-  const token = useRouteLoaderData('root');
-  const dispatch = useDispatch();
-  const [isHovered, setIsHovered] = useState(false);
+  const token = useRouteLoaderData('root')
+  const dispatch = useDispatch()
+  const [isHovered, setIsHovered] = useState(false)
 
   const handleFollow = async () => {
     try {
@@ -21,19 +20,19 @@ const FollowButton = ({ userId, isFollowing, followerCount }) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to follow');
+        throw new Error('Failed to follow')
       }
 
-      dispatch(userPageActions.updateFollowerState(true));
-      dispatch(userPageActions.updateFollowerCount(followerCount + 1));
+      dispatch(userPageActions.updateFollowerState(true))
+      dispatch(userPageActions.updateFollowerCount(followerCount + 1))
     } catch (error) {
-      console.error('Error: ', error.message);
-      toast.error('Error following');
+      console.error('Error: ', error.message)
+      toast.error('Error following')
     }
-  };
+  }
 
   const handleUnfollow = async () => {
     try {
@@ -43,25 +42,25 @@ const FollowButton = ({ userId, isFollowing, followerCount }) => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to unfollow');
+        throw new Error('Failed to unfollow')
       }
 
-      dispatch(userPageActions.updateFollowerState(false));
-      dispatch(userPageActions.updateFollowerCount(followerCount - 1));
+      dispatch(userPageActions.updateFollowerState(false))
+      dispatch(userPageActions.updateFollowerCount(followerCount - 1))
     } catch (error) {
-      console.error('Error: ', error.message);
-      toast.error('Error unfollowing');
+      console.error('Error: ', error.message)
+      toast.error('Error unfollowing')
     }
-  };
+  }
 
   const buttonContent = isFollowing
     ? isHovered
       ? 'Unfollow'
       : 'Following'
-    : 'Follow';
+    : 'Follow'
 
   return (
     <>
@@ -74,7 +73,7 @@ const FollowButton = ({ userId, isFollowing, followerCount }) => {
         {buttonContent}
       </button>
     </>
-  );
-};
+  )
+}
 
-export default FollowButton;
+export default FollowButton

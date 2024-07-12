@@ -1,7 +1,9 @@
-import React from 'react';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
-import classes from './ChannelListSkeleton.module.css';
+import 'react-loading-skeleton/dist/skeleton.css'
+
+import React from 'react'
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+
+import classes from './ChannelListSkeleton.module.css'
 
 const ChannelListSkeleton = () => {
   return (
@@ -17,7 +19,7 @@ const ChannelListSkeleton = () => {
         ))}
       </div>
     </SkeletonTheme>
-  );
-};
+  )
+}
 
-export default ChannelListSkeleton;
+export default ChannelListSkeleton

@@ -1,24 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
-import {
-  Link,
-  json,
-  useLocation,
-  useNavigate,
-  useRouteLoaderData,
-} from 'react-router-dom'
 import moment from 'moment'
-
-import { API_URL } from '../../constants/constants'
-import { getUserData } from '../../util/auth'
-import RefreshContext from '../../context/refresh'
-import PieceVote from '../UI/PieceVote'
-import SharePopover from '../UI/SharePopover'
-import ConfirmationModal from '../UI/Modals/ConfirmationModal'
-import AuthModal from '../UI/Modals/AuthModal'
-import ReportModal from '../UI/Modals/ReportModal'
-import PieceCarousel from '../UI/PieceCarousel'
-
-import classes from './Piece.module.css'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   RiChat3Line,
   RiDeleteBin7Line,
@@ -28,11 +9,29 @@ import {
   RiFlaskLine,
   RiMoreFill,
 } from 'react-icons/ri'
-import defaultAvatar from '../../assets/default-avatar.png'
 import { useSelector } from 'react-redux'
+import {
+  Link,
+  json,
+  useLocation,
+  useNavigate,
+  useRouteLoaderData,
+} from 'react-router-dom'
+
+import defaultAvatar from '../../assets/default-avatar.png'
+import { API_URL } from '../../constants/constants'
+import RefreshContext from '../../context/refresh'
+import { getUserData } from '../../util/auth'
+import AuthModal from '../UI/Modals/AuthModal'
+import ConfirmationModal from '../UI/Modals/ConfirmationModal'
+import ReportModal from '../UI/Modals/ReportModal'
+import PieceCarousel from '../UI/PieceCarousel'
+import PieceVote from '../UI/PieceVote'
+import SharePopover from '../UI/SharePopover'
+import classes from './Piece.module.css'
 
 const Piece = ({ piece }) => {
-  const activePiece = useSelector((state) => state.piece.piece)
+  const activePiece = useSelector(state => state.piece.piece)
   const location = useLocation()
   const navigate = useNavigate()
   const setRefreshRoot = useContext(RefreshContext)
@@ -60,19 +59,19 @@ const Piece = ({ piece }) => {
     setShowReportModal(!showReportModal)
   }
 
-  const handleDropdownToggle = (event) => {
+  const handleDropdownToggle = event => {
     event.stopPropagation()
     setShowDropdown(!showDropdown)
   }
 
-  const handleEditClick = (event) => {
+  const handleEditClick = event => {
     event.stopPropagation()
     if (piece.tweaks_count === 0) {
       navigate(`/channels/${piece.channel_id}/pieces/${piece.id}/edit`)
     }
   }
 
-  const handleParentPieceClick = (event) => {
+  const handleParentPieceClick = event => {
     event.stopPropagation()
     window.open(
       `/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`,
@@ -111,7 +110,7 @@ const Piece = ({ piece }) => {
   }
 
   useEffect(() => {
-    const handleClickOutsideDropdown = (event) => {
+    const handleClickOutsideDropdown = event => {
       const dropdownContainer = document.querySelector(
         `.${classes['dropdown-container']}`
       )
@@ -128,7 +127,7 @@ const Piece = ({ piece }) => {
     }
   }, [])
 
-  const handlePieceLinkClick = (event) => {
+  const handlePieceLinkClick = event => {
     const target = event.target
     const isDeleteButton = target.classList.contains(classes.danger)
     const isDropdown = target.closest(`.${classes.dropdown}`)
@@ -166,7 +165,7 @@ const Piece = ({ piece }) => {
     }
   }
 
-  const stopPropagation = (event) => {
+  const stopPropagation = event => {
     event.stopPropagation()
   }
 

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-import classes from './Channel.module.css';
-import defaultVisual from '../../assets/default-visual.png';
+import defaultVisual from '../../assets/default-visual.png'
+import classes from './Channel.module.css'
 
 const Channel = ({ channel }) => {
   return (
@@ -23,7 +23,7 @@ const Channel = ({ channel }) => {
         </div>
       </div>
     </Link>
-  );
-};
+  )
+}
 
-export default Channel;
+export default Channel

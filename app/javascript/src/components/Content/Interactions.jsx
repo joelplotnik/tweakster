@@ -1,46 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { useLocation, useNavigate } from 'react-router-dom'
 
-import Comments from './Comments';
-import Tweaks from './Tweaks';
-
-import classes from './Interactions.module.css';
+import Comments from './Comments'
+import classes from './Interactions.module.css'
+import Tweaks from './Tweaks'
 
 const Interactions = ({ pieceClassModalRef }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const piece = useSelector((state) => state.piece.piece);
-  const [activeTab, setActiveTab] = useState('comments');
+  const location = useLocation()
+  const navigate = useNavigate()
+  const piece = useSelector(state => state.piece.piece)
+  const [activeTab, setActiveTab] = useState('comments')
 
   useEffect(() => {
-    const tabState = location.state && location.state.tab;
+    const tabState = location.state && location.state.tab
 
     if (tabState) {
-      setActiveTab(tabState);
+      setActiveTab(tabState)
     } else {
-      const params = new URLSearchParams(location.search);
-      const tabParam = params.get('tab');
+      const params = new URLSearchParams(location.search)
+      const tabParam = params.get('tab')
 
       if (tabParam === 'tweaks') {
-        setActiveTab('tweaks');
+        setActiveTab('tweaks')
       } else {
-        setActiveTab('comments');
+        setActiveTab('comments')
       }
     }
-  }, [location.state, location.search]);
+  }, [location.state, location.search])
 
-  const handleTabClick = (tab) => {
-    const params = new URLSearchParams(location.search);
-    const tabParam = params.get('tab');
+  const handleTabClick = tab => {
+    const params = new URLSearchParams(location.search)
+    const tabParam = params.get('tab')
 
     if (tabParam) {
-      params.set('tab', tab);
-      navigate(`${location.pathname}?${params}`, { replace: true });
+      params.set('tab', tab)
+      navigate(`${location.pathname}?${params}`, { replace: true })
     }
 
-    setActiveTab(tab);
-  };
+    setActiveTab(tab)
+  }
 
   return (
     <>
@@ -75,7 +74,7 @@ const Interactions = ({ pieceClassModalRef }) => {
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default Interactions;
+export default Interactions

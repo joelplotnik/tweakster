@@ -1,5 +1,6 @@
-import React from 'react';
-import classes from './Dropzone.module.css';
+import React from 'react'
+
+import classes from './Dropzone.module.css'
 
 const ImagesPreview = ({ imageUrls }) => {
   return (
@@ -14,7 +15,7 @@ const ImagesPreview = ({ imageUrls }) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default ImagesPreview;
+export default ImagesPreview

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import classes from './CommentForm.module.css';
+import classes from './CommentForm.module.css'
 
 const PieceCommentForm = ({
   comment,
@@ -9,30 +9,30 @@ const PieceCommentForm = ({
   onSubmit,
   showCancel,
 }) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     if (comment) {
-      setMessage(comment.message);
+      setMessage(comment.message)
     }
-  }, [comment]);
+  }, [comment])
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = event => {
+    event.preventDefault()
 
-    const commentId = comment ? comment.id : null;
+    const commentId = comment ? comment.id : null
 
-    onSubmit(message, parentId, commentId);
-    setMessage('');
-    showCancel && onCancel();
-  };
+    onSubmit(message, parentId, commentId)
+    setMessage('')
+    showCancel && onCancel()
+  }
 
   return (
     <form className={classes['comment-form']} onSubmit={handleSubmit}>
       <textarea
         className={classes['comment-text-area']}
         value={message}
-        onChange={(event) => setMessage(event.target.value)}
+        onChange={event => setMessage(event.target.value)}
         placeholder="Add a comment..."
       />
       <div className={classes['button-container']}>
@@ -50,7 +50,7 @@ const PieceCommentForm = ({
         )}
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default PieceCommentForm;
+export default PieceCommentForm

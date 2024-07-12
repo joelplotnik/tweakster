@@ -1,23 +1,23 @@
-import { Form, useLocation, useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState } from 'react'
+import ReactDOM from 'react-dom'
+import { RiCloseLine } from 'react-icons/ri'
+import { useDispatch } from 'react-redux'
+import { Form, useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
-import { API_URL } from '../../../constants/constants';
-import { Backdrop } from './Backdrop';
-import ReactDOM from 'react-dom';
-import { RiCloseLine } from 'react-icons/ri';
-import classes from './AuthModal.module.css';
-import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
-import useInput from '../../../hooks/use-input';
-import { userActions } from '../../../store/user';
+import { API_URL } from '../../../constants/constants'
+import useInput from '../../../hooks/use-input'
+import { userActions } from '../../../store/user'
+import classes from './AuthModal.module.css'
+import { Backdrop } from './Backdrop'
 
 export function AuthModal({ authType, onClick }) {
-  const dispatch = useDispatch();
-  const [modalType, setModalType] = useState(authType);
-  const [signupError, setSignupError] = useState(null);
-  const [loginError, setLoginError] = useState(null);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const dispatch = useDispatch()
+  const [modalType, setModalType] = useState(authType)
+  const [signupError, setSignupError] = useState(null)
+  const [loginError, setLoginError] = useState(null)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const {
     value: enteredUsername,
@@ -26,14 +26,14 @@ export function AuthModal({ authType, onClick }) {
     valueChangeHandler: handleUsernameChange,
     handleInputBlur: handleUsernameBlur,
     reset: resetUsernameInput,
-  } = useInput((value) => {
+  } = useInput(value => {
     const isValid =
       value.trim() !== '' &&
       value.length >= 2 &&
       value.length <= 25 &&
-      /^[a-zA-Z0-9_.]+$/.test(value);
-    return isValid;
-  });
+      /^[a-zA-Z0-9_.]+$/.test(value)
+    return isValid
+  })
 
   const {
     value: enteredEmail,
@@ -42,10 +42,10 @@ export function AuthModal({ authType, onClick }) {
     valueChangeHandler: handleEmailChange,
     handleInputBlur: handleEmailBlur,
     reset: resetEmailInput,
-  } = useInput((value) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(value);
-  });
+  } = useInput(value => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(value)
+  })
 
   const {
     value: enteredPassword,
@@ -54,11 +54,11 @@ export function AuthModal({ authType, onClick }) {
     valueChangeHandler: handlePasswordChange,
     handleInputBlur: handlePasswordBlur,
     reset: resetPasswordInput,
-  } = useInput((value) => {
+  } = useInput(value => {
     const passwordRegex =
-      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-    return passwordRegex.test(value);
-  });
+      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/
+    return passwordRegex.test(value)
+  })
 
   const {
     isValid: enteredConfirmPasswordIsValid,
@@ -66,26 +66,26 @@ export function AuthModal({ authType, onClick }) {
     valueChangeHandler: handleConfirmPasswordChange,
     handleInputBlur: handleConfirmPasswordBlur,
     reset: resetConfirmPasswordInput,
-  } = useInput((value) => value === enteredPassword);
+  } = useInput(value => value === enteredPassword)
 
-  const storeUserData = async (response) => {
-    const responseData = await response.json();
-    const user = Object.setPrototypeOf(responseData.status.data, null);
-    const { id, username, avatar_url } = user;
-    const userData = { id, username, avatar_url };
-    dispatch(userActions.setUser(userData));
+  const storeUserData = async response => {
+    const responseData = await response.json()
+    const user = Object.setPrototypeOf(responseData.status.data, null)
+    const { id, username, avatar_url } = user
+    const userData = { id, username, avatar_url }
+    dispatch(userActions.setUser(userData))
 
-    const headers = response.headers;
-    const authorization = headers.get('authorization');
-    const token = authorization.replace('Bearer ', '');
-    const expiration = new Date();
-    expiration.setMinutes(expiration.getMinutes() + 120);
-    localStorage.setItem('token', token);
-    localStorage.setItem('expiration', expiration.toISOString());
-  };
+    const headers = response.headers
+    const authorization = headers.get('authorization')
+    const token = authorization.replace('Bearer ', '')
+    const expiration = new Date()
+    expiration.setMinutes(expiration.getMinutes() + 120)
+    localStorage.setItem('token', token)
+    localStorage.setItem('expiration', expiration.toISOString())
+  }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async event => {
+    event.preventDefault()
 
     try {
       if (modalType === 'signup') {
@@ -95,7 +95,7 @@ export function AuthModal({ authType, onClick }) {
           !enteredPasswordIsValid ||
           !enteredConfirmPasswordIsValid
         ) {
-          return;
+          return
         }
 
         const userData = {
@@ -104,7 +104,7 @@ export function AuthModal({ authType, onClick }) {
             email: enteredEmail,
             password: enteredPassword,
           },
-        };
+        }
 
         const response = await fetch(`${API_URL}/users`, {
           method: 'POST',
@@ -112,29 +112,29 @@ export function AuthModal({ authType, onClick }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(userData),
-        });
+        })
 
         if (response.status === 422) {
-          const responseData = await response.json();
-          setSignupError(responseData.status.errors);
-          return;
+          const responseData = await response.json()
+          setSignupError(responseData.status.errors)
+          return
         }
 
         if (!response.ok) {
-          throw new Error('Could not create user.');
+          throw new Error('Could not create user.')
         }
 
-        await storeUserData(response);
+        await storeUserData(response)
 
-        resetUsernameInput();
-        resetEmailInput();
-        resetPasswordInput();
-        resetConfirmPasswordInput();
-        onClick();
-        navigate(location.pathname);
+        resetUsernameInput()
+        resetEmailInput()
+        resetPasswordInput()
+        resetConfirmPasswordInput()
+        onClick()
+        navigate(location.pathname)
       } else {
         if (!enteredUsernameIsValid || !enteredPasswordIsValid) {
-          return;
+          return
         }
 
         const userData = {
@@ -142,7 +142,7 @@ export function AuthModal({ authType, onClick }) {
             login: enteredUsername,
             password: enteredPassword,
           },
-        };
+        }
 
         const response = await fetch(`${API_URL}/users/sign_in`, {
           method: 'POST',
@@ -150,31 +150,31 @@ export function AuthModal({ authType, onClick }) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(userData),
-        });
+        })
 
         if (response.status === 422 || response.status === 401) {
-          setLoginError(['Username or Password incorrect']);
-          return;
+          setLoginError(['Username or Password incorrect'])
+          return
         }
 
         if (!response.ok) {
-          throw new Error('Could not authenticate user.');
+          throw new Error('Could not authenticate user.')
         }
 
-        await storeUserData(response);
+        await storeUserData(response)
 
-        resetUsernameInput();
-        resetPasswordInput();
-        onClick();
-        navigate(location.pathname);
+        resetUsernameInput()
+        resetPasswordInput()
+        onClick()
+        navigate(location.pathname)
       }
     } catch (error) {
-      console.error('Error: ', error.message);
-      toast.error('Error logging in user');
+      console.error('Error: ', error.message)
+      toast.error('Error logging in user')
     }
-  };
+  }
 
-  let formIsValid = false;
+  let formIsValid = false
   if (
     modalType === 'signup' &&
     enteredUsernameIsValid &&
@@ -182,32 +182,30 @@ export function AuthModal({ authType, onClick }) {
     enteredPasswordIsValid &&
     enteredConfirmPasswordIsValid
   ) {
-    formIsValid = true;
+    formIsValid = true
   }
   if (
     modalType === 'login' &&
     enteredUsernameIsValid &&
     enteredPasswordIsValid
   ) {
-    formIsValid = true;
+    formIsValid = true
   }
 
-  const emailInvalidClass = emailInputHasError ? `${classes.invalid}` : '';
-  const usernameInvalidClass = usernameInputHasError
-    ? `${classes.invalid}`
-    : '';
-  const passwordInvalid = passwordInputHasError ? `${classes.invalid}` : '';
+  const emailInvalidClass = emailInputHasError ? `${classes.invalid}` : ''
+  const usernameInvalidClass = usernameInputHasError ? `${classes.invalid}` : ''
+  const passwordInvalid = passwordInputHasError ? `${classes.invalid}` : ''
   const confirmPasswordInvalidClass = confirmPasswordInputHasError
     ? `${classes.invalid}`
-    : '';
+    : ''
 
   return (
     <>
       {ReactDOM.createPortal(
         <Backdrop
-          onClick={(event) => {
-            event.stopPropagation();
-            onClick();
+          onClick={event => {
+            event.stopPropagation()
+            onClick()
           }}
         />,
         document.getElementById('backdrop-root')
@@ -217,29 +215,29 @@ export function AuthModal({ authType, onClick }) {
           <div className={classes.modal}>
             <button
               className={classes['close-icon']}
-              onClick={(event) => {
-                event.stopPropagation();
-                onClick();
+              onClick={event => {
+                event.stopPropagation()
+                onClick()
               }}
             >
               <RiCloseLine />
             </button>
             <div
               className={classes['modal-content']}
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               {modalType === 'login' && <h2>Log In</h2>}
               {modalType === 'signup' && <h2>Sign Up</h2>}
               {signupError && (
                 <div className={classes['error-text']}>
-                  {signupError.map((error) => (
+                  {signupError.map(error => (
                     <p key={error}>{error}</p>
                   ))}
                 </div>
               )}
               {loginError && (
                 <div className={classes['error-text']}>
-                  {loginError.map((error) => (
+                  {loginError.map(error => (
                     <p key={error}>{error}</p>
                   ))}
                 </div>
@@ -330,15 +328,15 @@ export function AuthModal({ authType, onClick }) {
                     id="swith-to-signup"
                     className={classes['switch-modal-btn']}
                     onClick={() => {
-                      const usernameInput = document.getElementById('username');
-                      const passwordInput = document.getElementById('password');
+                      const usernameInput = document.getElementById('username')
+                      const passwordInput = document.getElementById('password')
 
-                      usernameInput.value = '';
-                      passwordInput.value = '';
+                      usernameInput.value = ''
+                      passwordInput.value = ''
 
-                      resetUsernameInput();
-                      resetPasswordInput();
-                      setModalType('signup');
+                      resetUsernameInput()
+                      resetPasswordInput()
+                      setModalType('signup')
                     }}
                   >
                     Sign Up
@@ -354,22 +352,22 @@ export function AuthModal({ authType, onClick }) {
                     id="switch-to-login"
                     className={classes['switch-modal-btn']}
                     onClick={() => {
-                      const emailInput = document.getElementById('email');
-                      const usernameInput = document.getElementById('username');
-                      const passwordInput = document.getElementById('password');
+                      const emailInput = document.getElementById('email')
+                      const usernameInput = document.getElementById('username')
+                      const passwordInput = document.getElementById('password')
                       const confirmPasswordInput =
-                        document.getElementById('confirm-password');
+                        document.getElementById('confirm-password')
 
-                      emailInput.value = '';
-                      usernameInput.value = '';
-                      passwordInput.value = '';
-                      confirmPasswordInput.value = '';
+                      emailInput.value = ''
+                      usernameInput.value = ''
+                      passwordInput.value = ''
+                      confirmPasswordInput.value = ''
 
-                      resetUsernameInput();
-                      resetEmailInput();
-                      resetPasswordInput();
-                      resetConfirmPasswordInput();
-                      setModalType('login');
+                      resetUsernameInput()
+                      resetEmailInput()
+                      resetPasswordInput()
+                      resetConfirmPasswordInput()
+                      setModalType('login')
                     }}
                   >
                     Log In
@@ -382,7 +380,7 @@ export function AuthModal({ authType, onClick }) {
         document.getElementById('overlay-root')
       )}
     </>
-  );
+  )
 }
 
-export default AuthModal;
+export default AuthModal
