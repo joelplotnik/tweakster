@@ -1,4 +1,4 @@
-class Api::V1::VotesController < ApplicationController
+class Api::V1::VotesController < Api::V1::ApplicationController
     include Votable
 
     before_action :authenticate_user!
