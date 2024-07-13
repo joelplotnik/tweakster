@@ -14,7 +14,7 @@ test:
   <<: *default
   database: tweakster_test
 
-production:
+production: &production
   adapter: mysql2
   encoding: utf8
   database: <%= ENV['RDS_DB_NAME'] %>
@@ -22,3 +22,6 @@ production:
   password: <%= ENV['RDS_PASSWORD'] %>
   host: <%= ENV['RDS_HOSTNAME'] %>
   port: <%= ENV['RDS_PORT'] %>
+
+staging:
+  <<: *production
