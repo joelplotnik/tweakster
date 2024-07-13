@@ -1,6 +1,6 @@
 require 'will_paginate/array'
 
-class Api::V1::NotificationsController < ApplicationController
+class Api::V1::NotificationsController < Api::V1::ApplicationController
   before_action :authenticate_user!
 
   def index

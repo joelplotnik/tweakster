@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tweakster - Coming Soon</title>
+    <link rel="icon" href="/logo_color.svg" />
+    <link rel="apple-touch-icon" href="/logo_color.svg" />
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to right, #ff9c40, #d92563);
+        color: #fff;
+      }
+
+      .box {
+        max-width: 600px;
+        padding: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .logo {
+        width: 150px;
+        height: auto;
+        margin-right: 20px;
+      }
+
+      h1 {
+        font-family: 'Nunito', sans-serif;
+        font-size: 48px;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      p {
+        font-size: 24px;
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+          text-align: center;
+        }
+        .logo {
+          margin-bottom: 10px;
+          margin-right: 0;
+        }
+      }
+
+      @media (min-width: 769px) {
+        .container {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="box">
+        <%= link_to root_path(login: true) do %>
+          <img class="logo" src="logo.svg" alt="Logo" />
+        <% end %>
+        <div>
+          <h1>tweakster</h1>
+          <p>Something cool is in the works!</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

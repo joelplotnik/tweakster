@@ -24,7 +24,7 @@ Rails.application.routes.draw do
           put 'update_favorite_channels'
           get 'check_ownership'
         end
-        
+
         collection do
           get 'search'
           get 'popular'

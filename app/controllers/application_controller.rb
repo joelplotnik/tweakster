@@ -1,11 +1,23 @@
-class ApplicationController < ActionController::API
-    before_action :configure_permitted_parameters, if: :devise_controller?
+class ApplicationController < ActionController::Base
+  before_action :http_authenticate, if: :logging_in?
 
-    protected
+  private
 
-    def configure_permitted_parameters
-        added_attrs = [:username, :email, :password]
-        devise_parameter_sanitizer.permit(:sign_up, keys: added_attrs)
-        devise_parameter_sanitizer.permit(:account_update, keys: added_attrs)
+  def http_authenticate
+    return if Rails.env.development?
+
+    authenticate_or_request_with_http_basic do |username, password|
+      if username == ENV['BETA_USERNAME'] && password == ENV['BETA_PASSWORD']
+        @allowed = true
+        true
+      else
+        @allowed = false
+        false
+      end
     end
+  end
+
+  def logging_in?
+    params[:login]
+  end
 end

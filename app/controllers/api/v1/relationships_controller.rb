@@ -1,4 +1,4 @@
-class Api::V1::RelationshipsController < ApplicationController
+class Api::V1::RelationshipsController < Api::V1::ApplicationController
   before_action :authenticate_user!
 
   def create

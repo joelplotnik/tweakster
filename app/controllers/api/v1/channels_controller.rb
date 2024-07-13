@@ -1,4 +1,4 @@
-class Api::V1::ChannelsController < ApplicationController
+class Api::V1::ChannelsController < Api::V1::ApplicationController
   include Channelable
   include Userable
   include Pieceable

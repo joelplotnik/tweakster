@@ -1,4 +1,4 @@
-class Api::V1::ReportsController < ApplicationController
+class Api::V1::ReportsController < Api::V1::ApplicationController
     load_and_authorize_resource
     before_action :authenticate_user!
 
