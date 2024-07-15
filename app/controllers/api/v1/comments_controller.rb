@@ -1,6 +1,6 @@
 require 'will_paginate/array'
 
-class Api::V1::CommentsController < Api::V1::ApplicationController
+class Api::V1::CommentsController < ApplicationController
   include Commentable
 
   load_and_authorize_resource except: :index

@@ -1,6 +1,6 @@
 require 'will_paginate/array'
 
-class Api::V1::SubscriptionsController < Api::V1::ApplicationController
+class Api::V1::SubscriptionsController < ApplicationController
     include Pieceable
 
     before_action :authenticate_user!
