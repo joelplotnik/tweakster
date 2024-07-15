@@ -1,6 +1,6 @@
 require 'will_paginate/array'
 
-class Api::V1::PiecesController < Api::V1::ApplicationController
+class Api::V1::PiecesController < ApplicationController
   include Pieceable
   include Userable
   include Sanitizable
