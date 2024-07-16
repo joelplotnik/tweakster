@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  mount ActionCable.server => "/cable"
+  mount ActionCable.server => '/cable'
   devise_for :users, path: 'api/v1/users', controllers: {
     sessions: 'api/v1/users/sessions',
     registrations: 'api/v1/users/registrations'
@@ -12,7 +12,7 @@ Rails.application.routes.draw do
       get 'mischief_makers', to: 'home#mischief_makers'
       get 'personal_feed', to: 'home#personal_feed'
 
-      resources :users, only: [:show, :index, :update, :destroy] do
+      resources :users, only: %i[show index update destroy] do
         member do
           post 'follow', to: 'relationships#create'
           delete 'unfollow', to: 'relationships#destroy'
@@ -31,7 +31,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :channels, only: [:show, :index, :create, :update, :destroy] do
+      resources :channels, only: %i[show index create update destroy] do
         member do
           get 'check_ownership'
         end
@@ -41,13 +41,13 @@ Rails.application.routes.draw do
           get 'popular'
         end
 
-        resources :pieces, only: [:show, :index, :create, :update, :destroy] do
+        resources :pieces, only: %i[show index create update destroy] do
           member do
             get 'check_ownership'
             get 'tweaks', to: 'pieces#tweaks'
           end
 
-          resources :comments, only: [:index, :create, :update, :destroy] do
+          resources :comments, only: %i[index create update destroy] do
             member do
               get 'check_ownership'
             end
@@ -74,10 +74,10 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :reports, only: [:index, :create, :destroy]
+      resources :reports, only: %i[index create destroy]
     end
   end
 
   root to: 'home#show'
-  get '*path', to: 'home#show', constraints: lambda { |request| request.format.html? }
+  get '*path', to: 'home#show', constraints: ->(request) { request.format.html? }
 end

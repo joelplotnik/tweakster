@@ -1,5 +1,5 @@
 class HomeController < ActionController::Base
-  layout "application"
+  layout 'application'
   before_action :http_authenticate, if: :logging_in?
 
   def show

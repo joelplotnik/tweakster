@@ -4,9 +4,9 @@
 
 class TweakOfPieceNotifier < ApplicationNotifier
   deliver_by :action_cable do |config|
-    config.channel = "NotificationsChannel"
-    config.stream = ->{ recipient }
-    config.message = ->{ params.merge( user_id: recipient.id) }
+    config.channel = 'NotificationsChannel'
+    config.stream = -> { recipient }
+    config.message = -> { params.merge(user_id: recipient.id) }
   end
 
   # Add required params

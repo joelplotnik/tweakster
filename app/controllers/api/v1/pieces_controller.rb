@@ -6,7 +6,7 @@ class Api::V1::PiecesController < ApplicationController
   include Sanitizable
 
   load_and_authorize_resource
-  before_action :authenticate_user!, except: [:index, :show, :tweaks]
+  before_action :authenticate_user!, except: %i[index show tweaks]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
@@ -15,7 +15,7 @@ class Api::V1::PiecesController < ApplicationController
   def index
     channel = Channel.find(params[:channel_id])
     pieces = channel.pieces.paginate(page: params[:page], per_page: 5).order(created_at: :desc)
-    render json: pieces, include: { user: { only: [:id, :username] } }
+    render json: pieces, include: { user: { only: %i[id username] } }
   end
 
   def show
@@ -25,16 +25,16 @@ class Api::V1::PiecesController < ApplicationController
     image_urls = piece.images.map { |image| url_for(image) }
 
     parent_piece = get_parent_piece_info(piece.parent_piece_id)
-  
+
     render json: piece.as_json(include: {
-      user: { only: [:id, :username], methods: [:avatar_url] },
-      channel: { only: [:id, :name] },
-      votes: { only: [:user_id, :vote_type] }
-    }).merge({ 
-      comments_count: comments_count,
-      images: image_urls,
-      parent_piece: parent_piece,
-     })
+                                 user: { only: %i[id username], methods: [:avatar_url] },
+                                 channel: { only: %i[id name] },
+                                 votes: { only: %i[user_id vote_type] }
+                               }).merge({
+                                          comments_count:,
+                                          images: image_urls,
+                                          parent_piece:
+                                        })
   end
 
   def tweaks
@@ -55,22 +55,22 @@ class Api::V1::PiecesController < ApplicationController
       highest_scoring_tweak_info = get_highest_scoring_tweak_piece(tweak)
 
       tweak_json = tweak.as_json(include: {
-        user: { only: [:id, :username], methods: [:avatar_url] },
-        channel: { only: [:id, :name] },
-        votes: { only: [:user_id, :vote_type] }
-      }).merge(images: image_urls)
+                                   user: { only: %i[id username], methods: [:avatar_url] },
+                                   channel: { only: %i[id name] },
+                                   votes: { only: %i[user_id vote_type] }
+                                 }).merge(images: image_urls)
 
       tweak_json.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
 
       tweak_json
     end
-  
+
     render json: tweaks_with_images
   end
 
   def create
     channel = Channel.find(params[:channel_id])
-    if current_user.subscriptions.exists?(channel: channel)
+    if current_user.subscriptions.exists?(channel:)
       piece = Piece.new(piece_params.except(:images))
       sanitized_content = sanitize_rich_content(params[:piece][:content])
       piece.content = sanitized_content
@@ -93,12 +93,13 @@ class Api::V1::PiecesController < ApplicationController
           end
         end
 
-        render json: piece, include: { user: { only: [:id, :username] } }, status: :created
+        render json: piece, include: { user: { only: %i[id username] } }, status: :created
       else
         render json: { errors: piece.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      render json: { error: 'Access denied. You must be subscribed to the channel or an admin to create a piece.' }, status: :forbidden
+      render json: { error: 'Access denied. You must be subscribed to the channel or an admin to create a piece.' },
+             status: :forbidden
     end
   end
 
@@ -114,7 +115,7 @@ class Api::V1::PiecesController < ApplicationController
     piece.content = sanitized_content
 
     if piece.update(piece_params.except(:images))
-      render json: piece, include: { user: { only: [:id, :username] } }, status: :ok
+      render json: piece, include: { user: { only: %i[id username] } }, status: :ok
     else
       render json: { errors: piece.errors.full_messages }, status: :unprocessable_entity
     end
@@ -122,7 +123,7 @@ class Api::V1::PiecesController < ApplicationController
 
   def destroy
     piece = Piece.find(params[:id])
-  
+
     if piece.destroy
       render json: { message: 'Piece deleted successfully' }
     else
@@ -133,12 +134,12 @@ class Api::V1::PiecesController < ApplicationController
   def check_ownership
     piece = Piece.find(params[:id])
     belongs_to_user = piece.user == current_user || current_user.admin?
-    render json: { belongs_to_user: belongs_to_user }
+    render json: { belongs_to_user: }
   end
 
   private
 
   def piece_params
-    params.require(:piece).permit(:title, :content, :youtube_url, :parent_piece_id,  images: [])
+    params.require(:piece).permit(:title, :content, :youtube_url, :parent_piece_id, images: [])
   end
 end
