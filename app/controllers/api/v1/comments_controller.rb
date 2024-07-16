@@ -4,7 +4,7 @@ class Api::V1::CommentsController < ApplicationController
   include Commentable
 
   load_and_authorize_resource except: :index
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_user!, except: %i[index show]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
@@ -17,23 +17,25 @@ class Api::V1::CommentsController < ApplicationController
     excluded_comment_ids = JSON.parse(params[:exclude])
     comments = comments.where.not(id: excluded_comment_ids)
 
-    if params[:sort] == 'new'
-      comments = comments.order(created_at: :desc)
-    else
-      comments = comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
-    end
+    comments = if params[:sort] == 'new'
+                 comments.order(created_at: :desc)
+               else
+                 comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
+               end
 
     root_comments = comments.select { |comment| comment.parent_comment_id.nil? }
-    comments_with_children = root_comments.map { |comment| build_comment_tree(comment, sort_by_score: params[:sort] != 'new') }
+    comments_with_children = root_comments.map do |comment|
+      build_comment_tree(comment, sort_by_score: params[:sort] != 'new')
+    end
     paginated_comments = comments_with_children.paginate(page: params[:page], per_page: 10)
 
     render json: paginated_comments, include: {
       user: { only: [:username] },
-      votes: { only: [:user_id, :vote_type] },
+      votes: { only: %i[user_id vote_type] },
       child_comments: {
         include: {
           user: { only: [:username] },
-          votes: { only: [:user_id, :vote_type] }
+          votes: { only: %i[user_id vote_type] }
         }
       }
     }
@@ -42,19 +44,17 @@ class Api::V1::CommentsController < ApplicationController
   def create
     comment = Comment.new(comment_params)
     comment.user = current_user
-  
+
     if comment.save
-      unless comment.user == comment.piece.user
-        CommentOnPieceNotifier.with(record: comment).deliver(comment.piece.user)
-      end
-      
+      CommentOnPieceNotifier.with(record: comment).deliver(comment.piece.user) unless comment.user == comment.piece.user
+
       render json: build_comment_tree(comment), include: {
         user: { only: [:username] },
-        votes: { only: [:user_id, :vote_type] },
+        votes: { only: %i[user_id vote_type] },
         child_comments: {
           include: {
             user: { only: [:username] },
-            votes: { only: [:user_id, :vote_type] }
+            votes: { only: %i[user_id vote_type] }
           }
         }
       }, status: :created
@@ -69,11 +69,11 @@ class Api::V1::CommentsController < ApplicationController
     if comment.update(comment_params)
       render json: build_comment_tree(comment), include: {
         user: { only: [:username] },
-        votes: { only: [:user_id, :vote_type] },
+        votes: { only: %i[user_id vote_type] },
         child_comments: {
           include: {
             user: { only: [:username] },
-            votes: { only: [:user_id, :vote_type] }
+            votes: { only: %i[user_id vote_type] }
           }
         }
       }, status: :created
@@ -85,7 +85,7 @@ class Api::V1::CommentsController < ApplicationController
   def destroy
     comment = Comment.find(params[:id])
     comment.destroy
-  
+
     if comment.destroyed?
       render json: { message: 'Comment and its children successfully deleted' }, status: :ok
     else
@@ -96,7 +96,7 @@ class Api::V1::CommentsController < ApplicationController
   def check_ownership
     comment = Comment.find(params[:id])
     belongs_to_user = comment.user == current_user || current_user.admin?
-    render json: { belongs_to_user: belongs_to_user }
+    render json: { belongs_to_user: }
   end
 
   private

@@ -4,7 +4,7 @@ class User < ApplicationRecord
 
   before_save :calculate_integrity
   before_validation :strip_whitespace
-  
+
   has_one_attached :avatar
   has_many :subscriptions, dependent: :destroy
   has_many :channels, through: :subscriptions, dependent: :destroy
@@ -15,15 +15,15 @@ class User < ApplicationRecord
   has_many :reports, foreign_key: 'reporter_id'
   has_many :sent_messages, class_name: 'Message', foreign_key: 'sender_id'
   has_many :received_messages, class_name: 'Message', foreign_key: 'receiver_id'
-  has_many :notifications, as: :recipient, dependent: :destroy, class_name: "Noticed::Notification"
-  has_many :notification_mentions, as: :record, dependent: :destroy, class_name: "Noticed::Event"
-   # Users you follow
+  has_many :notifications, as: :recipient, dependent: :destroy, class_name: 'Noticed::Notification'
+  has_many :notification_mentions, as: :record, dependent: :destroy, class_name: 'Noticed::Event'
+  # Users you follow
   has_many :followed_users, foreign_key: :follower_id,
-    class_name: 'Relationship', dependent: :destroy
+                            class_name: 'Relationship', dependent: :destroy
   has_many :followees, through: :followed_users, dependent: :destroy
-   # Users following you
+  # Users following you
   has_many :following_users, foreign_key: :followee_id,
-    class_name: 'Relationship', dependent: :destroy
+                             class_name: 'Relationship', dependent: :destroy
   has_many :followers, through: :following_users, dependent: :destroy
 
   serialize :favorite_users, Array
@@ -31,22 +31,21 @@ class User < ApplicationRecord
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :database_authenticatable, :jwt_authenticatable, 
+         :database_authenticatable, :jwt_authenticatable,
          jwt_revocation_strategy: self
 
-  
   validate :validate_username
-  validates :username, presence: true, 
-         uniqueness: { case_sensitive: false }, 
-         length: { minimum: 2, maximum: 25 },
-         format: { with: /^[a-zA-Z0-9_\.]*$/, multiline: true }
+  validates :username, presence: true,
+                       uniqueness: { case_sensitive: false },
+                       length: { minimum: 2, maximum: 25 },
+                       format: { with: /^[a-zA-Z0-9_.]*$/, multiline: true }
   validates :url, allow_blank: true, length: { minimum: 7, maximum: 74 }
   validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
   validate :validate_favorite_channels_count
   validate :validate_favorite_users_count
 
-  ROLES = %w{admin moderator advertiser user}
-  
+  ROLES = %w[admin moderator advertiser user]
+
   # Create methods at runtime for users (meta programming)
   ROLES.each do |role_name|
     define_method "#{role_name}?" do
@@ -62,23 +61,26 @@ class User < ApplicationRecord
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
-    if login = conditions.delete(:login)
-      where(conditions.to_h).where(['lower(username) = :value OR lower(email) = :value', { :value => login.downcase}]).first
-    elsif conditions.has_key?(:username) || conditions.has_key?(:email)
-      where(conditions.to_h).first     
+    login = conditions.delete(:login)
+
+    if login
+      where(conditions.to_h).where(['lower(username) = :value OR lower(email) = :value',
+                                    { value: login.downcase }]).first
+    elsif conditions.key?(:username) || conditions.key?(:email)
+      where(conditions.to_h).first
     end
   end
-         
+
   def jwt_payload
-    super.merge({ username: self.username, role: self.role }) 
+    super.merge({ username:, role: })
   end
 
   private
 
   def validate_username
-    if User.where(email: username).exists?
-      errors.add(:username, :invalid)
-    end
+    return unless User.where(email: username).exists?
+
+    errors.add(:username, :invalid)
   end
 
   def validate_favorite_channels_count
@@ -90,7 +92,7 @@ class User < ApplicationRecord
   end
 
   def strip_whitespace
-    self.url&.strip!
-    self.bio&.strip!
+    url&.strip!
+    bio&.strip!
   end
 end
