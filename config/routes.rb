@@ -44,7 +44,6 @@ Rails.application.routes.draw do
         resources :pieces, only: %i[show index create update destroy] do
           member do
             get 'check_ownership'
-            get 'tweaks', to: 'pieces#tweaks'
           end
 
           resources :comments, only: %i[index create update destroy] do

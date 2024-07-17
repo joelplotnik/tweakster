@@ -5,21 +5,16 @@ class Api::V1::HomeController < ApplicationController
   include Pieceable
 
   def index
-    all_pieces = Piece.where(parent_piece_id: nil)
     sorted_pieces = if params[:sort] == 'new'
-                      all_pieces.order(created_at: :desc)
+                      Piece.order(created_at: :desc)
                     else
-                      all_pieces.sort_by { |piece| calculate_piece_score(piece) }.reverse
+                      Piece.all.sort_by { |piece| calculate_piece_score(piece) }.reverse
                     end
 
     paginated_pieces = sorted_pieces.paginate(page: params[:page], per_page: 10)
 
     pieces_with_images = paginated_pieces.map do |piece|
       image_urls = piece.images.map { |image| url_for(image) }
-
-      parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
-
-      highest_scoring_tweak_info = get_highest_scoring_tweak_piece(piece)
 
       piece_data = piece.as_json(include: {
                                    user: {
@@ -29,11 +24,8 @@ class Api::V1::HomeController < ApplicationController
                                    channel: { only: %i[id name] },
                                    votes: { only: %i[user_id vote_type] }
                                  }).merge({
-                                            images: image_urls,
-                                            parent_piece: parent_piece_info
+                                            images: image_urls
                                           })
-
-      piece_data.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
 
       piece_data
     end
@@ -62,8 +54,6 @@ class Api::V1::HomeController < ApplicationController
     pieces_with_images = paginated_personal_pieces.map do |piece|
       image_urls = piece.images.map { |image| url_for(image) }
 
-      parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
-
       piece_data = piece.as_json(include: {
                                    user: {
                                      only: %i[id username],
@@ -72,13 +62,8 @@ class Api::V1::HomeController < ApplicationController
                                    channel: { only: %i[id name] },
                                    votes: { only: %i[user_id vote_type] }
                                  }).merge({
-                                            images: image_urls,
-                                            parent_piece: parent_piece_info
+                                            images: image_urls
                                           })
-
-      highest_scoring_tweak_info = get_highest_scoring_tweak_piece(piece)
-
-      piece_data.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
 
       piece_data
     end

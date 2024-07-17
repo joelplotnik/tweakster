@@ -91,12 +91,8 @@ class Api::V1::UsersController < ApplicationController
     pieces_info = pieces.paginate(page:, per_page:).order(created_at: :desc).map do |piece|
       image_urls = piece.images.map { |image| url_for(image) }
 
-      parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
-
-      highest_scoring_tweak_info = get_highest_scoring_tweak_piece(piece)
-
-      piece_json = piece.as_json(only: %i[id title parent_piece_id content created_at upvotes downvotes channel_id
-                                          comments_count tweaks_count youtube_url],
+      piece_json = piece.as_json(only: %i[id title content created_at upvotes downvotes channel_id
+                                          comments_count youtube_url],
                                  include: {
                                    user: { only: %i[id username], methods: [:avatar_url] },
                                    channel: { only: %i[id name] },
@@ -104,9 +100,6 @@ class Api::V1::UsersController < ApplicationController
                                  })
 
       piece_json['images'] = image_urls
-      piece_json['parent_piece'] = parent_piece_info
-
-      piece_json.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
 
       piece_json
     end

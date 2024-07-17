@@ -90,18 +90,13 @@ class Api::V1::ChannelsController < ApplicationController
     rounded_popularity_percentage = popularity_percentage.round
 
     pieces_with_images = channel.pieces
-                                .where(parent_piece_id: nil)
                                 .order(created_at: :desc)
                                 .paginate(page: params[:page], per_page: 10)
                                 .map do |piece|
       image_urls = piece.images.map { |image| url_for(image) }
 
-      parent_piece_info = get_parent_piece_info(piece.parent_piece_id)
-
-      highest_scoring_tweak_info = get_highest_scoring_tweak_piece(piece)
-
-      piece_json = piece.as_json(only: %i[id title parent_piece_id content created_at upvotes downvotes channel_id
-                                          comments_count tweaks_count youtube_url],
+      piece_json = piece.as_json(only: %i[id title content created_at upvotes downvotes channel_id
+                                          youtube_url],
                                  include: {
                                    channel: { only: %i[id name] },
                                    user: { only: %i[id username], methods: [:avatar_url] },
@@ -109,9 +104,7 @@ class Api::V1::ChannelsController < ApplicationController
                                  })
 
       piece_json['images'] = image_urls
-      piece_json['parent_piece'] = parent_piece_info
-
-      piece_json.merge!(tweak: highest_scoring_tweak_info) if highest_scoring_tweak_info.present?
+      piece_json['comments_count'] = piece.comments.count
 
       piece_json
     end
@@ -130,7 +123,7 @@ class Api::V1::ChannelsController < ApplicationController
       },
       subscriber_count: channel.subscribers.count,
       pieces: pieces_with_images,
-      piece_count: channel.pieces.where(parent_piece_id: nil).count,
+      piece_count: channel.pieces.count,
       popularity: rounded_popularity_percentage
     }
 

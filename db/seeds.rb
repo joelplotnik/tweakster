@@ -223,27 +223,6 @@ users.each do |user|
   end
 end
 
-# Create Tweaks (50% chance)
-total_pieces = pieces.count
-desired_tweak_count = (total_pieces * 0.25).to_i
-tweak_count = 0
-
-pieces.each do |piece|
-  break if tweak_count >= desired_tweak_count
-
-  parent_candidates = Piece.where(channel_id: piece.channel_id, parent_piece_id: nil).where.not(id: piece.id)
-
-  next if parent_candidates.empty?
-
-  parent_piece = parent_candidates.sample
-  success = piece.update(parent_piece_id: parent_piece.id)
-
-  if success && parent_piece.user != piece.user
-    TweakOfPieceNotifier.with(record: piece).deliver(parent_piece.user)
-    tweak_count += 1
-  end
-end
-
 # Create Reports
 users.each do |user|
   # Pieces

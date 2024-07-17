@@ -10,7 +10,6 @@ class Ability
     can :popular, User # allow users to view popular users
     can :search, Channel # allow users to search for channels
     can :popular, Channel # allow users to view popular channels
-    can :tweaks, Piece # allow users to view tweaks
 
     return unless user.present? # additional permissions for logged in users
 
