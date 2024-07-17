@@ -2,9 +2,9 @@ module Commentable
   extend ActiveSupport::Concern
 
   def calculate_comment_score(comment)
-    likes = comment.votes.where(vote_type: 1).count
-    dislikes = comment.votes.where(vote_type: -1).count
-    likes - dislikes
+    upvotes = comment.votes.where(vote_type: 1).count
+    downvotes = comment.votes.where(vote_type: -1).count
+    upvotes - downvotes
   end
 
   def build_comment_tree(comment, sort_by_score: false)

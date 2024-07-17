@@ -237,8 +237,8 @@ const PiecePage = () => {
       <div key={piece.id} className={classes.piece}>
         <div className={classes.vote}>
           <PieceVote
-            likes={piece.likes}
-            dislikes={piece.dislikes}
+            upvotes={piece.upvotes}
+            downvote={piece.downvote}
             channelId={piece.channel_id}
             pieceId={piece.id}
             userVotes={piece.votes}

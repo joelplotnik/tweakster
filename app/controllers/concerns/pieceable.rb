@@ -2,15 +2,15 @@ module Pieceable
   extend ActiveSupport::Concern
 
   def calculate_piece_score(piece)
-    likes = piece.votes.where(vote_type: 1).count
-    dislikes = piece.votes.where(vote_type: -1).count
-    likes - dislikes
+    upvotes = piece.votes.where(vote_type: 1).count
+    downvotes = piece.votes.where(vote_type: -1).count
+    upvotes - downvotes
   end
 
   def calculate_piece_votes(piece)
-    likes = piece.likes
-    dislikes = piece.dislikes
-    likes + dislikes
+    upvotes = piece.upvotes
+    downvotes = piece.downvotes
+    upvotes + downvotes
   end
 
   def get_parent_piece_info(parent_piece_id)
@@ -26,8 +26,8 @@ module Pieceable
     }
     {
       title: parent_piece_data.title,
-      likes: parent_piece_data.likes,
-      dislikes: parent_piece_data.dislikes,
+      upvotes: parent_piece_data.upvotes,
+      downvotes: parent_piece_data.downvotes,
       user: parent_piece_user,
       channel: parent_piece_channel
     }

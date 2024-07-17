@@ -6,19 +6,20 @@ module Userable
   end
 
   def calculate_integrity
-    total_likes = pieces.sum(:likes) + comments.sum(:likes)
-    total_dislikes = pieces.sum(:dislikes) + comments.sum(:dislikes)
-    total_votes = total_likes + total_dislikes
+    total_upvotes = pieces.sum(:upvotes) + comments.sum(:upvotes)
+    total_downvotes = pieces.sum(:downvotes) + comments.sum(:downvotes)
+    total_votes = total_upvotes + total_downvotes
 
     # Default starting integrity value
     default_integrity = 0.0
 
     if total_votes >= min_votes_threshold
-      weighted_likes = calculate_weighted_votes(total_likes, :piece) + calculate_weighted_votes(total_likes, :comment)
-      weighted_dislikes = calculate_weighted_votes(total_dislikes,
-                                                   :piece) + calculate_weighted_votes(total_dislikes, :comment)
+      weighted_upvotes = calculate_weighted_votes(total_upvotes,
+                                                  :piece) + calculate_weighted_votes(total_upvotes, :comment)
+      weighted_downvotes = calculate_weighted_votes(total_downvotes,
+                                                    :piece) + calculate_weighted_votes(total_downvotes, :comment)
 
-      self.integrity = default_integrity + (weighted_likes.to_f / (weighted_likes + weighted_dislikes).to_f) * (100 - default_integrity)
+      self.integrity = default_integrity + (weighted_upvotes.to_f / (weighted_upvotes + weighted_downvotes).to_f) * (100 - default_integrity)
     else
       self.integrity = default_integrity
     end

@@ -308,8 +308,8 @@ const PieceModal = () => {
                     </div>
                     <div className={classes['header-center']}>
                       <PieceVote
-                        likes={piece.likes}
-                        dislikes={piece.dislikes}
+                        upvotes={piece.upvotes}
+                        downvotes={piece.downvotes}
                         channelId={piece.channel_id}
                         pieceId={piece.id}
                         userVotes={piece.votes}
@@ -323,8 +323,8 @@ const PieceModal = () => {
                   <div className={classes.piece} ref={pieceClassModalRef}>
                     <div className={classes.vote}>
                       <PieceVote
-                        likes={piece.likes}
-                        dislikes={piece.dislikes}
+                        upvotes={piece.upvotes}
+                        downvotes={piece.downvotes}
                         channelId={piece.channel_id}
                         pieceId={piece.id}
                         userVotes={piece.votes}

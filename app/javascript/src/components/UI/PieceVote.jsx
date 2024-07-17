@@ -15,8 +15,8 @@ import AuthModal from './Modals/AuthModal'
 import classes from './PieceVote.module.css'
 
 const PieceVote = ({
-  likes,
-  dislikes,
+  upvotes,
+  downvotes,
   channelId,
   pieceId,
   userVotes,
@@ -27,16 +27,16 @@ const PieceVote = ({
   const userId = useSelector(state => state.user.user?.id)
   const activePiece = useSelector(state => state.piece.piece)
   const [showModal, setShowModal] = useState(false)
-  const [localLikes, setLocalLikes] = useState(likes)
-  const [localDislikes, setLocalDislikes] = useState(dislikes)
+  const [localUpvotes, setLocalUpvotes] = useState(upvotes)
+  const [localDownvotes, setLocalDownvotes] = useState(downvotes)
   const [localVotes, setLocalVotes] = useState(userVotes)
   const dispatch = useDispatch()
 
   useEffect(() => {
     if (activePiece && activePiece.id === pieceId) {
       setLocalVotes(activePiece.votes)
-      setLocalLikes(activePiece.likes)
-      setLocalDislikes(activePiece.dislikes)
+      setLocalUpvotes(activePiece.upvotes)
+      setLocalDownvotes(activePiece.downvotes)
     }
   }, [activePiece, pieceId])
 
@@ -92,38 +92,38 @@ const PieceVote = ({
         if (userVoteIndex !== -1) {
           if (updatedVotes[userVoteIndex].vote_type === 1 && voteType === -1) {
             // User's previous vote was a like, and the incoming vote is a dislike
-            setLocalLikes(prevLikes => prevLikes - 1)
-            setLocalDislikes(prevDislikes => prevDislikes + 1)
+            setLocalUpvotes(prevUpvotes => prevUpvotes - 1)
+            setLocalDownvotes(prevDownvotes => prevDownvotes + 1)
             updatedVotes[userVoteIndex].vote_type = -1 // Update the vote_type
           } else if (
             updatedVotes[userVoteIndex].vote_type === -1 &&
             voteType === 1
           ) {
             // User's previous vote was a dislike, and the incoming vote is a like
-            setLocalLikes(prevLikes => prevLikes + 1)
-            setLocalDislikes(prevDislikes => prevDislikes - 1)
+            setLocalUpvotes(prevUpvotes => prevUpvotes + 1)
+            setLocalDownvotes(prevDownvotes => prevDownvotes - 1)
             updatedVotes[userVoteIndex].vote_type = 1 // Update the vote_type
           } else if (
             updatedVotes[userVoteIndex].vote_type === 1 &&
             voteType === 1
           ) {
             // User's previous vote was a like, and the incoming vote is also a like
-            setLocalLikes(prevLikes => prevLikes - 1)
+            setLocalUpvotes(prevUpvotes => prevUpvotes - 1)
             updatedVotes.splice(userVoteIndex, 1) // Remove the user's vote
           } else if (
             updatedVotes[userVoteIndex].vote_type === -1 &&
             voteType === -1
           ) {
             // User's previous vote was a dislike, and the incoming vote is also a dislike
-            setLocalDislikes(prevDislikes => prevDislikes - 1)
+            setLocalDownvotes(prevDownvotes => prevDownvotes - 1)
             updatedVotes.splice(userVoteIndex, 1) // Remove the user's vote
           }
         } else {
           updatedVotes.push({ user_id: userId, vote_type: voteType })
           if (voteType === 1) {
-            setLocalLikes(prevLikes => prevLikes + 1)
+            setLocalUpvotes(prevUpvotes => prevUpvotes + 1)
           } else if (voteType === -1) {
-            setLocalDislikes(prevDislikes => prevDislikes + 1)
+            setLocalDownvotes(prevDownvotes => prevDownvotes + 1)
           }
         }
         return updatedVotes
@@ -162,7 +162,7 @@ const PieceVote = ({
           )}
         </button>
         <span className={classes['vote-count']}>
-          {localLikes - localDislikes}
+          {localUpvotes - localDownvotes}
         </span>
         <button className={classes['vote-button']} onClick={handleDownvote}>
           {userVote?.vote_type === -1 ? (

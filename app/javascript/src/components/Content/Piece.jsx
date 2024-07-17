@@ -174,8 +174,8 @@ const Piece = ({ piece }) => {
       <div onClick={handlePieceLinkClick} className={classes.piece}>
         <div className={classes.vote}>
           <PieceVote
-            likes={piece.likes}
-            dislikes={piece.dislikes}
+            upvotes={piece.upvotes}
+            downvotes={piece.downvotes}
             channelId={piece.channel_id}
             pieceId={piece.id}
             userVotes={piece.votes}
@@ -266,7 +266,7 @@ const Piece = ({ piece }) => {
                   >
                     {piece.tweak.user.username}
                   </Link>
-                  (+{piece.tweak.vote_difference} likes)
+                  (+{piece.tweak.vote_difference} upvotes)
                 </p>
                 <div className={classes['disclaimer-btn-container']}>
                   <Link

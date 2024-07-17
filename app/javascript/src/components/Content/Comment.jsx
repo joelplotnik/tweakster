@@ -124,8 +124,8 @@ const Comment = ({
         <p className={classes['comment-message']}>{comment.message}</p>
         <div className={classes['comment-icons']}>
           <CommentVote
-            likes={comment.likes}
-            dislikes={comment.dislikes}
+            upvotes={comment.upvotes}
+            downvotes={comment.downvotes}
             channelId={piece.channel_id}
             pieceId={comment.piece_id}
             commentId={comment.id}

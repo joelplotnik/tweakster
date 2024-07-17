@@ -27,38 +27,38 @@ const pieceSlice = createSlice({
         if (userVoteIndex !== -1) {
           if (piece.votes[userVoteIndex].vote_type === 1 && voteType === -1) {
             // User's previous vote was a like, and the incoming vote is a dislike
-            piece.likes -= 1
-            piece.dislikes += 1
+            piece.upvotes -= 1
+            piece.downvotes += 1
             piece.votes[userVoteIndex].vote_type = -1 // Update the vote_type
           } else if (
             piece.votes[userVoteIndex].vote_type === -1 &&
             voteType === 1
           ) {
             // User's previous vote was a dislike, and the incoming vote is a like
-            piece.likes += 1
-            piece.dislikes -= 1
+            piece.upvotes += 1
+            piece.downvotes -= 1
             piece.votes[userVoteIndex].vote_type = 1 // Update the vote_type
           } else if (
             piece.votes[userVoteIndex].vote_type === 1 &&
             voteType === 1
           ) {
             // User's previous vote was a like, and the incoming vote is also a like
-            piece.likes -= 1
+            piece.upvotes -= 1
             piece.votes.splice(userVoteIndex, 1) // Remove the user's vote
           } else if (
             piece.votes[userVoteIndex].vote_type === -1 &&
             voteType === -1
           ) {
             // User's previous vote was a dislike, and the incoming vote is also a dislike
-            piece.dislikes -= 1
+            piece.downvotes -= 1
             piece.votes.splice(userVoteIndex, 1) // Remove the user's vote
           }
         } else {
           piece.votes.push({ user_id: userId, vote_type: voteType })
           if (voteType === 1) {
-            piece.likes += 1
+            piece.upvotes += 1
           } else if (voteType === -1) {
-            piece.dislikes += 1
+            piece.downvotes += 1
           }
         }
       }

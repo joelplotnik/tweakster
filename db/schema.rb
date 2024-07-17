@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 20_240_701_183_259) do
+ActiveRecord::Schema[7.0].define(version: 20_240_717_185_014) do
   create_table 'active_storage_attachments', charset: 'utf8mb4', collation: 'utf8mb4_0900_ai_ci', force: :cascade do |t|
     t.string 'name', null: false
     t.string 'record_type', null: false
@@ -60,8 +60,8 @@ ActiveRecord::Schema[7.0].define(version: 20_240_701_183_259) do
     t.datetime 'created_at', null: false
     t.datetime 'updated_at', null: false
     t.bigint 'parent_comment_id'
-    t.integer 'likes', default: 0
-    t.integer 'dislikes', default: 0
+    t.integer 'upvotes', default: 0
+    t.integer 'downvotes', default: 0
     t.index ['parent_comment_id'], name: 'index_comments_on_parent_comment_id'
   end
 
@@ -96,8 +96,8 @@ ActiveRecord::Schema[7.0].define(version: 20_240_701_183_259) do
     t.datetime 'updated_at', null: false
     t.integer 'user_id'
     t.integer 'channel_id'
-    t.integer 'likes', default: 0
-    t.integer 'dislikes', default: 0
+    t.integer 'upvotes', default: 0
+    t.integer 'downvotes', default: 0
     t.integer 'comments_count', default: 0
     t.bigint 'parent_piece_id'
     t.integer 'tweaks_count', default: 0

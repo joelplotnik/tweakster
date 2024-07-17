@@ -228,7 +228,7 @@ const Tweak = ({ tweak }) => {
                   >
                     {tweak.tweak.user.username}
                   </Link>
-                  (+{tweak.tweak.vote_difference} likes)
+                  (+{tweak.tweak.vote_difference} upvotes)
                 </p>
                 <div className={classes['disclaimer-btn-container']}>
                   <Link
@@ -248,8 +248,8 @@ const Tweak = ({ tweak }) => {
             <div className={classes['footer-container']}>
               <div className={classes.vote}>
                 <PieceVote
-                  likes={tweak.likes}
-                  dislikes={tweak.dislikes}
+                  upvotes={tweak.upvotes}
+                  downvotes={tweak.downvotes}
                   channelId={tweak.channel_id}
                   pieceId={tweak.id}
                   userVotes={tweak.votes}

@@ -95,7 +95,7 @@ class Api::V1::UsersController < ApplicationController
 
       highest_scoring_tweak_info = get_highest_scoring_tweak_piece(piece)
 
-      piece_json = piece.as_json(only: %i[id title parent_piece_id content created_at likes dislikes channel_id
+      piece_json = piece.as_json(only: %i[id title parent_piece_id content created_at upvotes downvotes channel_id
                                           comments_count tweaks_count youtube_url],
                                  include: {
                                    user: { only: %i[id username], methods: [:avatar_url] },

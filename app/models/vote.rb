@@ -8,19 +8,19 @@ class Vote < ApplicationRecord
   validates_uniqueness_of :user_id, scope: %i[votable_type votable_id],
                                     message: 'has already voted on this piece or comment'
 
-  after_create :update_likes_and_dislikes_and_integrity
-  after_update :update_likes_and_dislikes_and_integrity
-  after_destroy :update_likes_and_dislikes_and_integrity
+  after_create :update_upvotes_and_downvotes_and_integrity
+  after_update :update_upvotes_and_downvotes_and_integrity
+  after_destroy :update_upvotes_and_downvotes_and_integrity
 
   private
 
-  def update_likes_and_dislikes_and_integrity
+  def update_upvotes_and_downvotes_and_integrity
     return unless votable.present?
 
-    likes = votable.votes.where(vote_type: 1).count
-    dislikes = votable.votes.where(vote_type: -1).count
+    upvotes = votable.votes.where(vote_type: 1).count
+    downvotes = votable.votes.where(vote_type: -1).count
 
-    votable.update_columns(likes:, dislikes:)
+    votable.update_columns(upvotes:, downvotes:)
 
     # Update integrity for the user whose piece or comment received the vote
     votable_user = votable.user
