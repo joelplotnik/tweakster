@@ -1,2 +1,2 @@
 # Start with production config
-require File.expand_path('../production.rb', __FILE__)
+require File.expand_path('production.rb', __dir__)

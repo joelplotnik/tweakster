@@ -9,17 +9,21 @@ module Commentable
 
   def build_comment_tree(comment, sort_by_score: false)
     comment_info = {
-      comment: comment,
+      comment:,
       user: comment.user.as_json(only: [:username]),
-      votes: comment.votes.as_json(only: [:user_id, :vote_type]),
+      votes: comment.votes.as_json(only: %i[user_id vote_type]),
       child_comments: []
     }
 
     child_comments = comment.child_comments
-    child_comments = child_comments.sort_by { |child_comment| calculate_comment_score(child_comment) }.reverse if sort_by_score
+    if sort_by_score
+      child_comments = child_comments.sort_by do |child_comment|
+        calculate_comment_score(child_comment)
+      end.reverse
+    end
 
     child_comments.each do |child_comment|
-      comment_info[:child_comments] << build_comment_tree(child_comment, sort_by_score: sort_by_score)
+      comment_info[:child_comments] << build_comment_tree(child_comment, sort_by_score:)
     end
 
     comment_info
