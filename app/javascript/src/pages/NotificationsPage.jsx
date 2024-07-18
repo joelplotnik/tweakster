@@ -109,8 +109,6 @@ const NotificationsPage = () => {
       piece_title,
       piece_channel_id,
       piece_id,
-      parent_piece_id,
-      parent_piece_title,
     } = notification
 
     if (event.record_type === 'Comment') {
@@ -143,10 +141,10 @@ const NotificationsPage = () => {
           <div className={classes.notificationContent}>
             <span className={classes.username}>{username}</span> tweaked{' '}
             <a
-              href={`/channels/${piece_channel_id}/pieces/${parent_piece_id}?tab=tweaks`}
+              href={`/channels/${piece_channel_id}/pieces/${piece_id}?tab=tweaks`}
               className={classes.link}
             >
-              {parent_piece_title}
+              {piece_title}
             </a>
           </div>
         </li>

@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import Comments from './Comments'
 import classes from './Interactions.module.css'
-import Tweaks from './Tweaks'
 
 const Interactions = ({ pieceClassModalRef }) => {
   const location = useLocation()
@@ -21,9 +20,7 @@ const Interactions = ({ pieceClassModalRef }) => {
       const params = new URLSearchParams(location.search)
       const tabParam = params.get('tab')
 
-      if (tabParam === 'tweaks') {
-        setActiveTab('tweaks')
-      } else {
+      if (tabParam === 'comments' || 'tweaks') {
         setActiveTab('comments')
       }
     }
@@ -31,13 +28,8 @@ const Interactions = ({ pieceClassModalRef }) => {
 
   const handleTabClick = tab => {
     const params = new URLSearchParams(location.search)
-    const tabParam = params.get('tab')
-
-    if (tabParam) {
-      params.set('tab', tab)
-      navigate(`${location.pathname}?${params}`, { replace: true })
-    }
-
+    params.set('tab', tab)
+    navigate(`${location.pathname}?${params}`, { replace: true })
     setActiveTab(tab)
   }
 
@@ -52,25 +44,11 @@ const Interactions = ({ pieceClassModalRef }) => {
         >
           {piece.comments_count} Comments
         </button>
-        <button
-          className={`${classes.tab} ${
-            activeTab === 'tweaks' ? `${classes.active}` : ''
-          }`}
-          onClick={() => handleTabClick('tweaks')}
-        >
-          {piece.tweaks_count} Tweaks
-        </button>
       </div>
 
       {activeTab === 'comments' && (
         <div>
           <Comments piece={piece} pieceClassModalRef={pieceClassModalRef} />
-        </div>
-      )}
-
-      {activeTab === 'tweaks' && (
-        <div>
-          <Tweaks piece={piece} pieceClassModalRef={pieceClassModalRef} />
         </div>
       )}
     </>

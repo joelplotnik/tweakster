@@ -24,7 +24,8 @@ class Api::V1::HomeController < ApplicationController
                                    channel: { only: %i[id name] },
                                    votes: { only: %i[user_id vote_type] }
                                  }).merge({
-                                            images: image_urls
+                                            images: image_urls,
+                                            comments_count: piece.comments.size
                                           })
 
       piece_data
@@ -62,7 +63,8 @@ class Api::V1::HomeController < ApplicationController
                                    channel: { only: %i[id name] },
                                    votes: { only: %i[user_id vote_type] }
                                  }).merge({
-                                            images: image_urls
+                                            images: image_urls,
+                                            comments_count: piece.comments.size
                                           })
 
       piece_data

@@ -21,7 +21,7 @@ class Api::V1::PiecesController < ApplicationController
   def show
     piece = Piece.includes(:user, :channel, :comments, :votes).find(params[:id])
 
-    comments_count = piece.comments.count
+    comments_count = piece.comments.size
     image_urls = piece.images.map { |image| url_for(image) }
 
     render json: piece.as_json(include: {

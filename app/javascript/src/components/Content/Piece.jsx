@@ -45,8 +45,6 @@ const Piece = ({ piece }) => {
   const pieceUserID = piece.user.id
   const currentUser = pieceUserID === parseInt(userId, 10)
 
-  const tweaked = !!piece.tweak
-
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showAuthModal)
   }
@@ -62,41 +60,6 @@ const Piece = ({ piece }) => {
   const handleDropdownToggle = event => {
     event.stopPropagation()
     setShowDropdown(!showDropdown)
-  }
-
-  const handleEditClick = event => {
-    event.stopPropagation()
-    if (piece.tweaks_count === 0) {
-      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}/edit`)
-    }
-  }
-
-  const handleParentPieceClick = event => {
-    event.stopPropagation()
-    window.open(
-      `/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`,
-      '_blank'
-    )
-  }
-
-  const handleDeleteClick = async () => {
-    const response = await fetch(
-      `${API_URL}/channels/${piece.channel_id}/pieces/${piece.id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      throw json({ message: 'Could not delete piece' }, { status: 500 })
-    }
-
-    navigate(location.pathname)
-    setRefreshRoot(true)
   }
 
   const handleReportClick = () => {
@@ -227,19 +190,7 @@ const Piece = ({ piece }) => {
               - {moment(piece.created_at).fromNow()}
             </p>
           </div>
-          <div className={tweaked ? classes['tweak-effect'] : classes.main}>
-            {piece.parent_piece && (
-              <div className={classes['parent-piece-bar']}>
-                <p className={classes['parent-piece-text']}>
-                  Tweak of{' '}
-                  <Link onClick={handleParentPieceClick}>
-                    {piece.parent_piece.title.length > 20
-                      ? `${piece.parent_piece.title.slice(0, 20)}...`
-                      : piece.parent_piece.title}
-                  </Link>
-                </p>
-              </div>
-            )}
+          <div className={classes.main}>
             <div className={classes.body}>
               <h2 className="title-container">{piece.title}</h2>
               <div className={classes.carousel}>
@@ -252,46 +203,13 @@ const Piece = ({ piece }) => {
                 />
               </div>
             </div>
-            {tweaked && (
-              <div className={classes['disclaimer-container']}>
-                <RiFlaskFill className={classes['disclaimer-icon']} />
-                <p className={classes['disclaimer-text']}>
-                  Tweaked by
-                  <Link
-                    to={`/users/${piece.tweak.user.id}`}
-                    className={classes['tweak-user-link']}
-                    onClick={stopPropagation}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {piece.tweak.user.username}
-                  </Link>
-                  (+{piece.tweak.vote_difference} upvotes)
-                </p>
-                <div className={classes['disclaimer-btn-container']}>
-                  <Link
-                    to={`/channels/${piece.tweak.channel_id}/pieces/${piece.tweak.piece_id}`}
-                    className={classes['disclaimer-btn']}
-                    onClick={stopPropagation}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Tweak
-                  </Link>
-                </div>
-              </div>
-            )}
           </div>
           <div className={classes.footer}>
             <div className={classes['footer-container']}>
-              {!piece.parent_piece_id && (
-                <div className={`${classes.link} ${classes.tweak}`}>
-                  <RiFlaskLine className={classes.icon} />
-                  <span className={classes.text}>
-                    {piece.tweaks_count} Tweaks
-                  </span>
-                </div>
-              )}
+              <div className={`${classes.link} ${classes.tweak}`}>
+                <RiFlaskLine className={classes.icon} />
+                <span className={classes.text}>{3} Tweaks</span>
+              </div>
               <div className={`${classes.link} ${classes.comms}`}>
                 <RiChat3Line className={classes.icon} />
                 <span className={classes.text}>
@@ -314,20 +232,7 @@ const Piece = ({ piece }) => {
                 </div>
                 {showDropdown && (
                   <div className={classes.dropdown}>
-                    {token && (currentUser || userRole === 'admin') ? (
-                      <>
-                        <button
-                          onClick={handleEditClick}
-                          disabled={piece.tweaks_count > 0}
-                        >
-                          <RiEditBoxLine /> Edit
-                        </button>
-                        <button onClick={() => handleConfirmationModalToggle()}>
-                          <RiDeleteBin7Line className={classes.danger} />
-                          <span className={classes.danger}>Delete</span>
-                        </button>
-                      </>
-                    ) : (
+                    {token && (
                       <>
                         <button onClick={handleReportClick}>
                           <RiFlagLine className={classes.danger} />
@@ -344,12 +249,6 @@ const Piece = ({ piece }) => {
       </div>
       {showAuthModal && (
         <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
-      )}
-      {showConfirmationModal && (
-        <ConfirmationModal
-          onConfirm={handleDeleteClick}
-          onClick={handleConfirmationModalToggle}
-        />
       )}
       {showReportModal && (
         <ReportModal
