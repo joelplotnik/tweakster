@@ -23,21 +23,11 @@ class Api::V1::CommentsController < ApplicationController
                  comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
                end
 
-    root_comments = comments.select { |comment| comment.parent_comment_id.nil? }
-    comments_with_children = root_comments.map do |comment|
-      build_comment_tree(comment, sort_by_score: params[:sort] != 'new')
-    end
-    paginated_comments = comments_with_children.paginate(page: params[:page], per_page: 10)
+    paginated_comments = comments.paginate(page: params[:page], per_page: 10)
 
     render json: paginated_comments, include: {
       user: { only: [:username] },
-      votes: { only: %i[user_id vote_type] },
-      child_comments: {
-        include: {
-          user: { only: [:username] },
-          votes: { only: %i[user_id vote_type] }
-        }
-      }
+      votes: { only: %i[user_id vote_type] }
     }
   end
 
@@ -48,15 +38,9 @@ class Api::V1::CommentsController < ApplicationController
     if comment.save
       CommentOnPieceNotifier.with(record: comment).deliver(comment.piece.user) unless comment.user == comment.piece.user
 
-      render json: build_comment_tree(comment), include: {
+      render json: comment, include: {
         user: { only: [:username] },
-        votes: { only: %i[user_id vote_type] },
-        child_comments: {
-          include: {
-            user: { only: [:username] },
-            votes: { only: %i[user_id vote_type] }
-          }
-        }
+        votes: { only: %i[user_id vote_type] }
       }, status: :created
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
@@ -67,16 +51,10 @@ class Api::V1::CommentsController < ApplicationController
     comment = Comment.find(params[:id])
 
     if comment.update(comment_params)
-      render json: build_comment_tree(comment), include: {
+      render json: comment, include: {
         user: { only: [:username] },
-        votes: { only: %i[user_id vote_type] },
-        child_comments: {
-          include: {
-            user: { only: [:username] },
-            votes: { only: %i[user_id vote_type] }
-          }
-        }
-      }, status: :created
+        votes: { only: %i[user_id vote_type] }
+      }, status: :ok
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
     end
@@ -87,7 +65,7 @@ class Api::V1::CommentsController < ApplicationController
     comment.destroy
 
     if comment.destroyed?
-      render json: { message: 'Comment and its children successfully deleted' }, status: :ok
+      render json: { message: 'Comment successfully deleted' }, status: :ok
     else
       render json: { error: 'Failed to delete comment' }, status: :unprocessable_entity
     end
@@ -102,6 +80,6 @@ class Api::V1::CommentsController < ApplicationController
   private
 
   def comment_params
-    params.require(:comment).permit(:message, :piece_id, :parent_comment_id)
+    params.require(:comment).permit(:message, :piece_id)
   end
 end

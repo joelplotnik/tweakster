@@ -160,17 +160,10 @@ pieces = Piece.all
 pieces.each do |piece|
   num_comments = rand(0..20)
   users.sample(num_comments).each do |comment_user|
-    parent_comment = if piece.comments.where(parent_comment_id: nil).exists? && rand(2).zero?
-                       piece.comments.where(parent_comment_id: nil).sample
-                     else
-                       nil
-                     end
-
     comment = Comment.create!(
       message: Faker::Lorem.sentence,
       user: comment_user,
-      piece:,
-      parent_comment_id: parent_comment&.id
+      piece:
     )
 
     CommentOnPieceNotifier.with(record: comment).deliver(piece.user) if comment.persisted? && comment_user != piece.user

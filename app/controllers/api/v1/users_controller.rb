@@ -92,14 +92,15 @@ class Api::V1::UsersController < ApplicationController
       image_urls = piece.images.map { |image| url_for(image) }
 
       piece_json = piece.as_json(only: %i[id title content created_at upvotes downvotes channel_id
-                                          comments_count youtube_url],
+                                          youtube_url],
                                  include: {
                                    user: { only: %i[id username], methods: [:avatar_url] },
                                    channel: { only: %i[id name] },
                                    votes: { only: %i[user_id vote_type] }
-                                 })
-
-      piece_json['images'] = image_urls
+                                 }).merge({
+                                            images: image_urls,
+                                            comments_count: piece.comments.size
+                                          })
 
       piece_json
     end

@@ -20,17 +20,14 @@ class Api::V1::PiecesController < ApplicationController
 
   def show
     piece = Piece.includes(:user, :channel, :comments, :votes).find(params[:id])
-
-    comments_count = piece.comments.size
     image_urls = piece.images.map { |image| url_for(image) }
-
     render json: piece.as_json(include: {
                                  user: { only: %i[id username], methods: [:avatar_url] },
                                  channel: { only: %i[id name] },
                                  votes: { only: %i[user_id vote_type] }
                                }).merge({
-                                          comments_count:,
-                                          images: image_urls
+                                          images: image_urls,
+                                          comments_count: piece.comments.size
                                         })
   end
 

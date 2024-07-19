@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_17_200152) do
+ActiveRecord::Schema[7.0].define(version: 2024_07_18_163653) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -57,10 +57,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_200152) do
     t.integer "piece_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "parent_comment_id"
     t.integer "upvotes", default: 0
     t.integer "downvotes", default: 0
-    t.index ["parent_comment_id"], name: "index_comments_on_parent_comment_id"
   end
 
   create_table "noticed_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -156,5 +154,4 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_17_200152) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "comments", "comments", column: "parent_comment_id"
 end

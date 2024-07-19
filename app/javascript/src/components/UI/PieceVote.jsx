@@ -20,7 +20,6 @@ const PieceVote = ({
   channelId,
   pieceId,
   userVotes,
-  background,
   arrangement,
 }) => {
   const token = useRouteLoaderData('root')

@@ -139,12 +139,6 @@ const PieceModal = () => {
     }
   }, [])
 
-  const handleEditClick = () => {
-    if (piece.tweaks_count === 0) {
-      navigate(`edit`)
-    }
-  }
-
   const handleDeleteClick = async () => {
     try {
       const response = await fetch(
@@ -372,12 +366,6 @@ const PieceModal = () => {
                                 {token &&
                                 (currentUser || userRole === 'admin') ? (
                                   <>
-                                    <button
-                                      onClick={handleEditClick}
-                                      disabled={piece.tweaks_count > 0}
-                                    >
-                                      <RiEditBoxLine /> Edit
-                                    </button>
                                     <button
                                       onClick={() =>
                                         handleConfirmationModalToggle()

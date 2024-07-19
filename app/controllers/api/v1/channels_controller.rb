@@ -101,10 +101,10 @@ class Api::V1::ChannelsController < ApplicationController
                                    channel: { only: %i[id name] },
                                    user: { only: %i[id username], methods: [:avatar_url] },
                                    votes: { only: %i[user_id vote_type] }
-                                 })
-
-      piece_json['images'] = image_urls
-      piece_json['comments_count'] = piece.comments.count
+                                 }).merge({
+                                            images: image_urls,
+                                            comments_count: piece.comments.size
+                                          })
 
       piece_json
     end

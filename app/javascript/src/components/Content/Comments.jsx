@@ -26,14 +26,14 @@ const Comments = ({ piece, pieceClassModalRef }) => {
   const [newCommentIds, setNewCommentIds] = useState([])
   const [selectedSortOption, setSelectedSortOption] = useState('top')
   const selectedSortOptionRef = useRef(selectedSortOption)
-  const [isScrollableTargetAvailable, setScrollableTargetAvailable] =
+  const [isScrollableTargetAvailable, setIsScrollableTargetAvailable] =
     useState(false)
   const dispatch = useDispatch()
   const newCommentRef = useRef(null)
 
   useEffect(() => {
     if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
-      setScrollableTargetAvailable(true)
+      setIsScrollableTargetAvailable(true)
     }
   }, [pieceClassModalRef])
 
@@ -82,15 +82,13 @@ const Comments = ({ piece, pieceClassModalRef }) => {
       const commentsFromServer = await fetchComments(page)
 
       if (commentsFromServer) {
-        setComments([...comments, ...commentsFromServer])
-
         if (selectedSortOption !== selectedSortOptionRef.current) {
           // If the selectedSortOption has changed, reset comments
           selectedSortOptionRef.current = selectedSortOption
           setComments(commentsFromServer)
         } else {
           // If the sort option is the same, append fetched data
-          setComments([...comments, ...commentsFromServer])
+          setComments(prevComments => [...prevComments, ...commentsFromServer])
         }
 
         if (commentsFromServer.length === 0) {
@@ -108,43 +106,13 @@ const Comments = ({ piece, pieceClassModalRef }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const findCommentById = (commentsArray, targetCommentId) => {
-    for (const comment of commentsArray) {
-      if (comment.comment.id === targetCommentId) {
-        return comment
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        const foundComment = findCommentById(
-          comment.child_comments,
-          targetCommentId
-        )
-        if (foundComment) {
-          return foundComment
-        }
-      }
-    }
-    return null
-  }
-
   const updateCommentMessage = (commentsArray, targetCommentId, newMessage) => {
     return commentsArray.map(comment => {
-      if (comment.comment.id === targetCommentId) {
+      if (comment.id === targetCommentId) {
         // If this is the edited comment, update its message
         return {
           ...comment,
-          comment: {
-            ...comment.comment,
-            message: newMessage,
-          },
-        }
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        // If there are child comments, recursively update them as well
-        return {
-          ...comment,
-          child_comments: updateCommentMessage(
-            comment.child_comments,
-            targetCommentId,
-            newMessage
-          ),
+          message: newMessage,
         }
       } else {
         return comment
@@ -152,12 +120,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
     })
   }
 
-  const handleCommentSubmit = async (
-    message,
-    pieceId,
-    parentCommentId = null,
-    commentId = null
-  ) => {
+  const handleCommentSubmit = async (message, pieceId, commentId = null) => {
     try {
       const url = commentId
         ? `${API_URL}/${wildcardParam}/comments/${commentId}`
@@ -168,7 +131,6 @@ const Comments = ({ piece, pieceClassModalRef }) => {
       const commentData = {
         message: message,
         piece_id: pieceId,
-        parent_comment_id: parentCommentId,
       }
 
       const response = await fetch(url, {
@@ -185,7 +147,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
       }
 
       const newComment = await response.json()
-      const newCommentId = newComment.comment.id
+      const newCommentId = newComment.id
 
       // Handle the state update based on the comment action
       if (commentId) {
@@ -193,16 +155,6 @@ const Comments = ({ piece, pieceClassModalRef }) => {
         setComments(prevComments => {
           return updateCommentMessage(prevComments, commentId, message)
         })
-      } else if (parentCommentId) {
-        // Reply comment
-        const parentComment = findCommentById(comments, parentCommentId)
-        if (parentComment) {
-          parentComment.child_comments.push(newComment)
-          setNewCommentIds(prevIds => [...prevIds, newCommentId])
-          setComments(prevComments => [...prevComments])
-          newCommentRef.current = newCommentId
-          dispatch(pieceActions.increaseCommentCount())
-        }
       } else {
         // New comment
         setNewCommentIds(prevIds => [...prevIds, newCommentId])
@@ -210,7 +162,6 @@ const Comments = ({ piece, pieceClassModalRef }) => {
         newCommentRef.current = newCommentId
         dispatch(pieceActions.increaseCommentCount())
       }
-
       setActiveComment(null)
     } catch (error) {
       console.error('Error: ', error.message)
@@ -220,14 +171,8 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
   const deleteComment = (commentsArray, targetCommentId) => {
     return commentsArray.filter(comment => {
-      if (comment.comment.id === targetCommentId) {
+      if (comment.id === targetCommentId) {
         return false
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        comment.child_comments = deleteComment(
-          comment.child_comments,
-          targetCommentId
-        )
-        return true
       } else {
         return !comment.deleted // Filter out deleted comments
       }
@@ -236,35 +181,16 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
   const markCommentAsDeleted = (commentsArray, targetCommentId) => {
     return commentsArray.map(comment => {
-      if (comment.comment.id === targetCommentId) {
+      if (comment.id === targetCommentId) {
         // Mark the comment as deleted
         return {
           ...comment,
           deleted: true,
         }
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        // If there are child comments, recursively mark them as well
-        return {
-          ...comment,
-          child_comments: markCommentAsDeleted(
-            comment.child_comments,
-            targetCommentId
-          ),
-        }
       } else {
         return comment
       }
     })
-  }
-
-  const countComments = comment => {
-    let count = 1
-    if (comment.child_comments) {
-      for (const childComment of comment.child_comments) {
-        count += countComments(childComment)
-      }
-    }
-    return count
   }
 
   const handleDeleteComment = async commentId => {
@@ -286,14 +212,14 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
       setActiveComment(null)
 
-      // Find the deleted comment and its children in the state
-      const commentToDelete = findCommentById(comments, commentId)
+      // Find the deleted comment in the state
+      const commentToDelete = comments.find(comment => comment.id === commentId)
 
       if (!commentToDelete) {
         return // Comment not found, nothing to delete
       }
 
-      const decreaseCommentCountBy = countComments(commentToDelete)
+      const decreaseCommentCountBy = 1
       dispatch(pieceActions.decreaseCommentCount({ decreaseCommentCountBy }))
 
       setComments(prevComments => {
@@ -369,44 +295,27 @@ const Comments = ({ piece, pieceClassModalRef }) => {
             loader={<h4>Loading...</h4>}
             endMessage={<span></span>}
           >
-            {comments
-              .filter(comment => !comment.parent_comment_id)
-              .map(comment => (
-                <div
-                  key={comment.comment.id}
-                  id={
-                    comment.comment.id === newCommentRef.current
-                      ? newCommentRef.current
-                      : undefined
+            {comments.map(comment => (
+              <div
+                key={comment.id}
+                id={
+                  comment.id === newCommentRef.current
+                    ? newCommentRef.current
+                    : undefined
+                }
+              >
+                <Comment
+                  comment={comment}
+                  piece={piece}
+                  onEdit={(message, commentId) =>
+                    handleCommentSubmit(message, piece.id, commentId)
                   }
-                >
-                  <Comment
-                    comment={comment.comment}
-                    piece={piece}
-                    childComments={comment.child_comments}
-                    onReply={(message, parentCommentId) =>
-                      handleCommentSubmit(
-                        message,
-                        piece.id,
-                        parentCommentId,
-                        null
-                      )
-                    }
-                    onEdit={(message, parentCommentId, commentId) =>
-                      handleCommentSubmit(
-                        message,
-                        piece.id,
-                        parentCommentId,
-                        commentId
-                      )
-                    }
-                    onDelete={commentId => handleDeleteComment(commentId)}
-                    activeComment={activeComment}
-                    setActiveComment={setActiveComment}
-                    newCommentRef={newCommentRef}
-                  />
-                </div>
-              ))}
+                  onDelete={commentId => handleDeleteComment(commentId)}
+                  activeComment={activeComment}
+                  setActiveComment={setActiveComment}
+                />
+              </div>
+            ))}
           </InfiniteScroll>
         )}
       </div>

@@ -107,12 +107,6 @@ const PiecePage = () => {
     setShowDropdown(!showDropdown)
   }
 
-  const handleEditClick = () => {
-    if (piece.tweaks_count === 0) {
-      navigate(`edit`)
-    }
-  }
-
   const handleDeleteClick = async () => {
     try {
       const response = await fetch(
@@ -240,7 +234,7 @@ const PiecePage = () => {
         <div className={classes.vote}>
           <PieceVote
             upvotes={piece.upvotes}
-            downvote={piece.downvote}
+            downvotes={piece.downvotes}
             channelId={piece.channel_id}
             pieceId={piece.id}
             userVotes={piece.votes}
@@ -296,12 +290,6 @@ const PiecePage = () => {
                   <div className={classes.dropdown}>
                     {token && (currentUser || userRole === 'admin') ? (
                       <>
-                        <button
-                          onClick={handleEditClick}
-                          disabled={piece.tweaks_count > 0}
-                        >
-                          <RiEditBoxLine /> Edit
-                        </button>
                         <button onClick={() => handleConfirmationModalToggle()}>
                           <RiDeleteBin7Line className={classes.danger} />
                           <span className={classes.danger}>Delete</span>

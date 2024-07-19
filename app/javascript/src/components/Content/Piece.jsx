@@ -45,6 +45,8 @@ const Piece = ({ piece }) => {
   const pieceUserID = piece.user.id
   const currentUser = pieceUserID === parseInt(userId, 10)
 
+  // const tweaked = !!piece.tweak
+
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showAuthModal)
   }
@@ -60,6 +62,26 @@ const Piece = ({ piece }) => {
   const handleDropdownToggle = event => {
     event.stopPropagation()
     setShowDropdown(!showDropdown)
+  }
+
+  const handleDeleteClick = async () => {
+    const response = await fetch(
+      `${API_URL}/channels/${piece.channel_id}/pieces/${piece.id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+
+    if (!response.ok) {
+      throw json({ message: 'Could not delete piece' }, { status: 500 })
+    }
+
+    navigate(location.pathname)
+    setRefreshRoot(true)
   }
 
   const handleReportClick = () => {
@@ -203,6 +225,35 @@ const Piece = ({ piece }) => {
                 />
               </div>
             </div>
+            {/* {tweaked && (
+              <div className={classes['disclaimer-container']}>
+                <RiFlaskFill className={classes['disclaimer-icon']} />
+                <p className={classes['disclaimer-text']}>
+                  Tweaked by
+                  <Link
+                    to={`/users/${piece.tweak.user.id}`}
+                    className={classes['tweak-user-link']}
+                    onClick={stopPropagation}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {piece.tweak.user.username}
+                  </Link>
+                  (+{piece.tweak.vote_difference} likes)
+                </p>
+                <div className={classes['disclaimer-btn-container']}>
+                  <Link
+                    to={`/channels/${piece.tweak.channel_id}/pieces/${piece.tweak.piece_id}`}
+                    className={classes['disclaimer-btn']}
+                    onClick={stopPropagation}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Tweak
+                  </Link>
+                </div>
+              </div>
+            )} */}
           </div>
           <div className={classes.footer}>
             <div className={classes['footer-container']}>
@@ -232,7 +283,14 @@ const Piece = ({ piece }) => {
                 </div>
                 {showDropdown && (
                   <div className={classes.dropdown}>
-                    {token && (
+                    {token && userRole === 'admin' ? (
+                      <>
+                        <button onClick={() => handleConfirmationModalToggle()}>
+                          <RiDeleteBin7Line className={classes.danger} />
+                          <span className={classes.danger}>Delete</span>
+                        </button>
+                      </>
+                    ) : (
                       <>
                         <button onClick={handleReportClick}>
                           <RiFlagLine className={classes.danger} />
@@ -249,6 +307,12 @@ const Piece = ({ piece }) => {
       </div>
       {showAuthModal && (
         <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+      )}
+      {showConfirmationModal && (
+        <ConfirmationModal
+          onConfirm={handleDeleteClick}
+          onClick={handleConfirmationModalToggle}
+        />
       )}
       {showReportModal && (
         <ReportModal
