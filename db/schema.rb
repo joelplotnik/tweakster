@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_18_163653) do
+ActiveRecord::Schema[7.0].define(version: 2024_07_23_221049) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -40,7 +40,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_18_163653) do
   end
 
   create_table "channels", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.string "url"
     t.text "protocol"
     t.integer "subscriptions_count", default: 0
@@ -52,13 +52,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_18_163653) do
   end
 
   create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.text "message"
-    t.integer "user_id"
-    t.integer "piece_id"
+    t.text "message", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "upvotes", default: 0
     t.integer "downvotes", default: 0
+    t.string "commentable_type", null: false
+    t.integer "commentable_id", null: false
+    t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
   end
 
   create_table "noticed_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -86,38 +88,54 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_18_163653) do
   end
 
   create_table "pieces", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "title"
-    t.text "content"
+    t.string "title", null: false
+    t.text "content", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id"
-    t.integer "channel_id"
+    t.integer "user_id", null: false
+    t.integer "channel_id", null: false
     t.integer "upvotes", default: 0
     t.integer "downvotes", default: 0
     t.string "youtube_url"
   end
 
   create_table "relationships", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.integer "follower_id"
-    t.integer "followee_id"
+    t.integer "follower_id", null: false
+    t.integer "followee_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "reports", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "content_type"
-    t.integer "content_id"
-    t.integer "reporter_id"
-    t.text "reason"
+    t.string "content_type", null: false
+    t.integer "content_id", null: false
+    t.integer "reporter_id", null: false
+    t.text "reason", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "subscriptions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "channel_id"
+    t.integer "user_id", null: false
+    t.integer "channel_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "tweaks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.text "annotation", null: false
+    t.integer "piece_id", null: false
+    t.integer "user_id", null: false
+    t.integer "start_offset", null: false
+    t.integer "end_offset", null: false
+    t.string "style_type", null: false
+    t.string "style_value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "upvotes"
+    t.integer "downvotes"
+    t.index ["piece_id"], name: "index_tweaks_on_piece_id"
+    t.index ["user_id"], name: "index_tweaks_on_user_id"
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|

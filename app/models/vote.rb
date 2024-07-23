@@ -22,7 +22,7 @@ class Vote < ApplicationRecord
 
     votable.update_columns(upvotes:, downvotes:)
 
-    # Update integrity for the user whose piece or comment received the vote
+    # Update integrity for the user whose piece, tweak, or comment received the vote
     votable_user = votable.user
     votable_user&.calculate_integrity
     votable_user&.save

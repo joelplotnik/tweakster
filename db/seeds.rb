@@ -121,7 +121,8 @@ piece_count.times do |index|
   piece = Piece.new(
     title: Faker::Book.title,
     user_id: user.id,
-    channel_id: channel.id
+    channel_id: channel.id,
+    content: Faker::Lorem.paragraph(sentence_count: 50)
   )
 
   if index.even?
@@ -135,8 +136,6 @@ piece_count.times do |index|
       end
     when :youtube_url
       piece.youtube_url = youtube_url
-    when :content
-      piece.content = Faker::Lorem.paragraph(sentence_count: 50)
     end
   else
     # Apply all attributes for the other half of the pieces (odd index)
@@ -144,7 +143,6 @@ piece_count.times do |index|
     image_urls.each do |image_url|
       piece.images.attach(io: URI.open(image_url), filename: 'image.png')
     end
-    piece.content = Faker::Lorem.paragraph(sentence_count: 50)
   end
 
   # Validate that at least one attribute is present
@@ -155,7 +153,34 @@ piece_count.times do |index|
   piece.save
 end
 
-# Create Comments
+# Create Tweaks for Pieces
+pieces = Piece.all
+pieces.each do |piece|
+  num_tweaks = rand(0..5)
+  users.sample(num_tweaks).each do |tweak_user|
+    annotation = Faker::Lorem.paragraph(sentence_count: 6)
+    annotation_length = annotation.length
+    start_offset = rand(0..(annotation_length - 1))
+    end_offset = rand(start_offset..annotation_length)
+
+    style_type = %w[bold italic underline strikethrough highlight color].sample
+    style_value = nil
+
+    style_value = Faker::Color.hex_color.to_s if %w[highlight color].include?(style_type)
+
+    Tweak.create!(
+      annotation:,
+      piece:,
+      user: tweak_user,
+      start_offset:,
+      end_offset:,
+      style_type:,
+      style_value:
+    )
+  end
+end
+
+# Create Comments for Pieces
 pieces = Piece.all
 pieces.each do |piece|
   num_comments = rand(0..20)
@@ -163,22 +188,40 @@ pieces.each do |piece|
     comment = Comment.create!(
       message: Faker::Lorem.sentence,
       user: comment_user,
-      piece:
+      commentable: piece
     )
 
-    CommentOnPieceNotifier.with(record: comment).deliver(piece.user) if comment.persisted? && comment_user != piece.user
+    next unless comment.persisted? && comment_user != piece.user
+
+    CommentOnPieceNotifier.with(record: comment).deliver(piece.user) if piece.respond_to?(:user)
+  end
+end
+
+# Create Comments for Tweaks
+tweaks = Tweak.all
+tweaks.each do |tweak|
+  num_comments = rand(0..20)
+  users.sample(num_comments).each do |comment_user|
+    comment = Comment.create!(
+      message: Faker::Lorem.sentence,
+      user: comment_user,
+      commentable: tweak
+    )
+
+    if comment.persisted? && comment_user != tweak.user
+      # Add logic to notify the tweak's user if necessary
+    end
   end
 end
 
 # Create Votes for Pieces
 users.each do |user|
   voted_pieces = []
-  num_votes = rand(10..20)
+  num_votes = rand(20..40)
 
   num_votes.times do
     piece = Piece.all.sample
-
-    next if voted_pieces.include?(piece.id)
+    next if voted_pieces.include?(piece.id) || piece.nil?
 
     voted_pieces << piece.id
 
@@ -196,12 +239,11 @@ end
 # Create Votes for Comments
 users.each do |user|
   voted_comments = []
-  num_votes = rand(10..20)
+  num_votes = rand(40..80)
 
   num_votes.times do
     comment = Comment.all.sample
-
-    next if voted_comments.include?(comment.id)
+    next if voted_comments.include?(comment.id) || comment.nil?
 
     voted_comments << comment.id
 
@@ -211,6 +253,28 @@ users.each do |user|
       user_id: user.id,
       votable_type: 'Comment',
       votable_id: comment.id,
+      vote_type:
+    )
+  end
+end
+
+# Create Votes for Tweaks
+users.each do |user|
+  voted_tweaks = []
+  num_votes = rand(30..50)
+
+  num_votes.times do
+    tweak = Tweak.all.sample
+    next if voted_tweaks.include?(tweak.id) || tweak.nil?
+
+    voted_tweaks << tweak.id
+
+    vote_type = [1, -1].sample
+
+    Vote.create!(
+      user_id: user.id,
+      votable_type: 'Tweak',
+      votable_id: tweak.id,
       vote_type:
     )
   end

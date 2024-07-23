@@ -11,10 +11,10 @@ class Api::V1::CommentsController < ApplicationController
   end
 
   def index
-    piece = Piece.find(params[:piece_id])
-    comments = piece.comments.includes(:user, :votes)
+    commentable = find_commentable
+    comments = commentable.comments.includes(:user, :votes)
 
-    excluded_comment_ids = JSON.parse(params[:exclude])
+    excluded_comment_ids = JSON.parse(params[:exclude] || '[]')
     comments = comments.where.not(id: excluded_comment_ids)
 
     comments = if params[:sort] == 'new'
@@ -36,7 +36,9 @@ class Api::V1::CommentsController < ApplicationController
     comment.user = current_user
 
     if comment.save
-      CommentOnPieceNotifier.with(record: comment).deliver(comment.piece.user) unless comment.user == comment.piece.user
+      unless comment.user == comment.commentable.user
+        CommentOnPieceNotifier.with(record: comment).deliver(comment.commentable.user)
+      end
 
       render json: comment, include: {
         user: { only: [:username] },
@@ -79,7 +81,12 @@ class Api::V1::CommentsController < ApplicationController
 
   private
 
+  def find_commentable
+    commentable_type = params[:commentable_type].constantize
+    commentable_type.find(params[:commentable_id])
+  end
+
   def comment_params
-    params.require(:comment).permit(:message, :piece_id)
+    params.require(:comment).permit(:message, :commentable_type, :commentable_id)
   end
 end

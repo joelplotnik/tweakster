@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  annotation: MyText
+  piece_id: 1
+  user_id: 1
+  start_offset: 1
+  end_offset: 1
+  style_type: MyString
+  style_value: MyString
+
+two:
+  annotation: MyText
+  piece_id: 1
+  user_id: 1
+  start_offset: 1
+  end_offset: 1
+  style_type: MyString
+  style_value: MyString
