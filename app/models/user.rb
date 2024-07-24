@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_many :channels, through: :subscriptions, dependent: :destroy
   has_many :owned_channels, class_name: 'Channel', foreign_key: 'user_id', dependent: :destroy
   has_many :pieces, dependent: :destroy
+  has_many :tweaks, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :votes, dependent: :destroy
   has_many :reports, foreign_key: 'reporter_id'

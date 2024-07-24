@@ -39,13 +39,23 @@ const Piece = ({ piece }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
-
   const token = useRouteLoaderData('root')
-  const { userId, userRole } = getUserData() || {}
-  const pieceUserID = piece.user.id
-  const currentUser = pieceUserID === parseInt(userId, 10)
-
+  const { userRole } = getUserData() || {}
   // const tweaked = !!piece.tweak
+
+  const getTitle = (count, singular, plural) =>
+    count === 1 ? singular : plural
+  const commentsCount =
+    activePiece && activePiece.id === piece.id
+      ? activePiece.comments_count
+      : piece.comments_count
+  const tweaksCount =
+    activePiece && activePiece.id === piece.id
+      ? activePiece.tweaks_count
+      : piece.tweaks_count
+
+  const commentsTitle = getTitle(commentsCount, 'Comment', 'Comments')
+  const tweaksTitle = getTitle(tweaksCount, 'Tweak', 'Tweaks')
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showAuthModal)
@@ -259,7 +269,9 @@ const Piece = ({ piece }) => {
             <div className={classes['footer-container']}>
               <div className={`${classes.link} ${classes.tweak}`}>
                 <RiFlaskLine className={classes.icon} />
-                <span className={classes.text}>{3} Tweaks</span>
+                <span className={classes.text}>
+                  {piece.tweaks_count} {tweaksTitle}
+                </span>
               </div>
               <div className={`${classes.link} ${classes.comms}`}>
                 <RiChat3Line className={classes.icon} />
@@ -267,7 +279,7 @@ const Piece = ({ piece }) => {
                   {activePiece && activePiece.id === piece.id
                     ? activePiece.comments_count
                     : piece.comments_count}{' '}
-                  Comments
+                  {commentsTitle}
                 </span>
               </div>
               <SharePopover

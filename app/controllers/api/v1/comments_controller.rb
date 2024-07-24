@@ -3,16 +3,16 @@ require 'will_paginate/array'
 class Api::V1::CommentsController < ApplicationController
   include Commentable
 
-  load_and_authorize_resource except: :index
   before_action :authenticate_user!, except: %i[index show]
+  load_and_authorize_resource except: %i[index]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
   end
 
   def index
-    commentable = find_commentable
-    comments = commentable.comments.includes(:user, :votes)
+    comments = Comment.where(commentable: find_commentable)
+                      .includes(:user, :votes)
 
     excluded_comment_ids = JSON.parse(params[:exclude] || '[]')
     comments = comments.where.not(id: excluded_comment_ids)
@@ -32,12 +32,13 @@ class Api::V1::CommentsController < ApplicationController
   end
 
   def create
-    comment = Comment.new(comment_params)
+    commentable = find_commentable
+    comment = commentable.comments.new(comment_params)
     comment.user = current_user
 
     if comment.save
       unless comment.user == comment.commentable.user
-        CommentOnPieceNotifier.with(record: comment).deliver(comment.commentable.user)
+        CommentOnPieceNotifier.with(record: comment).deliver(commentable.user)
       end
 
       render json: comment, include: {
@@ -82,11 +83,14 @@ class Api::V1::CommentsController < ApplicationController
   private
 
   def find_commentable
-    commentable_type = params[:commentable_type].constantize
-    commentable_type.find(params[:commentable_id])
+    if params[:tweak_id]
+      Tweak.find(params[:tweak_id])
+    elsif params[:piece_id]
+      Piece.find(params[:piece_id])
+    end
   end
 
   def comment_params
-    params.require(:comment).permit(:message, :commentable_type, :commentable_id)
+    params.require(:comment).permit(:message, :commentable_id, :commentable_type)
   end
 end

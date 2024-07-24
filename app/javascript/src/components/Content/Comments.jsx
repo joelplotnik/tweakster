@@ -13,7 +13,7 @@ import Comment from './Comment'
 import classes from './Comments.module.css'
 import CommentForm from './Forms/CommentForm'
 
-const Comments = ({ piece, pieceClassModalRef }) => {
+const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   const token = useRouteLoaderData('root')
   const [comments, setComments] = useState([])
   const params = useParams()
@@ -55,13 +55,21 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
   const fetchComments = async currentPage => {
     try {
-      const response = await fetch(
-        `${API_URL}/channels/${piece.channel_id}/pieces/${
-          piece.id
+      let url = ''
+
+      if (commentableType === 'Piece') {
+        url = `${API_URL}/${wildcardParam}/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
+          newCommentIds
+        )}`
+      } else if (commentableType === 'Tweak') {
+        url = `${API_URL}/${wildcardParam}/tweaks/${
+          commentable.id
         }/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
           newCommentIds
         )}`
-      )
+      }
+
+      const response = await fetch(url)
 
       if (!response.ok) {
         throw new Error('Failed to fetch comments')
@@ -120,7 +128,11 @@ const Comments = ({ piece, pieceClassModalRef }) => {
     })
   }
 
-  const handleCommentSubmit = async (message, pieceId, commentId = null) => {
+  const handleCommentSubmit = async (
+    message,
+    commentableId,
+    commentId = null
+  ) => {
     try {
       const url = commentId
         ? `${API_URL}/${wildcardParam}/comments/${commentId}`
@@ -130,7 +142,8 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
       const commentData = {
         message: message,
-        piece_id: pieceId,
+        commentable_id: commentableId,
+        commentable_type: commentableType,
       }
 
       const response = await fetch(url, {
@@ -265,9 +278,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
       <div className={classes.comments}>
         {token ? (
           <CommentForm
-            onSubmit={(message, parentCommentId = null, commentId = null) =>
-              handleCommentSubmit(message, piece.id, parentCommentId, commentId)
-            }
+            onSubmit={message => handleCommentSubmit(message, commentable.id)}
             showCancel={false}
           />
         ) : (
@@ -306,9 +317,9 @@ const Comments = ({ piece, pieceClassModalRef }) => {
               >
                 <Comment
                   comment={comment}
-                  piece={piece}
+                  commentable={commentable}
                   onEdit={(message, commentId) =>
-                    handleCommentSubmit(message, piece.id, commentId)
+                    handleCommentSubmit(message, commentable.id, commentId)
                   }
                   onDelete={commentId => handleDeleteComment(commentId)}
                   activeComment={activeComment}

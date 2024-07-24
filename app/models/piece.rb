@@ -3,8 +3,10 @@ class Piece < ApplicationRecord
   belongs_to :channel
 
   has_many_attached :images
+
   has_many :votes, as: :votable, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy
+  has_many :tweaks, dependent: :destroy
   has_many :notification_mentions, as: :record, dependent: :destroy, class_name: 'Noticed::Event'
 
   validates :title, presence: true, length: { minimum: 1, maximum: 300 }

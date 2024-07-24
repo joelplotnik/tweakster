@@ -99,7 +99,8 @@ class Api::V1::UsersController < ApplicationController
                                    votes: { only: %i[user_id vote_type] }
                                  }).merge({
                                             images: image_urls,
-                                            comments_count: piece.comments.size
+                                            comments_count: piece.comments.size,
+                                            tweaks_count: piece.tweaks.size
                                           })
 
       piece_json
@@ -321,14 +322,26 @@ class Api::V1::UsersController < ApplicationController
 
     followee_ids = user.followees.pluck(:id)
 
-    commented_piece_ids = user.comments.pluck(:piece_id)
-    voted_piece_ids = user.votes.where(vote_type: 'upvote').pluck(:votable_id)
+    commented_piece_ids = user.comments.where(commentable_type: 'Piece').pluck(:commentable_id)
+    commented_tweak_ids = user.comments.where(commentable_type: 'Tweak').pluck(:commentable_id)
+
+    voted_piece_ids = user.votes.where(vote_type: 'upvote', votable_type: 'Piece').pluck(:votable_id)
+    voted_tweak_ids = user.votes.where(vote_type: 'upvote', votable_type: 'Tweak').pluck(:votable_id)
+
     interacted_piece_ids = (commented_piece_ids + voted_piece_ids).uniq
+    interacted_tweak_ids = (commented_tweak_ids + voted_tweak_ids).uniq
 
     interacted_users = User.joins(pieces: :user)
                            .where(pieces: { id: interacted_piece_ids })
                            .where(users: { id: followee_ids })
                            .distinct
+
+    interacted_users += User.joins(tweaks: { piece: :user })
+                            .where(tweaks: { id: interacted_tweak_ids })
+                            .where(users: { id: followee_ids })
+                            .distinct
+
+    interacted_users = interacted_users.uniq
 
     if interacted_users.empty?
       most_recently_followed_users = user.followees.order('relationships.created_at DESC').limit(5)
@@ -346,6 +359,7 @@ class Api::V1::UsersController < ApplicationController
 
     interacted_users = interacted_users.sort_by do |u|
       latest_interaction_date = u.pieces.where(id: interacted_piece_ids).maximum(:created_at)
+      latest_interaction_date ||= u.tweaks.joins(:piece).where(pieces: { id: interacted_piece_ids }).maximum('tweaks.created_at')
       latest_interaction_date || u.created_at
     end.reverse
 

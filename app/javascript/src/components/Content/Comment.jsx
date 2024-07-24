@@ -18,7 +18,7 @@ import CommentForm from './Forms/CommentForm'
 
 const Comment = ({
   comment,
-  piece,
+  commentable,
   onEdit,
   onDelete,
   activeComment,
@@ -117,8 +117,8 @@ const Comment = ({
           <CommentVote
             upvotes={comment.upvotes}
             downvotes={comment.downvotes}
-            channelId={piece.channel_id}
-            pieceId={comment.piece_id}
+            channelId={commentable.channel_id}
+            pieceId={comment.commentable_id}
             commentId={comment.id}
             userVotes={comment.votes}
           />
@@ -137,7 +137,7 @@ const Comment = ({
                 {token &&
                 (currentUser ||
                   userRole === 'admin' ||
-                  userId === piece.user_id) ? (
+                  userId === commentable.user_id) ? (
                   <>
                     <button onClick={handleEditClick}>
                       <RiEditBoxLine />

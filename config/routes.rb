@@ -46,13 +46,31 @@ Rails.application.routes.draw do
             get 'check_ownership'
           end
 
+          resources :votes, only: [:create]
+
           resources :comments, only: %i[index create update destroy] do
             member do
               get 'check_ownership'
             end
+
+            resources :votes, only: [:create]
           end
 
-          resources :votes, only: [:create]
+          resources :tweaks, only: %i[show index create update destroy] do
+            member do
+              get 'check_ownership'
+            end
+
+            resources :votes, only: [:create]
+
+            resources :comments, only: %i[index create update destroy] do
+              member do
+                get 'check_ownership'
+              end
+
+              resources :votes, only: [:create]
+            end
+          end
         end
 
         post 'subscribe', to: 'subscriptions#create'
