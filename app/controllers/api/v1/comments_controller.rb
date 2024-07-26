@@ -26,7 +26,7 @@ class Api::V1::CommentsController < ApplicationController
     paginated_comments = comments.paginate(page: params[:page], per_page: 10)
 
     render json: paginated_comments, include: {
-      user: { only: [:username] },
+      user: { only: [:username], methods: [:avatar_url] },
       votes: { only: %i[user_id vote_type] }
     }
   end
@@ -42,7 +42,7 @@ class Api::V1::CommentsController < ApplicationController
       end
 
       render json: comment, include: {
-        user: { only: [:username] },
+        user: { only: [:username], methods: [:avatar_url] },
         votes: { only: %i[user_id vote_type] }
       }, status: :created
     else
@@ -55,7 +55,7 @@ class Api::V1::CommentsController < ApplicationController
 
     if comment.update(comment_params)
       render json: comment, include: {
-        user: { only: [:username] },
+        user: { only: [:username], methods: [:avatar_url] },
         votes: { only: %i[user_id vote_type] }
       }, status: :ok
     else

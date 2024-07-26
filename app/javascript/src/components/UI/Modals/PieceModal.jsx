@@ -306,16 +306,16 @@ const PieceModal = () => {
                     </div>
                   </div>
                   <div className={classes.piece} ref={pieceClassModalRef}>
-                    <div className={classes.vote}>
-                      <PieceVote
-                        upvotes={piece.upvotes}
-                        downvotes={piece.downvotes}
-                        channelId={piece.channel_id}
-                        pieceId={piece.id}
-                        userVotes={piece.votes}
-                      />
-                    </div>
                     <div className={classes['content-wrapper']}>
+                      <div className={classes.vote}>
+                        <PieceVote
+                          upvotes={piece.upvotes}
+                          downvotes={piece.downvotes}
+                          channelId={piece.channel_id}
+                          pieceId={piece.id}
+                          userVotes={piece.votes}
+                        />
+                      </div>
                       <div className={classes.header}>
                         <div className={classes['user-info']}>
                           <Link

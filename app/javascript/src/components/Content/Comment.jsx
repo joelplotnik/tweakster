@@ -36,6 +36,8 @@ const Comment = ({
   const dropdownRef = useRef(null)
   const [dropdownActive, setDropdownActive] = useState(false)
 
+  console.log(comment)
+
   const handleEditClick = () => {
     setActiveComment(null)
     setDropdownActive(false)
@@ -98,6 +100,19 @@ const Comment = ({
     <>
       <div className={classes.comment}>
         <div className={classes['comment-info']}>
+          <Link
+            to={`/users/${comment.user_id}`}
+            className={classes['user-link']}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className={classes['photo-container']}>
+              <img
+                className={classes.photo}
+                src={comment.user.avatar_url || '/default-avatar.png'} // Replace with your default avatar path
+                alt={`${comment.user.username}'s avatar`}
+              />
+            </div>
+          </Link>
           <div>
             <Link
               to={`/users/${comment.user_id}`}

@@ -231,16 +231,16 @@ const PiecePage = () => {
   return (
     <>
       <div key={piece.id} className={classes.piece}>
-        <div className={classes.vote}>
-          <PieceVote
-            upvotes={piece.upvotes}
-            downvotes={piece.downvotes}
-            channelId={piece.channel_id}
-            pieceId={piece.id}
-            userVotes={piece.votes}
-          />
-        </div>
         <div className={classes['content-wrapper']}>
+          <div className={classes.vote}>
+            <PieceVote
+              upvotes={piece.upvotes}
+              downvotes={piece.downvotes}
+              channelId={piece.channel_id}
+              pieceId={piece.id}
+              userVotes={piece.votes}
+            />
+          </div>
           <div className={classes.header}>
             <div className={classes['user-info']}>
               <Link
