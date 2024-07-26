@@ -197,7 +197,7 @@ const PieceModal = () => {
     //     } else if (!response.ok) {
     //       throw new Error('Failed to check channel subscription')
     //     } else {
-    //       if (piece.content) {
+    //       if (piece.body) {
     //         setShowPopulateModal(true)
     //       } else {
     //         const queryParams = new URLSearchParams(tweakData).toString()
@@ -242,7 +242,7 @@ const PieceModal = () => {
 
       setShowSubscriptionModal(false)
 
-      if (piece.content) {
+      if (piece.body) {
         setShowPopulateModal(true)
       } else {
         const queryParams = new URLSearchParams(tweakData).toString()
@@ -408,7 +408,7 @@ const PieceModal = () => {
                           )}
                           <div
                             className={classes.content}
-                            dangerouslySetInnerHTML={{ __html: piece.content }}
+                            dangerouslySetInnerHTML={{ __html: piece.body }}
                           />
                         </div>
                       </div>

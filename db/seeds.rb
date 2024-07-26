@@ -122,7 +122,7 @@ piece_count.times do |index|
     title: Faker::Book.title,
     user_id: user.id,
     channel_id: channel.id,
-    content: Faker::Lorem.paragraph(sentence_count: 50)
+    body: Faker::Lorem.paragraph(sentence_count: 50)
   )
 
   if index.even?

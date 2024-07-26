@@ -91,7 +91,7 @@ class Api::V1::UsersController < ApplicationController
     pieces_info = pieces.paginate(page:, per_page:).order(created_at: :desc).map do |piece|
       image_urls = piece.images.map { |image| url_for(image) }
 
-      piece_json = piece.as_json(only: %i[id title content created_at upvotes downvotes channel_id
+      piece_json = piece.as_json(only: %i[id title body created_at upvotes downvotes channel_id
                                           youtube_url],
                                  include: {
                                    user: { only: %i[id username], methods: [:avatar_url] },

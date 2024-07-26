@@ -229,7 +229,7 @@ const Piece = ({ piece }) => {
                 <PieceCarousel
                   pieceUrl={`/channels/${piece.channel.id}/pieces/${piece.id}`}
                   background={location}
-                  content={piece.content}
+                  body={piece.body}
                   images={piece.images}
                   youtubeUrl={piece.youtube_url}
                 />

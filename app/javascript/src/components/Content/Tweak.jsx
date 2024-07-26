@@ -209,7 +209,7 @@ const Tweak = ({ tweak }) => {
                 pieceUrl={`/channels/${tweak.channel.id}/pieces/${tweak.id}`}
                 tweak={true}
                 background={background}
-                content={tweak.content}
+                body={tweak.body}
                 images={tweak.images}
                 youtubeUrl={tweak.youtube_url}
               />

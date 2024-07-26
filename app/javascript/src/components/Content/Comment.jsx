@@ -36,8 +36,6 @@ const Comment = ({
   const dropdownRef = useRef(null)
   const [dropdownActive, setDropdownActive] = useState(false)
 
-  console.log(comment)
-
   const handleEditClick = () => {
     setActiveComment(null)
     setDropdownActive(false)

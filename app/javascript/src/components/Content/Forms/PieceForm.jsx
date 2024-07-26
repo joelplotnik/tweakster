@@ -41,10 +41,10 @@ const PieceForm = ({ type, piece, tweakText }) => {
   const submissionMethod = type === 'new' || type === 'tweak' ? 'POST' : 'PUT'
   const revalidator = useRevalidator()
   const [quillContent, setQuillContent] = useState(() => {
-    if (type === 'edit' && piece && piece.content) {
-      return piece.content
-    } else if (type === 'tweak' && piece && piece.content && tweakText) {
-      return piece.content
+    if (type === 'edit' && piece && piece.body) {
+      return piece.body
+    } else if (type === 'tweak' && piece && piece.body && tweakText) {
+      return piece.body
     } else {
       return ''
     }
@@ -77,7 +77,7 @@ const PieceForm = ({ type, piece, tweakText }) => {
     const formData = new FormData(event.target)
 
     formData.append('piece[title]', formData.get('title'))
-    formData.append('piece[content]', quillContent)
+    formData.append('piece[body]', quillContent)
     formData.append('piece[youtube_url]', formData.get('youtubeUrl'))
 
     for (let i = 0; i < images.length; i++) {
@@ -337,8 +337,8 @@ const PieceForm = ({ type, piece, tweakText }) => {
             <ReactQuill
               modules={modules}
               className={classes['form-quill']}
-              id="content"
-              name="content"
+              id="body"
+              name="body"
               value={quillContent}
               onChange={value => {
                 setQuillContent(value)

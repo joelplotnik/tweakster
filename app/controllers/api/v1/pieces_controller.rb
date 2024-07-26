@@ -36,8 +36,8 @@ class Api::V1::PiecesController < ApplicationController
     channel = Channel.find(params[:channel_id])
     if current_user.subscriptions.exists?(channel:)
       piece = Piece.new(piece_params.except(:images))
-      sanitized_content = sanitize_rich_content(params[:piece][:content])
-      piece.content = sanitized_content
+      sanitized_body = sanitize_rich_content(params[:piece][:body])
+      piece.body = sanitized_body
 
       images = params[:piece][:images]
       images&.each do |image|
@@ -61,8 +61,8 @@ class Api::V1::PiecesController < ApplicationController
   def update
     piece = Piece.find(params[:id])
 
-    sanitized_content = sanitize_rich_content(params[:piece][:content])
-    piece.content = sanitized_content
+    sanitized_body = sanitize_rich_content(params[:piece][:body])
+    piece.body = sanitized_body
 
     if piece.update(piece_params.except(:images))
       render json: piece, include: { user: { only: %i[id username] } }, status: :ok
@@ -90,6 +90,6 @@ class Api::V1::PiecesController < ApplicationController
   private
 
   def piece_params
-    params.require(:piece).permit(:title, :content, :youtube_url, images: [])
+    params.require(:piece).permit(:title, :body, :youtube_url, images: [])
   end
 end

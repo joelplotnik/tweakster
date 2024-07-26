@@ -16,7 +16,7 @@ const PieceCarousel = ({
   pieceUrl,
   tweak,
   background,
-  content,
+  body,
   images,
   youtubeUrl,
 }) => {
@@ -63,7 +63,7 @@ const PieceCarousel = ({
             </div>
           </SwiperSlide>
         ))}
-        {content && (
+        {body && (
           <SwiperSlide onClick={() => handleSlideClick()}>
             <div
               className={`${classes['content-container']} ${
@@ -72,7 +72,7 @@ const PieceCarousel = ({
             >
               <div
                 className={classes.content}
-                dangerouslySetInnerHTML={{ __html: content }}
+                dangerouslySetInnerHTML={{ __html: body }}
               />
             </div>
           </SwiperSlide>

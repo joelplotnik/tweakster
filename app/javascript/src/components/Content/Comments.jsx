@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { RiAddFill } from 'react-icons/ri'
-import InfiniteScroll from 'react-infinite-scroll-component'
 import { useDispatch } from 'react-redux'
 import { useParams, useRouteLoaderData } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -16,20 +15,20 @@ import CommentForm from './Forms/CommentForm'
 const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   const token = useRouteLoaderData('root')
   const [comments, setComments] = useState([])
-  const params = useParams()
-  const wildcardParam = params['*']
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [activeComment, setActiveComment] = useState(null)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [newCommentIds, setNewCommentIds] = useState([])
   const [selectedSortOption, setSelectedSortOption] = useState('top')
   const selectedSortOptionRef = useRef(selectedSortOption)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [activeComment, setActiveComment] = useState(null)
   const [isScrollableTargetAvailable, setIsScrollableTargetAvailable] =
     useState(false)
   const dispatch = useDispatch()
   const newCommentRef = useRef(null)
+  const params = useParams()
+  const wildcardParam = params['*']
 
   useEffect(() => {
     if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
@@ -84,7 +83,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   }
 
   const fetchData = async () => {
-    if (!isLoading) {
+    if (!isLoading && hasMore) {
       setIsLoading(true)
 
       const commentsFromServer = await fetchComments(page)
@@ -93,16 +92,17 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
         if (selectedSortOption !== selectedSortOptionRef.current) {
           // If the selectedSortOption has changed, reset comments
           selectedSortOptionRef.current = selectedSortOption
-          setComments(commentsFromServer)
+          setComments(commentsFromServer.comments)
         } else {
           // If the sort option is the same, append fetched data
-          setComments(prevComments => [...prevComments, ...commentsFromServer])
+          setComments(prevComments => [
+            ...prevComments,
+            ...commentsFromServer.comments,
+          ])
         }
 
-        if (commentsFromServer.length === 0) {
-          setHasMore(false)
-        }
-        setPage(page + 1)
+        setHasMore(commentsFromServer.meta.has_more)
+        setPage(prevPage => prevPage + 1)
       }
 
       setIsLoading(false)
@@ -112,7 +112,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   useEffect(() => {
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedSortOption])
 
   const updateCommentMessage = (commentsArray, targetCommentId, newMessage) => {
     return commentsArray.map(comment => {
@@ -296,38 +296,37 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
             selectedSortOption={selectedSortOption}
           />
         )}
-        {isScrollableTargetAvailable && (
-          <InfiniteScroll
-            key={selectedSortOption}
-            dataLength={comments.length}
-            next={fetchData}
-            hasMore={hasMore}
-            scrollableTarget={pieceClassModalRef?.current}
-            loader={<h4>Loading...</h4>}
-            endMessage={<span></span>}
-          >
-            {comments.map(comment => (
-              <div
-                key={comment.id}
-                id={
-                  comment.id === newCommentRef.current
-                    ? newCommentRef.current
-                    : undefined
+        <div className={classes.commentList}>
+          {comments.map(comment => (
+            <div
+              key={comment.id}
+              id={
+                comment.id === newCommentRef.current
+                  ? newCommentRef.current
+                  : undefined
+              }
+            >
+              <Comment
+                comment={comment}
+                commentable={commentable}
+                onEdit={(message, commentId) =>
+                  handleCommentSubmit(message, commentable.id, commentId)
                 }
-              >
-                <Comment
-                  comment={comment}
-                  commentable={commentable}
-                  onEdit={(message, commentId) =>
-                    handleCommentSubmit(message, commentable.id, commentId)
-                  }
-                  onDelete={commentId => handleDeleteComment(commentId)}
-                  activeComment={activeComment}
-                  setActiveComment={setActiveComment}
-                />
-              </div>
-            ))}
-          </InfiniteScroll>
+                onDelete={commentId => handleDeleteComment(commentId)}
+                activeComment={activeComment}
+                setActiveComment={setActiveComment}
+              />
+            </div>
+          ))}
+        </div>
+        {hasMore && (
+          <button
+            className={classes['show-more-button']}
+            onClick={fetchData}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Loading...' : 'Show More Comments'}
+          </button>
         )}
       </div>
       {showAuthModal && (

@@ -23,9 +23,18 @@ class Api::V1::CommentsController < ApplicationController
                  comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
                end
 
-    paginated_comments = comments.paginate(page: params[:page], per_page: 10)
+    page = params[:page] || 1
+    per_page = 5
+    paginated_comments = comments.paginate(page:, per_page:)
 
-    render json: paginated_comments, include: {
+    more_comments = paginated_comments.next_page.present?
+
+    render json: {
+      comments: paginated_comments,
+      meta: {
+        has_more: more_comments
+      }
+    }, include: {
       user: { only: [:username], methods: [:avatar_url] },
       votes: { only: %i[user_id vote_type] }
     }

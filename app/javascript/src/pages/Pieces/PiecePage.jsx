@@ -193,7 +193,7 @@ const PiecePage = () => {
 
       setShowSubscriptionModal(false)
 
-      if (piece.content) {
+      if (piece.body) {
         setShowPopulateModal(true)
       } else {
         const queryParams = new URLSearchParams(tweakData).toString()
@@ -322,7 +322,7 @@ const PiecePage = () => {
               )}
               <div
                 className={classes.content}
-                dangerouslySetInnerHTML={{ __html: piece.content }}
+                dangerouslySetInnerHTML={{ __html: piece.body }}
               />
             </div>
           </div>

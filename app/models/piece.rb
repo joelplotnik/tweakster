@@ -18,9 +18,9 @@ class Piece < ApplicationRecord
   private
 
   def material
-    return if images.attached? || content.present? || youtube_url.present?
+    return if images.attached? || body.present? || youtube_url.present?
 
-    errors.add(:base, 'A piece must have at least one image, content, or YouTube URL')
+    errors.add(:base, 'A piece must have at least one image, body, or YouTube URL')
   end
 
   def valid_youtube_url
