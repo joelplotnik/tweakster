@@ -24,7 +24,7 @@ class Api::V1::ReportsController < ApplicationController
           }
         when 'comment'
           comment = Comment.find(report.content_id)
-          piece = comment.piece
+          piece = comment.commentable.is_a?(Piece) ? comment.commentable : comment.commentable.piece
           channel = piece.channel
           reporter = User.find(report.reporter_id)
           creator = piece.user
