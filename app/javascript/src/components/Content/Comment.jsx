@@ -106,7 +106,7 @@ const Comment = ({
             <div className={classes['photo-container']}>
               <img
                 className={classes.photo}
-                src={comment.user.avatar_url || '/default-avatar.png'} // Replace with your default avatar path
+                src={comment.user.avatar_url || '/default-avatar.png'}
                 alt={`${comment.user.username}'s avatar`}
               />
             </div>

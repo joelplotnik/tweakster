@@ -22,19 +22,14 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   const [selectedSortOption, setSelectedSortOption] = useState('top')
   const selectedSortOptionRef = useRef(selectedSortOption)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showCommentForm, setShowCommentForm] = useState(false)
   const [activeComment, setActiveComment] = useState(null)
-  const [isScrollableTargetAvailable, setIsScrollableTargetAvailable] =
-    useState(false)
+  const commentsTitle =
+    commentable.comments_count === 1 ? 'Comment' : 'Comments'
   const dispatch = useDispatch()
   const newCommentRef = useRef(null)
   const params = useParams()
   const wildcardParam = params['*']
-
-  useEffect(() => {
-    if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
-      setIsScrollableTargetAvailable(true)
-    }
-  }, [pieceClassModalRef])
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showAuthModal)
@@ -171,7 +166,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
       } else {
         // New comment
         setNewCommentIds(prevIds => [...prevIds, newCommentId])
-        setComments(prevComments => [newComment, ...prevComments])
+        setComments(prevComments => [...prevComments, newComment])
         newCommentRef.current = newCommentId
         dispatch(pieceActions.increaseCommentCount())
       }
@@ -276,26 +271,17 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   return (
     <>
       <div className={classes.comments}>
-        {token ? (
-          <CommentForm
-            onSubmit={message => handleCommentSubmit(message, commentable.id)}
-            showCancel={false}
-          />
-        ) : (
-          <button
-            className={classes['comment-button']}
-            onClick={handleAuthModalToggle}
-          >
-            <RiAddFill />
-            Comment
-          </button>
-        )}
-        {comments.length > 0 && (
-          <SortDropdown
-            onSortChange={handleSortChange}
-            selectedSortOption={selectedSortOption}
-          />
-        )}
+        <div className={classes['header-container']}>
+          <h2 className={classes.title}>
+            {commentable.comments_count} {commentsTitle}
+          </h2>
+          {comments.length > 0 && (
+            <SortDropdown
+              onSortChange={handleSortChange}
+              selectedSortOption={selectedSortOption}
+            />
+          )}
+        </div>
         <div className={classes.commentList}>
           {comments.map(comment => (
             <div
@@ -319,14 +305,38 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
             </div>
           ))}
         </div>
-        {hasMore && (
-          <button
-            className={classes['show-more-button']}
-            onClick={fetchData}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Loading...' : 'Show More Comments'}
-          </button>
+        <div className={classes['buttons-container']}>
+          {hasMore && (
+            <button
+              className={classes['comments-button']}
+              onClick={fetchData}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Loading...' : 'Show More Comments'}
+            </button>
+          )}
+          {token ? (
+            <button
+              className={classes['comments-button']}
+              onClick={() => setShowCommentForm(true)}
+            >
+              Leave A Comment
+            </button>
+          ) : (
+            <button
+              className={classes['comments-button']}
+              onClick={handleAuthModalToggle}
+            >
+              Leave A Comment
+            </button>
+          )}
+        </div>
+        {showCommentForm && (
+          <CommentForm
+            onCancel={() => setShowCommentForm(false)}
+            onSubmit={message => handleCommentSubmit(message, commentable.id)}
+            showCancel={true}
+          />
         )}
       </div>
       {showAuthModal && (

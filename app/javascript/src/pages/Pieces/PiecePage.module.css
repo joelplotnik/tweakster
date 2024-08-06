@@ -7,6 +7,7 @@
   margin-bottom: 10px;
   text-decoration: none;
   border: 1px solid #cccccc;
+  max-width: 46rem;
 }
 
 .vote {
@@ -14,12 +15,6 @@
   left: 0;
   flex: 0 0 auto;
   margin-right: 10px;
-}
-
-.header,
-.main,
-.footer {
-  margin-left: 50px;
 }
 
 .content-wrapper {
@@ -33,6 +28,7 @@
   justify-content: space-between;
   flex-direction: row;
   margin-bottom: 10px;
+  margin-left: 50px;
 }
 
 .flex-right {
@@ -164,6 +160,7 @@
   align-items: center;
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
+  margin-left: 50px;
 }
 
 .footer-container {

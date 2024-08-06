@@ -17,8 +17,8 @@ class Ability
     can :manage, User, id: user.id # user can manage their own user account
     can(:manage, Channel, user:) # user can manage their own channel
     can(:manage, Subscription, user:) # user can manage their own subscription
-    can(:manage, Comment, user:) # user can manage their own comment
-    can :destroy, Comment, piece: { user_id: user.id } # piece owners can manage comments on their pieces
+    can :manage, Comment, user_id: user.id # user can manage their own comments
+    can :destroy, Comment, commentable: { user_id: user.id } # piece owners can manage comments on their pieces
     can(:manage, Vote, user:) # user can manage their own comment
     can :create, Report, reporter_id: user.id # user can create their own reports
 

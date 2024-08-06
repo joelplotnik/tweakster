@@ -12,8 +12,6 @@ const Interactions = ({ pieceClassModalRef }) => {
   const [isScrollableTargetAvailable, setIsScrollableTargetAvailable] =
     useState(false)
   const targetSectionIdRef = useRef(null)
-  const commentsTitle = piece.comments_count === 1 ? 'Comment' : 'Comments'
-  const tweaksTitle = piece.tweaks_count === 1 ? 'Tweak' : 'Tweaks'
 
   useEffect(() => {
     if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
@@ -57,21 +55,15 @@ const Interactions = ({ pieceClassModalRef }) => {
   return (
     <div className={classes['section-container']}>
       <div id="comments-section" className={classes.section}>
-        <h2>
-          {piece.comments_count} {commentsTitle}
-        </h2>
         <Comments
           commentable={piece}
           commentableType={'Piece'}
           pieceClassModalRef={pieceClassModalRef}
         />
       </div>
-      {/* <div id="tweaks-section" className={classes.section}>
-        <h2>
-          {piece.tweaks_count} {tweaksTitle}
-        </h2>
+      <div id="tweaks-section" className={classes.section}>
         <Tweaks piece={piece} pieceClassModalRef={pieceClassModalRef} />
-      </div> */}
+      </div>
     </div>
   )
 }
