@@ -3,6 +3,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import TweakVote from '../UI/TweakVote'
+import Comments from './Comments'
 import classes from './Tweak.module.css'
 
 const Tweak = ({ tweak, pieceClassModalRef }) => {
@@ -44,12 +45,12 @@ const Tweak = ({ tweak, pieceClassModalRef }) => {
             </div>
           </Link>
         </div>
+        <Comments
+          commentable={tweak}
+          commentableType={'Tweak'}
+          pieceClassModalRef={pieceClassModalRef}
+        />
       </div>
-      {/* <Comments
-        commentable={tweak}
-        commentableType={'Tweak'}
-        pieceClassModalRef={pieceClassModalRef}
-      /> */}
     </div>
   )
 }

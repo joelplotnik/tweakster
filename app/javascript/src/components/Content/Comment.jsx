@@ -19,6 +19,7 @@ import CommentForm from './Forms/CommentForm'
 const Comment = ({
   comment,
   commentable,
+  commentableType,
   onEdit,
   onDelete,
   activeComment,
@@ -96,7 +97,13 @@ const Comment = ({
 
   return (
     <>
-      <div className={classes.comment}>
+      <div
+        className={
+          commentableType === 'Piece'
+            ? classes['piece-comment']
+            : classes['tweak-comment']
+        }
+      >
         <div className={classes['comment-info']}>
           <Link
             to={`/users/${comment.user_id}`}

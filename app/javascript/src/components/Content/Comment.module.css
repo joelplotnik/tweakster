@@ -1,6 +1,12 @@
-.comment {
+.piece-comment {
   padding-left: 10px;
   margin-left: 3rem;
+  margin-right: 10px;
+  margin-top: -1rem;
+}
+
+.tweak-comment {
+  padding-left: 10px;
   margin-right: 10px;
   margin-top: -1rem;
 }

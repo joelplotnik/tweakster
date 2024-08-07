@@ -17,6 +17,8 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   const [comments, setComments] = useState([])
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [commentsLeft, setCommentsLeft] = useState(0)
+  const [showLess, setShowLess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [newCommentIds, setNewCommentIds] = useState([])
   const [selectedSortOption, setSelectedSortOption] = useState('top')
@@ -47,20 +49,20 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
     setHasMore(true)
   }, [])
 
-  const fetchComments = async currentPage => {
+  const fetchComments = async (currentPage, loadAll = false) => {
     try {
       let url = ''
 
       if (commentableType === 'Piece') {
         url = `${API_URL}/${wildcardParam}/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
           newCommentIds
-        )}`
+        )}${loadAll ? '&load_all=true' : ''}`
       } else if (commentableType === 'Tweak') {
         url = `${API_URL}/${wildcardParam}/tweaks/${
           commentable.id
         }/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
           newCommentIds
-        )}`
+        )}${loadAll ? '&load_all=true' : ''}`
       }
 
       const response = await fetch(url)
@@ -77,11 +79,11 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
     }
   }
 
-  const fetchData = async () => {
+  const fetchData = async (loadAll = false) => {
     if (!isLoading && hasMore) {
       setIsLoading(true)
 
-      const commentsFromServer = await fetchComments(page)
+      const commentsFromServer = await fetchComments(page, loadAll)
 
       if (commentsFromServer) {
         if (selectedSortOption !== selectedSortOptionRef.current) {
@@ -97,6 +99,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
         }
 
         setHasMore(commentsFromServer.meta.has_more)
+        setCommentsLeft(commentsFromServer.meta.comments_left)
         setPage(prevPage => prevPage + 1)
       }
 
@@ -268,20 +271,26 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
     }
   }, [comments, pieceClassModalRef])
 
+  const handleShowAllComments = () => {
+    fetchData(true)
+  }
+
   return (
     <>
       <div className={classes.comments}>
-        <div className={classes['header-container']}>
-          <h2 className={classes.title}>
-            {commentable.comments_count} {commentsTitle}
-          </h2>
-          {comments.length > 0 && (
-            <SortDropdown
-              onSortChange={handleSortChange}
-              selectedSortOption={selectedSortOption}
-            />
-          )}
-        </div>
+        {commentableType === 'Piece' && (
+          <div className={classes['header-container']}>
+            <h2 className={classes.title}>
+              {commentable.comments_count} {commentsTitle}
+            </h2>
+            {comments.length > 0 && (
+              <SortDropdown
+                onSortChange={handleSortChange}
+                selectedSortOption={selectedSortOption}
+              />
+            )}
+          </div>
+        )}
         <div className={classes.commentList}>
           {comments.map(comment => (
             <div
@@ -295,6 +304,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
               <Comment
                 comment={comment}
                 commentable={commentable}
+                commentableType={commentableType}
                 onEdit={(message, commentId) =>
                   handleCommentSubmit(message, commentable.id, commentId)
                 }
@@ -309,10 +319,14 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
           {hasMore && (
             <button
               className={classes['comments-button']}
-              onClick={fetchData}
+              onClick={handleShowAllComments}
               disabled={isLoading}
             >
-              {isLoading ? 'Loading...' : 'Show More Comments'}
+              {isLoading
+                ? 'Loading...'
+                : commentsLeft === 1
+                ? 'Show 1 more comment'
+                : `Show ${commentsLeft} more comments`}
             </button>
           )}
           {token ? (

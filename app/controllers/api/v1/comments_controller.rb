@@ -23,16 +23,26 @@ class Api::V1::CommentsController < ApplicationController
                  comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
                end
 
-    page = params[:page] || 1
+    total_comments = comments.count
     per_page = 5
-    paginated_comments = comments.paginate(page:, per_page:)
+    page = params[:page] || 1
 
-    more_comments = paginated_comments.next_page.present?
+    if params[:load_all] == 'true'
+      comments_to_send = comments.drop(per_page)
+      paginated_comments = comments_to_send
+      comments_left = [total_comments - (per_page * (page.to_i - 1)), 0].max
+      more_comments = false
+    else
+      paginated_comments = comments.paginate(page:, per_page:)
+      comments_left = [total_comments - (page.to_i * per_page), 0].max
+      more_comments = paginated_comments.next_page.present?
+    end
 
     render json: {
       comments: paginated_comments,
       meta: {
-        has_more: more_comments
+        has_more: more_comments,
+        comments_left:
       }
     }, include: {
       user: { only: [:username], methods: [:avatar_url] },

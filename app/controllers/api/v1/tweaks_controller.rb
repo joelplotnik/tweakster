@@ -32,7 +32,8 @@ class Api::V1::TweaksController < ApplicationController
                                    },
                                    votes: { only: %i[user_id vote_type] }
                                  }).merge({
-                                            channel_id: piece.channel.id
+                                            channel_id: piece.channel.id,
+                                            comments_count: tweak.comments.size
                                           })
 
       tweak_data
