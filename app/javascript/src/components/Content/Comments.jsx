@@ -18,7 +18,6 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [commentsLeft, setCommentsLeft] = useState(0)
-  const [showLess, setShowLess] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [newCommentIds, setNewCommentIds] = useState([])
   const [selectedSortOption, setSelectedSortOption] = useState('top')
@@ -316,7 +315,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
           ))}
         </div>
         <div className={classes['buttons-container']}>
-          {hasMore && (
+          {hasMore ? (
             <button
               className={classes['comments-button']}
               onClick={handleShowAllComments}
@@ -328,8 +327,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
                 ? 'Show 1 more comment'
                 : `Show ${commentsLeft} more comments`}
             </button>
-          )}
-          {token ? (
+          ) : token ? (
             <button
               className={classes['comments-button']}
               onClick={() => setShowCommentForm(true)}
