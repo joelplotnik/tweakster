@@ -3,9 +3,9 @@ import { RiSortDesc } from 'react-icons/ri'
 
 import classes from './SortDropdown.module.css'
 
-const SortDropdown = ({ onSortChange, selectedSortOption }) => {
+const SortDropdown = ({ onSortChange }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const options = ['top', 'new']
+  const options = ['top', 'new', 'old']
   const dropdownRef = useRef(null)
 
   const handleSortChange = option => {

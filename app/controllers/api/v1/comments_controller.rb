@@ -17,10 +17,12 @@ class Api::V1::CommentsController < ApplicationController
     excluded_comment_ids = JSON.parse(params[:exclude] || '[]')
     comments = comments.where.not(id: excluded_comment_ids)
 
-    comments = if params[:sort] == 'new'
-                 comments.order(created_at: :desc)
-               else
+    comments = if params[:sort] == 'top'
                  comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
+               elsif params[:sort] == 'old'
+                 comments.order(created_at: :asc)
+               else
+                 comments.order(created_at: :desc)
                end
 
     total_comments = comments.count

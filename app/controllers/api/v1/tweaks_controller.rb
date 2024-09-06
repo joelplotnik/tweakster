@@ -14,6 +14,8 @@ class Api::V1::TweaksController < ApplicationController
 
     tweaks = if params[:sort] == 'new'
                tweaks.order(created_at: :desc)
+             elsif params[:sort] == 'old'
+               tweaks.order(created_at: :asc)
              else
                tweaks.sort_by { |tweak| calculate_tweak_score(tweak) }.reverse
              end

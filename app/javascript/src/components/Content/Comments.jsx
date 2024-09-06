@@ -20,7 +20,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   const [commentsLeft, setCommentsLeft] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [newCommentIds, setNewCommentIds] = useState([])
-  const [selectedSortOption, setSelectedSortOption] = useState('top')
+  const [selectedSortOption, setSelectedSortOption] = useState('old')
   const selectedSortOptionRef = useRef(selectedSortOption)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showCommentForm, setShowCommentForm] = useState(false)
@@ -290,10 +290,7 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
               {commentable.comments_count} {commentsTitle}
             </h2>
             {comments.length > 0 && (
-              <SortDropdown
-                onSortChange={handleSortChange}
-                selectedSortOption={selectedSortOption}
-              />
+              <SortDropdown onSortChange={handleSortChange} />
             )}
           </div>
         )}

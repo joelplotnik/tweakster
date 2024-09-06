@@ -96,12 +96,7 @@ const Tweaks = ({ piece, pieceClassModalRef }) => {
         <h2 className={classes.title}>
           {piece.tweaks_count} {tweaksTitle}
         </h2>
-        {tweaks.length > 0 && (
-          <SortDropdown
-            onSortChange={handleSortChange}
-            selectedSortOption={selectedSortOption}
-          />
-        )}
+        {tweaks.length > 0 && <SortDropdown onSortChange={handleSortChange} />}
       </div>
       <div className={classes['tweak-layout']}>
         {tweaks.length === 0 && (
