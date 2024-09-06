@@ -131,11 +131,18 @@ const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
     commentId = null
   ) => {
     try {
-      const url = commentId
-        ? `${API_URL}/${wildcardParam}/comments/${commentId}`
-        : `${API_URL}/${wildcardParam}/comments`
+      let url = ''
+      let method = commentId ? 'PUT' : 'POST'
 
-      const method = commentId ? 'PUT' : 'POST'
+      if (commentableType === 'Piece') {
+        url = commentId
+          ? `${API_URL}/${wildcardParam}/comments/${commentId}`
+          : `${API_URL}/${wildcardParam}/comments`
+      } else if (commentableType === 'Tweak') {
+        url = commentId
+          ? `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments/${commentId}`
+          : `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments`
+      }
 
       const commentData = {
         message: message,
