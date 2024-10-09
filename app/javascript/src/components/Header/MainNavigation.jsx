@@ -31,8 +31,8 @@ import Sidebar from './Sidebar'
 
 const MainNavigation = () => {
   const token = useRouteLoaderData('root')
-  const cableContext = useContext(CableContext)
-  const cable = cableContext ? cableContext.cable : null
+  // const cableContext = useContext(CableContext)
+  // const cable = cableContext ? cableContext.cable : null
   const [showMenu, setShowMenu] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
@@ -40,60 +40,60 @@ const MainNavigation = () => {
   const dropdownRef = useRef(null)
   const submit = useSubmit()
   const user = useSelector(state => state.user.user)
-  const { userId, userRole } = getUserData() || {}
+  const { userId } = getUserData() || {}
   const dispatch = useDispatch()
-  const hasNewNotifications = useSelector(
-    state => state.notifications.hasNewNotifications
-  )
+  // const hasNewNotifications = useSelector(
+  //   state => state.notifications.hasNewNotifications
+  // )
 
-  useEffect(() => {
-    if (!token) return
+  // useEffect(() => {
+  //   if (!token) return
 
-    const subscription = cable.subscriptions.create(
-      { channel: 'NotificationsChannel' },
-      {
-        received: () => {
-          dispatch(notificationsActions.setHasNewNotifications(true))
-        },
-      }
-    )
+  //   const subscription = cable.subscriptions.create(
+  //     { channel: 'NotificationsChannel' },
+  //     {
+  //       received: () => {
+  //         dispatch(notificationsActions.setHasNewNotifications(true))
+  //       },
+  //     }
+  //   )
 
-    return () => {
-      subscription.unsubscribe()
-    }
-  }, [token])
+  //   return () => {
+  //     subscription.unsubscribe()
+  //   }
+  // }, [token])
 
-  useEffect(() => {
-    if (!token) return
+  // useEffect(() => {
+  //   if (!token) return
 
-    const fetchUnseenNotifications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/notifications/unseen`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
+  //   const fetchUnseenNotifications = async () => {
+  //     try {
+  //       const response = await fetch(`${API_URL}/notifications/unseen`, {
+  //         method: 'GET',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       })
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch unseen notifications')
-        }
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch unseen notifications')
+  //       }
 
-        const data = await response.json()
+  //       const data = await response.json()
 
-        dispatch(
-          notificationsActions.setHasNewNotifications(
-            data.has_unseen_notifications
-          )
-        )
-      } catch (error) {
-        console.error('Error fetching unseen notifications: ', error)
-      }
-    }
+  //       dispatch(
+  //         notificationsActions.setHasNewNotifications(
+  //           data.has_unseen_notifications
+  //         )
+  //       )
+  //     } catch (error) {
+  //       console.error('Error fetching unseen notifications: ', error)
+  //     }
+  //   }
 
-    fetchUnseenNotifications()
-  }, [token])
+  //   fetchUnseenNotifications()
+  // }, [token])
 
   const handleMenuToggle = () => {
     setShowMenu(!showMenu)
@@ -161,11 +161,6 @@ const MainNavigation = () => {
         </div>
         <SearchBar />
         <nav className={classes['navbar-nav']}>
-          {/* {token && (
-            <NavLink to="messages" className={classes['icon-button']}>
-              <RiChat3Line />
-            </NavLink>
-          )} */}
           {token && (
             <NavLink to="new" className={classes['icon-button']}>
               <RiAddFill />
@@ -178,9 +173,9 @@ const MainNavigation = () => {
               className={classes['icon-button']}
             >
               <RiNotification3Line />
-              {hasNewNotifications && (
+              {/* {hasNewNotifications && (
                 <span className={classes['notification-dot']}></span>
-              )}
+              )} */}
             </NavLink>
           )}
           {!token && (
@@ -214,19 +209,6 @@ const MainNavigation = () => {
             </button>
             {showMenu && (
               <div className={classes['dropdown-menu']}>
-                {token && userRole === 'admin' && (
-                  <NavLink
-                    to={`admin`}
-                    className={({ isActive }) =>
-                      isActive ? classes.active : undefined
-                    }
-                    end
-                    onClick={() => setShowMenu(false)}
-                  >
-                    <RiDashboardLine />
-                    <span>Admin</span>
-                  </NavLink>
-                )}
                 {token && (
                   <NavLink
                     to={`users/${userId}`}

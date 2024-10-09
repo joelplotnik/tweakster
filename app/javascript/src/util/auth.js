@@ -66,66 +66,10 @@ export async function checkAuthLoader({ params }) {
   const { id } = params
   const parsedID = parseInt(id, 10)
 
-  const path = params['*']
-  const splitPath = path.split('/')
-  const page = splitPath[0]
-  const pageID = splitPath[1]
-  const piecePage = splitPath[2] === 'pieces'
-  const hasPieceID = !isNaN(splitPath[3])
-  const newPiece = splitPath[3] === 'new'
-
-  // User attempting to edit a piece
-  if (hasPieceID && page === 'channels' && piecePage) {
+  // User attempting to edit their profile
+  if (parsedID) {
     const response = await fetch(
-      `${API_URL}/${page}/${pageID}/pieces/${parsedID}/check_ownership`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      const data = await response.json()
-
-      if (response.status === 401 || !data.belongs_to_user) {
-        return redirect('/')
-      } else {
-        throw json({ message: 'Could not make request.' }, { status: 500 })
-      }
-    }
-  }
-
-  // User attempting to create a piece
-  if (newPiece && page === 'channels' && piecePage) {
-    const response = await fetch(
-      `${API_URL}/${page}/${pageID}/check_channel_subscription`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      await response.json()
-
-      if (response.status === 403) {
-        return redirect('/')
-      } else {
-        throw json({ message: 'Could not make request.' }, { status: 500 })
-      }
-    }
-  }
-
-  // User attempting to edit a user or channel
-  if (parsedID && !piecePage && (page === 'users' || page === 'channels')) {
-    const response = await fetch(
-      `${API_URL}/${page}/${parsedID}/check_ownership`,
+      `${API_URL}/users/${parsedID}/check_ownership`,
       {
         method: 'GET',
         headers: {

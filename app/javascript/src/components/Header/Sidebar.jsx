@@ -143,7 +143,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </Link>
           <hr className={classes.line} />
           <div className={classes.header}>
-            {isTopChannelsEmpty ? 'POPULAR CHANNELS' : 'TOP SUBSCRIPTIONS'}
+            {isTopChannelsEmpty ? 'POPULAR CHANNELS' : 'TOP CHALLENEGES'}
           </div>
           {channels?.map(channel => (
             <Link
@@ -174,7 +174,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </Link>
           <hr className={classes.line} />
           <div className={classes.header}>
-            {isTopUsersEmpty ? 'ACTIVE USERS' : 'RECENT INTERACTIONS'}
+            {isTopUsersEmpty ? 'ACTIVE USERS' : 'TOP ACHIEVERS'}
           </div>
           {users?.map(user => (
             <Link
