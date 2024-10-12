@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_26_191225) do
+ActiveRecord::Schema[7.0].define(version: 2024_10_12_064109) do
+  create_table "accepted_challenges", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "challenge_id", null: false
+    t.string "status"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["challenge_id"], name: "index_accepted_challenges_on_challenge_id"
+    t.index ["user_id"], name: "index_accepted_challenges_on_user_id"
+  end
+
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,16 +50,27 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_26_191225) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "channels", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "url"
-    t.text "protocol"
-    t.integer "subscriptions_count", default: 0
-    t.integer "user_id"
+  create_table "approvals", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "accepted_challenge_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "summary"
-    t.index ["name"], name: "index_channels_on_name", unique: true
+    t.index ["accepted_challenge_id"], name: "index_approvals_on_accepted_challenge_id"
+    t.index ["user_id"], name: "index_approvals_on_user_id"
+  end
+
+  create_table "challenges", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "title"
+    t.text "description"
+    t.bigint "game_id", null: false
+    t.integer "likes_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "hidden", default: false
+    t.integer "accepted_count"
+    t.bigint "user_id", null: false
+    t.index ["game_id"], name: "index_challenges_on_game_id"
+    t.index ["user_id"], name: "index_challenges_on_user_id"
   end
 
   create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -56,11 +78,40 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_26_191225) do
     t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "upvotes", default: 0
-    t.integer "downvotes", default: 0
     t.string "commentable_type", null: false
     t.integer "commentable_id", null: false
+    t.integer "likes_count", default: 0
+    t.bigint "parent_id"
     t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
+    t.index ["parent_id"], name: "index_comments_on_parent_id"
+  end
+
+  create_table "difficulties", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "challenge_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "rating", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["challenge_id"], name: "index_difficulties_on_challenge_id"
+    t.index ["user_id"], name: "index_difficulties_on_user_id"
+  end
+
+  create_table "games", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "platform", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "likes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "likeable_type", null: false
+    t.bigint "likeable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["likeable_type", "likeable_id"], name: "index_likes_on_likeable"
+    t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
   create_table "noticed_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -87,25 +138,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_26_191225) do
     t.index ["recipient_type", "recipient_id"], name: "index_noticed_notifications_on_recipient"
   end
 
-  create_table "pieces", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.string "title", null: false
-    t.text "body", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
-    t.integer "channel_id", null: false
-    t.integer "upvotes", default: 0
-    t.integer "downvotes", default: 0
-    t.string "youtube_url"
-    t.string "image"
-    t.string "url"
-    t.datetime "dateTimePub"
-    t.text "authors"
-    t.text "links"
-    t.text "videos"
-    t.string "source"
-  end
-
   create_table "relationships", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "follower_id", null: false
     t.integer "followee_id", null: false
@@ -122,29 +154,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_26_191225) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "subscriptions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "channel_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "tweaks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.text "annotation", null: false
-    t.integer "piece_id", null: false
-    t.integer "user_id", null: false
-    t.integer "start_offset", null: false
-    t.integer "end_offset", null: false
-    t.string "style_type", null: false
-    t.string "style_value"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "upvotes"
-    t.integer "downvotes"
-    t.index ["piece_id"], name: "index_tweaks_on_piece_id"
-    t.index ["user_id"], name: "index_tweaks_on_user_id"
-  end
-
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -156,27 +165,25 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_26_191225) do
     t.string "jti", null: false
     t.string "username"
     t.string "role", default: "user"
-    t.float "integrity", default: 0.0
     t.text "bio"
     t.string "url"
-    t.text "favorite_channels"
-    t.text "favorite_users"
+    t.text "favorite_games"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  create_table "votes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.string "votable_type", null: false
-    t.integer "votable_id", null: false
-    t.integer "vote_type", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["votable_type", "votable_id"], name: "index_votes_on_votable_type_and_votable_id"
-  end
-
+  add_foreign_key "accepted_challenges", "challenges"
+  add_foreign_key "accepted_challenges", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "approvals", "accepted_challenges"
+  add_foreign_key "approvals", "users"
+  add_foreign_key "challenges", "games"
+  add_foreign_key "challenges", "users"
+  add_foreign_key "comments", "comments", column: "parent_id"
+  add_foreign_key "difficulties", "challenges"
+  add_foreign_key "difficulties", "users"
+  add_foreign_key "likes", "users"
 end

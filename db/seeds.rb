@@ -1,328 +1,387 @@
+# Clear existing data to avoid duplication and ensure a clean state
+User.delete_all
+Relationship.delete_all
+Game.delete_all
+Challenge.delete_all
+AcceptedChallenge.delete_all
+Comment.delete_all
+Like.delete_all
+Approval.delete_all
+Difficulty.delete_all
+Report.delete_all
+
+# Delete all notifications
+ActiveRecord::Base.connection.execute('DELETE FROM noticed_notifications')
+ActiveRecord::Base.connection.execute('DELETE FROM noticed_events')
+
 # Create Users
 users = []
 20.times do
-  user = User.create!(
-    email: Faker::Internet.email,
+  email = Faker::Internet.email
+  next if User.exists?(email:)
+
+  user = User.new(
+    email:,
     password: 'Password11!!',
     username: Faker::Internet.username,
     url: Faker::Internet.url,
     bio: Faker::Lorem.paragraph_by_chars(number: 100)
   )
 
-  # Attach an avatar image to the user
   avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
-  user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
 
-  users << user
-rescue ActiveRecord::RecordInvalid => e
-  puts "Validation error: #{e.message}. Skipping this user."
-  # Log or handle the validation error as needed
+  if avatar_url.present?
+    begin
+      user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
+    rescue StandardError => e
+      puts "Error attaching avatar for #{user.username}: #{e.message}. Skipping this user."
+    end
+  else
+    puts "No avatar URL generated for #{user.username}. Skipping avatar attachment."
+  end
+
+  begin
+    user.save!
+    users << user
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for #{user.username}: #{e.message}. Skipping this user."
+  end
 end
 
 # Create Admin User
-admin_user = User.create!(
-  email: 'superadmin@example.com',
-  password: 'Password11!!',
-  username: 'superadmin',
-  role: 'admin',
-  url: Faker::Internet.url,
-  bio: Faker::Lorem.paragraph_by_chars(number: 100)
-)
-
-avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
-admin_user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
-
-users << admin_user
-
-# Create Channels
-channels = []
-subscriptions = []
-20.times do
-  user = users.sample
-  channel_name = ''
-  loop do
-    channel_name = Faker::Hipster.unique.word
-    break if channel_name.length >= 3
-  end
-  channel = Channel.create!(
-    name: channel_name,
+admin_email = 'superadmin@example.com'
+unless User.exists?(email: admin_email)
+  admin_user = User.new(
+    email: admin_email,
+    password: 'Password11!!',
+    username: 'superadmin',
+    role: 'admin',
     url: Faker::Internet.url,
-    summary: Faker::Lorem.paragraph_by_chars(number: 100),
-    protocol: Faker::Lorem.paragraph_by_chars(number: 100),
-    user_id: user.id
+    bio: Faker::Lorem.paragraph_by_chars(number: 100)
   )
-  channels << channel
 
-  # Attach a visual representation to the channel
-  visual_url = Faker::LoremFlickr.image(size: '300x300')
-  channel.visual.attach(io: URI.open(visual_url), filename: 'channel_visual.png')
+  avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
 
-  # Create a subscription for the user who created the channel
-  subscriptions << Subscription.create!(
-    user_id: user.id,
-    channel_id: channel.id
-  )
-rescue ActiveRecord::RecordInvalid => e
-  puts "Validation error for Channel: #{e.message}. Skipping this channel."
-  # Log or handle the validation error as needed
+  if avatar_url.present?
+    begin
+      admin_user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
+    rescue StandardError => e
+      puts "Error attaching avatar for Admin User: #{e.message}. Skipping this user."
+    end
+  else
+    puts 'No avatar URL generated for Admin User. Skipping avatar attachment.'
+  end
+
+  begin
+    admin_user.save!
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Admin User: #{e.message}. Skipping this user."
+  end
 end
 
-# Create Subscriptions
-subscriptions_count = 50
-subscriptions_count.times do
-  user = users.sample
-  channel = channels.sample
+# Create Games
+games = []
+PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
+10.times do
+  name = Faker::Game.title
+  next if Game.exists?(name:)
 
-  next if Subscription.exists?(user_id: user.id, channel_id: channel.id)
+  begin
+    game = Game.create!(
+      name:,
+      platform: PLATFORMS.sample,
+      description: Faker::Lorem.paragraph(sentence_count: 3)
+    )
 
-  Subscription.create!(
-    user_id: user.id,
-    channel_id: channel.id
-  )
+    image_url = Faker::LoremFlickr.image(size: '300x300')
+    if image_url.present?
+      game.image.attach(io: URI.open(image_url), filename: 'game_image.png')
+    else
+      puts "No image URL generated for #{game.name}. Skipping image attachment."
+    end
+
+    games << game
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Game: #{e.message}. Skipping this game."
+  rescue StandardError => e
+    puts "Error attaching image for Game: #{e.message}. Skipping this game."
+  end
+end
+
+# Create Challenges
+challenges = []
+20.times do
+  title = Faker::Game.title
+  next if Challenge.exists?(title:)
+
+  begin
+    challenge = Challenge.create!(
+      title:,
+      description: Faker::Lorem.paragraph(sentence_count: 5),
+      game: games.sample,
+      user: users.sample
+    )
+    challenges << challenge
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Challenge: #{e.message}. Skipping this challenge."
+  end
+end
+
+# Create Accepted Challenges
+accepted_challenges = []
+30.times do
+  next if AcceptedChallenge.exists?(challenge: challenges.sample)
+
+  begin
+    accepted_challenge = AcceptedChallenge.create!(
+      challenge: challenges.sample,
+      user: users.sample,
+      status: %w[accepted in_progress completed].sample,
+      completed_at: Faker::Date.between(from: '2023-01-01', to: '2024-01-01')
+    )
+    accepted_challenges << accepted_challenge
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Accepted Challenge: #{e.message}. Skipping this accepted challenge."
+  end
 end
 
 # Create Relationships
-relationships_count = 5
-
 users.each do |follower|
-  relationships_count.times do
-    followee = users.reject { |user| user == follower }.sample
+  relationships_count = rand(1..[users.size - 1, 3].min)
+  followees = users.reject { |user| user == follower }.sample(relationships_count)
 
+  followees.each do |followee|
     next if Relationship.exists?(follower_id: follower.id, followee_id: followee.id)
 
-    Relationship.create!(
-      follower_id: follower.id,
-      followee_id: followee.id
-    )
+    begin
+      Relationship.create!(
+        follower_id: follower.id,
+        followee_id: followee.id
+      )
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Relationship: #{e.message}. Skipping this relationship."
+    end
   end
 end
 
-# Assign Pieces to Users and Channels
-piece_count = 100
-youtube_urls = [
-  'https://www.youtube.com/watch?v=C0DPdy98e4c',
-  'https://www.youtube.com/watch?v=sZtCF_9pee4',
-  'https://www.youtube.com/watch?v=IIqtuupvdWg'
-]
+# Create Comments on Challenges
+challenges.each do |challenge|
+  num_comments = rand(0..5)
 
-piece_count.times do |index|
-  user = users.sample
-  channel = channels.sample
-  youtube_url = youtube_urls.sample
+  # Sample unique users to prevent duplicate user comments
+  comment_users = users.sample(num_comments)
 
-  # Generate random image URLs with non-square dimensions
-  image_urls = []
-  rand(1..3).times do
-    width = rand(300..800)
-    height = rand(300..800)
-    image_urls << Faker::LoremFlickr.image(size: "#{width}x#{height}")
+  comment_users.each do |comment_user|
+    # Create a parent comment
+    parent_comment = Comment.create!(
+      message: Faker::Lorem.sentence,
+      user: comment_user,
+      commentable: challenge
+    )
+
+    next unless parent_comment.persisted? && comment_user != challenge.user
+
+    CommentNotifier.with(record: parent_comment).deliver(challenge.user) if challenge.respond_to?(:user)
+
+    # Create child comments (nested)
+    num_child_comments = rand(0..3)
+    child_comment_users = users.sample(num_child_comments).uniq
+
+    child_comment_users.each do |child_comment_user|
+      next if parent_comment.parent_id.present?
+
+      child_comment = Comment.create!(
+        message: Faker::Lorem.sentence,
+        user: child_comment_user,
+        commentable: challenge,
+        parent_id: parent_comment.id
+      )
+
+      next unless child_comment.persisted? && child_comment_user != parent_comment.user
+
+      # Notify the parent commenter
+      CommentNotifier.with(record: child_comment).deliver(parent_comment.user) if parent_comment.respond_to?(:user)
+
+      # Notify the challenge creator
+      CommentNotifier.with(record: child_comment).deliver(challenge.user) if challenge.respond_to?(:user)
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Comment: #{e.message}. Skipping this comment."
   end
+end
 
-  piece = Piece.new(
-    title: Faker::Book.title,
-    user_id: user.id,
-    channel_id: channel.id,
-    body: Faker::Lorem.paragraph(sentence_count: 50)
-  )
+# Create Comments on Accepted Challenges
+accepted_challenges.each do |accepted_challenge|
+  num_comments = rand(0..5)
 
-  if index.even?
-    # Apply variations for half of the pieces (even index)
-    attributes = %i[images youtube_url content].sample
+  comment_users = users.sample(num_comments)
 
-    case attributes
-    when :images
-      image_urls.each do |image_url|
-        piece.images.attach(io: URI.open(image_url), filename: 'image.png')
+  comment_users.each do |comment_user|
+    parent_comment = Comment.create!(
+      message: Faker::Lorem.sentence,
+      user: comment_user,
+      commentable: accepted_challenge
+    )
+
+    next unless parent_comment.persisted? && comment_user != accepted_challenge.user
+
+    if accepted_challenge.respond_to?(:user)
+      CommentNotifier.with(record: parent_comment).deliver(accepted_challenge.user)
+    end
+
+    # Create child comments (nested)
+    num_child_comments = rand(0..3)
+    child_comment_users = users.sample(num_child_comments).uniq
+
+    child_comment_users.each do |child_comment_user|
+      next if parent_comment.parent_id.present?
+
+      child_comment = Comment.create!(
+        message: Faker::Lorem.sentence,
+        user: child_comment_user,
+        commentable: accepted_challenge,
+        parent_id: parent_comment.id
+      )
+
+      next unless child_comment.persisted? && child_comment_user != parent_comment.user
+
+      # Notify the parent commenter
+      CommentNotifier.with(record: child_comment).deliver(parent_comment.user) if parent_comment.respond_to?(:user)
+
+      # Notify the accepted_challenge creator
+      if accepted_challenge.respond_to?(:user)
+        CommentNotifier.with(record: child_comment).deliver(accepted_challenge.user)
       end
-    when :youtube_url
-      piece.youtube_url = youtube_url
     end
-  else
-    # Apply all attributes for the other half of the pieces (odd index)
-    piece.youtube_url = youtube_url
-    image_urls.each do |image_url|
-      piece.images.attach(io: URI.open(image_url), filename: 'image.png')
-    end
-  end
-
-  # Validate that at least one attribute is present
-  unless piece.content.present? || piece.youtube_url.present? || piece.images.attached?
-    piece.errors.add(:base, 'At least one attribute (content, youtube_url, or images) must be present')
-  end
-
-  piece.save
-end
-
-# Create Tweaks for Pieces
-pieces = Piece.all
-pieces.each do |piece|
-  num_tweaks = rand(0..5)
-  users.sample(num_tweaks).each do |tweak_user|
-    annotation = Faker::Lorem.paragraph(sentence_count: 6)
-    annotation_length = annotation.length
-    start_offset = rand(0..(annotation_length - 1))
-    end_offset = rand(start_offset..annotation_length)
-
-    style_type = %w[bold italic underline strikethrough highlight color].sample
-    style_value = nil
-
-    style_value = Faker::Color.hex_color.to_s if %w[highlight color].include?(style_type)
-
-    Tweak.create!(
-      annotation:,
-      piece:,
-      user: tweak_user,
-      start_offset:,
-      end_offset:,
-      style_type:,
-      style_value:
-    )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Comment: #{e.message}. Skipping this comment."
   end
 end
 
-# Create Comments for Pieces
-pieces = Piece.all
-pieces.each do |piece|
-  num_comments = rand(0..20)
-  users.sample(num_comments).each do |comment_user|
-    comment = Comment.create!(
-      message: Faker::Lorem.sentence,
-      user: comment_user,
-      commentable: piece
-    )
+# Create Likes on Challenges
+challenges.each do |challenge|
+  num_likes = rand(0..10)
+  likers = users.sample(num_likes).uniq
+  likers.each do |liker|
+    next if Like.exists?(user: liker, likeable: challenge)
 
-    next unless comment.persisted? && comment_user != piece.user
+    begin
+      Like.create!(
+        user: liker,
+        likeable: challenge
+      )
 
-    CommentOnPieceNotifier.with(record: comment).deliver(piece.user) if piece.respond_to?(:user)
-  end
-end
-
-# Create Comments for Tweaks
-tweaks = Tweak.all
-tweaks.each do |tweak|
-  num_comments = rand(0..20)
-  users.sample(num_comments).each do |comment_user|
-    comment = Comment.create!(
-      message: Faker::Lorem.sentence,
-      user: comment_user,
-      commentable: tweak
-    )
-
-    if comment.persisted? && comment_user != tweak.user
-      # Add logic to notify the tweak's user if necessary
+    # # Notify the challenge creator about the like
+    # LikeNotifier.with(record: like).deliver(challenge.user) if challenge.respond_to?(:user)
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Like on Challenge: #{e.message}. Skipping this like."
     end
   end
 end
 
-# Create Votes for Pieces
-users.each do |user|
-  voted_pieces = []
-  num_votes = rand(20..40)
+# Create Likes on Comments
+comments = Comment.all
+comments.each do |comment|
+  num_likes = rand(0..10)
+  likers = users.sample(num_likes).uniq
+  likers.each do |liker|
+    next if Like.exists?(user: liker, likeable: comment)
 
-  num_votes.times do
-    piece = Piece.all.sample
-    next if voted_pieces.include?(piece.id) || piece.nil?
+    begin
+      Like.create!(
+        user: liker,
+        likeable: comment
+      )
 
-    voted_pieces << piece.id
-
-    vote_type = [1, -1].sample
-
-    Vote.create!(
-      user_id: user.id,
-      votable_type: 'Piece',
-      votable_id: piece.id,
-      vote_type:
-    )
+      # Notify the comment creator about the like
+      # LikeNotifier.with(record: like).deliver(comment.user) if comment.respond_to?(:user)
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Like on Comment: #{e.message}. Skipping this like."
+    end
   end
 end
 
-# Create Votes for Comments
-users.each do |user|
-  voted_comments = []
-  num_votes = rand(40..80)
+# Create Approvals on Accepted Challenges
+accepted_challenges.each do |accepted_challenge|
+  num_approvals = rand(0..5)
+  approvers = users.sample(num_approvals).uniq
+  approvers.each do |approver|
+    next if Approval.exists?(user: approver, accepted_challenge:)
 
-  num_votes.times do
-    comment = Comment.all.sample
-    next if voted_comments.include?(comment.id) || comment.nil?
+    begin
+      Approval.create!(
+        user: approver,
+        accepted_challenge:
+      )
 
-    voted_comments << comment.id
-
-    vote_type = [1, -1].sample
-
-    Vote.create!(
-      user_id: user.id,
-      votable_type: 'Comment',
-      votable_id: comment.id,
-      vote_type:
-    )
+      # Notify the accepted challenge creator about the approval
+      # ApprovalNotifier.with(record: approval).deliver(accepted_challenge.user) if accepted_challenge.respond_to?(:user)
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Approval on Accepted Challenge: #{e.message}. Skipping this approval."
+    end
   end
 end
 
-# Create Votes for Tweaks
-users.each do |user|
-  voted_tweaks = []
-  num_votes = rand(30..50)
+# Create Difficulties on Challenges
+challenges.each do |challenge|
+  num_difficulties = rand(1..3)
+  difficulty_users = users.sample(num_difficulties).uniq
 
-  num_votes.times do
-    tweak = Tweak.all.sample
-    next if voted_tweaks.include?(tweak.id) || tweak.nil?
-
-    voted_tweaks << tweak.id
-
-    vote_type = [1, -1].sample
-
-    Vote.create!(
-      user_id: user.id,
-      votable_type: 'Tweak',
-      votable_id: tweak.id,
-      vote_type:
+  difficulty_users.each do |difficulty_user|
+    Difficulty.create!(
+      challenge:,
+      user: difficulty_user,
+      rating: rand(1..5)
     )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Difficulty on Challenge: #{e.message}. Skipping this difficulty."
   end
 end
+
+# Define reasons for reporting
+report_reasons = %w[spam inappropriate offensive harassing]
 
 # Create Reports
 users.each do |user|
-  # Pieces
-  pieces_to_report = Piece.where.not(user_id: user.id)
-  pieces_to_report.sample(rand(1..5)).each do |piece|
+  # Challenges
+  challenges_to_report = Challenge.where.not(user_id: user.id)
+  sampled_challenges = challenges_to_report.sample(rand(1..[5, challenges_to_report.count].min))
+  sampled_challenges.each do |challenge|
     Report.create!(
-      content_type: 'piece',
-      content_id: piece.id,
+      content_type: 'challenge',
+      content_id: challenge.id,
       reporter_id: user.id,
-      reason: %w[spam inappropriate].sample
+      reason: report_reasons.sample
     )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Report on Challenge: #{e.message}. Skipping this report."
   end
 
   # Comments
   comments_to_report = Comment.where.not(user_id: user.id)
-  comments_to_report.sample(rand(1..5)).each do |comment|
+  sampled_comments = comments_to_report.sample(rand(1..[5, comments_to_report.count].min))
+  sampled_comments.each do |comment|
     Report.create!(
       content_type: 'comment',
       content_id: comment.id,
       reporter_id: user.id,
-      reason: %w[spam inappropriate].sample
+      reason: report_reasons.sample
     )
-  end
-
-  # Channels
-  channels_to_report = Channel.where.not(user_id: user.id)
-  channels_to_report.sample(rand(1..5)).each do |channel|
-    Report.create!(
-      content_type: 'channel',
-      content_id: channel.id,
-      reporter_id: user.id,
-      reason: %w[spam inappropriate].sample
-    )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Report on Comment: #{e.message}. Skipping this report."
   end
 
   # Users
   users_to_report = User.where.not(id: user.id)
-  users_to_report.sample(rand(1..5)).each do |report_user|
+  sampled_users = users_to_report.sample(rand(1..[5, users_to_report.count].min))
+  sampled_users.each do |report_user|
     Report.create!(
       content_type: 'user',
       content_id: report_user.id,
       reporter_id: user.id,
-      reason: %w[spam inappropriate].sample
+      reason: report_reasons.sample
     )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Report on User: #{e.message}. Skipping this report."
   end
 end

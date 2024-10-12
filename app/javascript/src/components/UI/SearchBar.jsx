@@ -10,7 +10,7 @@ import classes from './SearchBar.module.css'
 function SearchBar() {
   const [searchTerm, setSearchTerm] = useState('')
   const [userResults, setUserResults] = useState([])
-  const [channelResults, setChannelResults] = useState([])
+  const [gameResults, setGameResults] = useState([])
   const [isFocused, setIsFocused] = useState(false)
   const searchRef = useRef(null)
 
@@ -30,17 +30,17 @@ function SearchBar() {
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const [userResponse, channelResponse] = await Promise.all([
+        const [userResponse, gameResponse] = await Promise.all([
           fetch(`${API_URL}/users/search?search_term=${searchTerm}`),
-          fetch(`${API_URL}/channels/search?search_term=${searchTerm}`),
+          fetch(`${API_URL}/games/search?search_term=${searchTerm}`),
         ])
-        if (!userResponse.ok || !channelResponse.ok) {
+        if (!userResponse.ok || !gameResponse.ok) {
           throw new Error('Network response was not ok')
         }
         const userData = await userResponse.json()
-        const channelData = await channelResponse.json()
+        const gameData = await gameResponse.json()
         setUserResults(userData)
-        setChannelResults(channelData)
+        setGameResults(gameData)
       } catch (error) {
         console.error('Error: ', error.message)
       }
@@ -50,7 +50,7 @@ function SearchBar() {
       fetchResults()
     } else {
       setUserResults([])
-      setChannelResults([])
+      setGameResults([])
     }
   }, [searchTerm, isFocused])
 
@@ -66,7 +66,7 @@ function SearchBar() {
     setIsFocused(true)
   }
 
-  const hasResults = userResults.length !== 0 || channelResults.length !== 0
+  const hasResults = userResults.length !== 0 || gameResults.length !== 0
 
   return (
     <div className={classes['search-bar']} ref={searchRef}>
@@ -120,25 +120,25 @@ function SearchBar() {
               ))}
             </div>
           )}
-          {channelResults.length !== 0 && (
-            <div className={classes.channels}>
+          {gameResults.length !== 0 && (
+            <div className={classes.games}>
               <>
                 <hr />
-                <p>Channels:</p>
+                <p>Games:</p>
               </>
 
-              {channelResults.map(result => (
+              {gameResults.map(result => (
                 <Link
-                  to={`/channels/${result.id}`}
+                  to={`/games/${result.id}`}
                   key={result.id}
-                  className={classes['channel-result']}
+                  className={classes['game-result']}
                   onClick={clearInput}
                 >
-                  <div className={classes['channel-visual-container']}>
+                  <div className={classes['game-visual-container']}>
                     <img
                       src={result.visual_url || defaultVisual}
-                      alt="User"
-                      className={classes['channel-visual']}
+                      alt="Game"
+                      className={classes['game-visual']}
                     />
                   </div>
                   {result.name}

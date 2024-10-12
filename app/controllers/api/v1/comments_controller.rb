@@ -11,44 +11,39 @@ class Api::V1::CommentsController < ApplicationController
   end
 
   def index
-    comments = Comment.where(commentable: find_commentable)
-                      .includes(:user, :votes)
+    comments = Comment.where(commentable: find_commentable, parent_id: nil)
+                      .includes(:user)
+                      .order(likes_count: :desc)
 
-    excluded_comment_ids = JSON.parse(params[:exclude] || '[]')
-    comments = comments.where.not(id: excluded_comment_ids)
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_comments = comments.offset((page - 1) * per_page).limit(per_page)
 
-    comments = if params[:sort] == 'top'
-                 comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
-               elsif params[:sort] == 'old'
-                 comments.order(created_at: :asc)
-               else
-                 comments.order(created_at: :desc)
-               end
-
-    total_comments = comments.count
-    per_page = 5
-    page = params[:page] || 1
-
-    if params[:load_all] == 'true'
-      comments_to_send = comments.drop(per_page)
-      paginated_comments = comments_to_send
-      comments_left = [total_comments - (per_page * (page.to_i - 1)), 0].max
-      more_comments = false
-    else
-      paginated_comments = comments.paginate(page:, per_page:)
-      comments_left = [total_comments - (page.to_i * per_page), 0].max
-      more_comments = paginated_comments.next_page.present?
+    comments_with_replies_count = paginated_comments.map do |comment|
+      {
+        comment:,
+        replies_count: comment.children.count
+      }
     end
 
+    render json: comments_with_replies_count, include: {
+      user: { only: [:username], methods: [:avatar_url] }
+    }
+  end
+
+  def replies
+    parent_comment = Comment.find(params[:parent_comment_id])
+    replies = parent_comment.children.includes(:user).order(likes_count: :desc)
+
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_replies = replies.offset((page - 1) * per_page).limit(per_page)
+
     render json: {
-      comments: paginated_comments,
-      meta: {
-        has_more: more_comments,
-        comments_left:
-      }
+      replies: paginated_replies,
+      replies_count: replies.count
     }, include: {
-      user: { only: [:username], methods: [:avatar_url] },
-      votes: { only: %i[user_id vote_type] }
+      user: { only: [:username], methods: [:avatar_url] }
     }
   end
 
@@ -57,14 +52,14 @@ class Api::V1::CommentsController < ApplicationController
     comment = commentable.comments.new(comment_params)
     comment.user = current_user
 
+    comment.parent_id = params[:parent_id] if params[:parent_id].present?
+
     if comment.save
-      unless comment.user == comment.commentable.user
-        CommentOnPieceNotifier.with(record: comment).deliver(commentable.user)
-      end
+      CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == comment.commentable.user
 
       render json: comment, include: {
         user: { only: [:username], methods: [:avatar_url] },
-        votes: { only: %i[user_id vote_type] }
+        likes: { only: [:user_id] }
       }, status: :created
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
@@ -74,10 +69,10 @@ class Api::V1::CommentsController < ApplicationController
   def update
     comment = Comment.find(params[:id])
 
-    if comment.update(comment_params)
+    if comment.update(comment_params.except(:parent_id))
       render json: comment, include: {
         user: { only: [:username], methods: [:avatar_url] },
-        votes: { only: %i[user_id vote_type] }
+        likes: { only: [:user_id] }
       }, status: :ok
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
@@ -104,10 +99,12 @@ class Api::V1::CommentsController < ApplicationController
   private
 
   def find_commentable
-    if params[:tweak_id]
-      Tweak.find(params[:tweak_id])
-    elsif params[:piece_id]
-      Piece.find(params[:piece_id])
+    if params[:challenge_id]
+      Challenge.find(params[:challenge_id])
+    elsif params[:accepted_challenge_id]
+      AcceptedChallenge.find(params[:accepted_challenge_id])
+    else
+      render json: { error: 'Commentable not found' }, status: :not_found
     end
   end
 

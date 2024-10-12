@@ -9,78 +9,40 @@ Rails.application.routes.draw do
     namespace :v1 do
       root 'home#index'
 
-      get 'mischief_makers', to: 'home#mischief_makers'
-      get 'personal_feed', to: 'home#personal_feed'
-
       resources :users, only: %i[show index update destroy] do
         member do
           post 'follow', to: 'relationships#create'
           delete 'unfollow', to: 'relationships#destroy'
-          get 'most_interacted_channels'
-          get 'most_interacted_users'
-          get 'subscriptions'
           get 'following'
-          put 'update_favorite_users'
-          put 'update_favorite_channels'
+          put 'update_favorite_games'
           get 'check_ownership'
         end
 
         collection do
           get 'search'
-          get 'popular'
         end
       end
 
-      resources :channels, only: %i[show index create update destroy] do
-        member do
-          get 'check_ownership'
-        end
-
+      resources :games, only: %i[show index create update destroy] do
         collection do
           get 'search'
-          get 'popular'
         end
 
-        resources :pieces, only: %i[show index create update destroy] do
-          member do
-            get 'check_ownership'
+        resources :challenges, only: %i[show index create update destroy] do
+          resources :likes, only: [:create]
+          resources :difficulty_ratings, only: [:create]
+
+          resources :comments, only: %i[index create update destroy], shallow: true do
+            resources :likes, only: [:create]
           end
 
-          resources :votes, only: [:create]
+          resources :accepted_challenges, only: %i[index create update destroy], shallow: true do
+            resources :approvals, only: [:create]
 
-          resources :comments, only: %i[index create update destroy] do
-            member do
-              get 'check_ownership'
-            end
-
-            resources :votes, only: [:create]
-          end
-
-          resources :tweaks, only: %i[show index create update destroy] do
-            member do
-              get 'check_ownership'
-            end
-
-            resources :votes, only: [:create]
-
-            resources :comments, only: %i[index create update destroy] do
-              member do
-                get 'check_ownership'
-              end
-
-              resources :votes, only: [:create]
+            resources :comments, only: %i[index create update destroy], shallow: true do
+              resources :likes, only: [:create]
             end
           end
-        end
-
-        post 'subscribe', to: 'subscriptions#create'
-        delete 'unsubscribe', to: 'subscriptions#destroy'
-        get 'check_channel_subscription', to: 'subscriptions#check_channel_subscription'
-      end
-
-      resources :subscriptions, only: [:index] do
-        collection do
-          get 'check_user_subscriptions'
         end
       end
 
