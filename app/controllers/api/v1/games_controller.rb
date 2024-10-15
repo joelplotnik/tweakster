@@ -1,4 +1,6 @@
 class Api::V1::GamesController < ApplicationController
+  before_action :set_game, only: %i[show update destroy]
+
   def index
     limit = params[:limit] || 5
     page = params[:page] || 1
@@ -6,75 +8,64 @@ class Api::V1::GamesController < ApplicationController
     games = Game
             .paginate(page:, per_page: limit)
             .order(created_at: :asc)
-            .map do |game|
-      {
-        id: game.id,
-        name: game.name,
-        image_url: game.image_url,
-        platform: game.platform
-      }
-    end
+            .map { |game| format_game(game) }
 
     render json: games
   end
 
   def show
-    game = Game.find(params[:id])
-    render json: {
-      id: game.id,
-      name: game.name,
-      platform: game.platform,
-      image_url: game.image_url,
-      description: game.description,
-      created_at: game.created_at,
-      updated_at: game.updated_at
-    }
+    render json: format_game(@game)
   end
 
   def create
     game = Game.new(game_params)
     if game.save
-      render json: { message: 'Game created successfully', game: }, status: :created
+      render json: { message: 'Game created successfully', game: format_game(game) }, status: :created
     else
       render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def update
-    game = Game.find(params[:id])
-    if game.update(game_params)
-      render json: { message: 'Game updated successfully', game: }
+    if @game.update(game_params)
+      render json: { message: 'Game updated successfully', game: format_game(@game) }
     else
-      render json: { errors: game.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @game.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def destroy
-    game = Game.find(params[:id])
-    game.destroy
+    @game.destroy
     render json: { message: 'Game deleted successfully' }, status: :no_content
   end
 
   def search
     search_term = params[:search_term].downcase.strip
     games = Game.where('LOWER(name) LIKE ?', "#{search_term}%")
-
-    games = games
-            .paginate(page: params[:page], per_page: 5)
-            .order(created_at: :asc)
-            .map do |game|
-      {
-        id: game.id,
-        name: game.name,
-        image_url: game.image_url,
-        platform: game.platform
-      }
-    end
+                .paginate(page: params[:page], per_page: 5)
+                .order(created_at: :asc)
+                .map { |game| format_game(game) }
 
     render json: games
   end
 
   private
+
+  def set_game
+    @game = Game.find(params[:id])
+  end
+
+  def format_game(game)
+    {
+      id: game.id,
+      name: game.name,
+      image_url: game.image_url,
+      platform: game.platform,
+      description: game.description,
+      created_at: game.created_at,
+      updated_at: game.updated_at
+    }
+  end
 
   def game_params
     params.require(:game).permit(:name, :image, :description)

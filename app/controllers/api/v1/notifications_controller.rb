@@ -4,7 +4,7 @@ class Api::V1::NotificationsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    notifications = current_user.notifications.includes(event: { record: { user: [], piece: [], tweak: [] } })
+    notifications = current_user.notifications.includes(event: { record: { user: [], callenge: [], accepted_challenge: [] } })
                                 .order(created_at: :desc)
                                 .paginate(page: params[:page], per_page: 10)
 
@@ -25,14 +25,22 @@ class Api::V1::NotificationsController < ApplicationController
                             piece_channel_id: record.commentable.channel_id,
                             piece_title: record.commentable.title
                           }
-                        when 'Piece'
+                        when 'Challenge'
                           record = notification.event.record
                           {
                             user_avatar_url: record.user.avatar_url,
                             username: record.user.username,
-                            piece_id: record.id,
-                            piece_channel_id: record.channel_id,
-                            piece_title: record.title
+                            challenge_id: record.id,
+                            challenge_title: record.title
+                          }
+                        when 'AcceptedChallenge'
+                          record = notification.event.record
+                          {
+                            user_avatar_url: record.user.avatar_url,
+                            username: record.user.username,
+                            accepted_challenge_id: record.id,
+                            challenge_title: record.challenge.title,
+                            accepted_at: record.accepted_at
                           }
                         else
                           {}

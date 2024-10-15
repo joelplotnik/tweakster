@@ -1,8 +1,6 @@
 require 'will_paginate/array'
 
 class Api::V1::CommentsController < ApplicationController
-  include Commentable
-
   before_action :authenticate_user!, except: %i[index show]
   load_and_authorize_resource except: %i[index]
 

@@ -1,6 +1,5 @@
 class User < ApplicationRecord
   include Devise::JWT::RevocationStrategies::JTIMatcher
-  include Userable
 
   before_validation :strip_whitespace
 
@@ -70,6 +69,10 @@ class User < ApplicationRecord
 
   def jwt_payload
     super.merge({ username:, role: })
+  end
+
+  def avatar_url
+    Rails.application.routes.url_helpers.url_for(avatar) if avatar.attached?
   end
 
   private

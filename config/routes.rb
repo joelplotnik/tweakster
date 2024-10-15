@@ -32,14 +32,14 @@ Rails.application.routes.draw do
           resources :likes, only: [:create]
           resources :difficulty_ratings, only: [:create]
 
-          resources :comments, only: %i[index create update destroy], shallow: true do
+          resources :comments, only: %i[index create update destroy] do
             resources :likes, only: [:create]
           end
 
-          resources :accepted_challenges, only: %i[index create update destroy], shallow: true do
+          resources :accepted_challenges, only: %i[index create update destroy] do
             resources :approvals, only: [:create]
 
-            resources :comments, only: %i[index create update destroy], shallow: true do
+            resources :comments, only: %i[index create update destroy] do
               resources :likes, only: [:create]
             end
           end

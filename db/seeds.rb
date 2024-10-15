@@ -111,7 +111,7 @@ end
 # Create Challenges
 challenges = []
 20.times do
-  title = Faker::Game.title
+  title = Faker::Lorem.sentence(word_count: 3, supplemental: true).chomp('.')
   next if Challenge.exists?(title:)
 
   begin
