@@ -23,7 +23,7 @@ class User < ApplicationRecord
                              class_name: 'Relationship', dependent: :destroy
   has_many :followers, through: :following_users, dependent: :destroy
 
-  serialize :favorite_users, Array
+  serialize :favorite_games, Array
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
@@ -31,7 +31,7 @@ class User < ApplicationRecord
          jwt_revocation_strategy: self
 
   validate :validate_username
-  # validate :validate_favorite_games_count
+  validate :validate_favorite_games_count
 
   validates :username, presence: true,
                        uniqueness: { case_sensitive: false },
@@ -83,9 +83,9 @@ class User < ApplicationRecord
     errors.add(:username, :invalid)
   end
 
-  # def validate_favorite_games_count
-  #   errors.add(:favorite_games, "can't have more than 5 favorite games") if favorite_games.size > 5
-  # end
+  def validate_favorite_games_count
+    errors.add(:favorite_games, "can't have more than 5 favorite games") if favorite_games.size > 5
+  end
 
   def strip_whitespace
     url&.strip!

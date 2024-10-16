@@ -21,6 +21,14 @@ Rails.application.routes.draw do
         collection do
           get 'search'
         end
+
+        resources :accepted_challenges, only: %i[index show update destroy] do
+          resources :approvals, only: [:create]
+
+          resources :comments, only: %i[index create update destroy] do
+            resources :likes, only: [:create]
+          end
+        end
       end
 
       resources :games, only: %i[show index create update destroy] do
@@ -36,7 +44,7 @@ Rails.application.routes.draw do
             resources :likes, only: [:create]
           end
 
-          resources :accepted_challenges, only: %i[index create update destroy] do
+          resources :accepted_challenges, only: %i[index create] do
             resources :approvals, only: [:create]
 
             resources :comments, only: %i[index create update destroy] do

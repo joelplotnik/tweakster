@@ -82,7 +82,7 @@ end
 # Create Games
 games = []
 PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
-10.times do
+20.times do
   name = Faker::Game.title
   next if Game.exists?(name:)
 
@@ -110,7 +110,7 @@ end
 
 # Create Challenges
 challenges = []
-20.times do
+40.times do
   title = Faker::Lorem.sentence(word_count: 3, supplemental: true).chomp('.')
   next if Challenge.exists?(title:)
 
@@ -129,15 +129,19 @@ end
 
 # Create Accepted Challenges
 accepted_challenges = []
-30.times do
+statuses = ['To Do', 'In Progress', 'Complete']
+
+60.times do
   next if AcceptedChallenge.exists?(challenge: challenges.sample)
+
+  status = statuses.sample # Sample status
 
   begin
     accepted_challenge = AcceptedChallenge.create!(
       challenge: challenges.sample,
       user: users.sample,
-      status: %w[accepted in_progress completed].sample,
-      completed_at: Faker::Date.between(from: '2023-01-01', to: '2024-01-01')
+      status:,
+      completed_at: status == 'Complete' ? Faker::Date.between(from: '2023-01-01', to: '2024-01-01') : nil
     )
     accepted_challenges << accepted_challenge
   rescue ActiveRecord::RecordInvalid => e
@@ -212,7 +216,7 @@ end
 
 # Create Comments on Accepted Challenges
 accepted_challenges.each do |accepted_challenge|
-  num_comments = rand(0..5)
+  num_comments = rand(0..10)
 
   comment_users = users.sample(num_comments)
 
@@ -230,7 +234,7 @@ accepted_challenges.each do |accepted_challenge|
     end
 
     # Create child comments (nested)
-    num_child_comments = rand(0..3)
+    num_child_comments = rand(0..6)
     child_comment_users = users.sample(num_child_comments).uniq
 
     child_comment_users.each do |child_comment_user|
@@ -260,7 +264,7 @@ end
 
 # Create Likes on Challenges
 challenges.each do |challenge|
-  num_likes = rand(0..10)
+  num_likes = rand(0..20)
   likers = users.sample(num_likes).uniq
   likers.each do |liker|
     next if Like.exists?(user: liker, likeable: challenge)
@@ -282,7 +286,7 @@ end
 # Create Likes on Comments
 comments = Comment.all
 comments.each do |comment|
-  num_likes = rand(0..10)
+  num_likes = rand(0..20)
   likers = users.sample(num_likes).uniq
   likers.each do |liker|
     next if Like.exists?(user: liker, likeable: comment)
@@ -303,8 +307,11 @@ end
 
 # Create Approvals on Accepted Challenges
 accepted_challenges.each do |accepted_challenge|
-  num_approvals = rand(0..5)
+  next unless accepted_challenge.status == 'Complete'
+
+  num_approvals = rand(0..10)
   approvers = users.sample(num_approvals).uniq
+
   approvers.each do |approver|
     next if Approval.exists?(user: approver, accepted_challenge:)
 
@@ -324,7 +331,7 @@ end
 
 # Create Difficulties on Challenges
 challenges.each do |challenge|
-  num_difficulties = rand(1..3)
+  num_difficulties = rand(1..6)
   difficulty_users = users.sample(num_difficulties).uniq
 
   difficulty_users.each do |difficulty_user|
@@ -345,7 +352,7 @@ report_reasons = %w[spam inappropriate offensive harassing]
 users.each do |user|
   # Challenges
   challenges_to_report = Challenge.where.not(user_id: user.id)
-  sampled_challenges = challenges_to_report.sample(rand(1..[5, challenges_to_report.count].min))
+  sampled_challenges = challenges_to_report.sample(rand(1..[10, challenges_to_report.count].min))
   sampled_challenges.each do |challenge|
     Report.create!(
       content_type: 'challenge',
@@ -359,7 +366,7 @@ users.each do |user|
 
   # Comments
   comments_to_report = Comment.where.not(user_id: user.id)
-  sampled_comments = comments_to_report.sample(rand(1..[5, comments_to_report.count].min))
+  sampled_comments = comments_to_report.sample(rand(1..[10, comments_to_report.count].min))
   sampled_comments.each do |comment|
     Report.create!(
       content_type: 'comment',
@@ -373,7 +380,7 @@ users.each do |user|
 
   # Users
   users_to_report = User.where.not(id: user.id)
-  sampled_users = users_to_report.sample(rand(1..[5, users_to_report.count].min))
+  sampled_users = users_to_report.sample(rand(1..[10, users_to_report.count].min))
   sampled_users.each do |report_user|
     Report.create!(
       content_type: 'user',

@@ -3,4 +3,17 @@ class Approval < ApplicationRecord
   belongs_to :user
 
   validates :user_id, uniqueness: { scope: :accepted_challenge_id }
+
+  after_create :increment_approvals_count
+  after_destroy :decrement_approvals_count
+
+  private
+
+  def increment_approvals_count
+    accepted_challenge.increment!(:approvals_count)
+  end
+
+  def decrement_approvals_count
+    accepted_challenge.decrement!(:approvals_count)
+  end
 end
