@@ -1,7 +1,7 @@
 class Api::V1::ChallengesController < ApplicationController
   load_and_authorize_resource
-  before_action :authenticate_user!, except: %i[index show]
-  before_action :set_game
+  before_action :authenticate_user!, except: %i[index show top_challenges]
+  before_action :set_game, only: %i[index show]
   before_action :set_challenge, only: %i[show update destroy]
 
   rescue_from CanCan::AccessDenied do |exception|
@@ -11,6 +11,22 @@ class Api::V1::ChallengesController < ApplicationController
   def index
     challenges = @game.challenges.includes(:difficulties, :likes)
     render json: challenges.map { |challenge| format_challenge(challenge) }, status: :ok
+  end
+
+  def top_challenges
+    limit = params[:limit] || 5
+    page = params[:page] || 1
+    point_in_time = params[:point_in_time] || Time.current
+
+    top_challenges = Challenge
+                     .left_joins(:likes)
+                     .where('likes.created_at >= ? AND likes.created_at <= ?', 7.days.ago, point_in_time)
+                     .group('challenges.id')
+                     .order('COUNT(likes.id) DESC')
+                     .paginate(page:, per_page: limit)
+                     .map { |challenge| format_challenge(challenge) }
+
+    render json: { challenges: top_challenges, point_in_time: }, status: :ok
   end
 
   def show
@@ -60,14 +76,8 @@ class Api::V1::ChallengesController < ApplicationController
   end
 
   def format_challenge(challenge)
-    {
-      id: challenge.id,
-      title: challenge.title,
-      description: challenge.description,
-      likes: challenge.likes.count,
-      difficulty: challenge.average_difficulty,
-      created_at: challenge.created_at,
-      updated_at: challenge.updated_at
-    }
+    challenge.as_json(include: {
+                        game: {}
+                      })
   end
 end

@@ -7,7 +7,10 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      root 'home#index'
+      get 'top_users', to: 'users#top_users'
+      get 'top_games', to: 'games#top_games'
+      get 'top_challenges', to: 'challenges#top_challenges'
+      get 'top_accepted_challenges', to: 'accepted_challenges#top_accepted_challenges'
 
       resources :users, only: %i[show index update destroy] do
         member do
@@ -27,6 +30,7 @@ Rails.application.routes.draw do
 
           resources :comments, only: %i[index create update destroy] do
             resources :likes, only: [:create]
+            get 'replies', to: 'comments#replies', on: :member
           end
         end
       end
@@ -42,6 +46,7 @@ Rails.application.routes.draw do
 
           resources :comments, only: %i[index create update destroy] do
             resources :likes, only: [:create]
+            get 'replies', to: 'comments#replies', on: :member
           end
 
           resources :accepted_challenges, only: %i[index create] do

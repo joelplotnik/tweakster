@@ -11,6 +11,9 @@ class Difficulty < ApplicationRecord
   private
 
   def update_difficulty_rating
-    challenge.update!(difficulty_rating: challenge.difficulties.average(:rating) || 0)
+    challenge.with_lock do
+      average_rating = challenge.difficulties.average(:rating) || 0
+      challenge.update!(difficulty_rating: average_rating.round(2))
+    end
   end
 end

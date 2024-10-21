@@ -10,10 +10,14 @@ class Like < ApplicationRecord
   private
 
   def increment_likeable_count
-    likeable.increment!(:likes_count)
+    likeable.with_lock do
+      likeable.increment!(:likes_count)
+    end
   end
 
   def decrement_likeable_count
-    likeable.decrement!(:likes_count)
+    likeable.with_lock do
+      likeable.decrement!(:likes_count)
+    end
   end
 end

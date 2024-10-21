@@ -10,9 +10,9 @@ module Approvable
     approval = current_user.approvals.build(accepted_challenge: @accepted_challenge)
 
     if approval.save
-      render json: { message: 'Approval added successfully' }, status: :created
+      render json: { success: true, message: 'Approval added successfully' }, status: :created
     else
-      render json: { errors: approval.errors.full_messages }, status: :unprocessable_entity
+      render json: { success: false, errors: approval.errors.full_messages }, status: :unprocessable_entity
     end
   end
 end

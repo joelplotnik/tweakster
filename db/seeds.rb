@@ -216,7 +216,7 @@ end
 
 # Create Comments on Accepted Challenges
 accepted_challenges.each do |accepted_challenge|
-  num_comments = rand(0..10)
+  num_comments = rand(0..5)
 
   comment_users = users.sample(num_comments)
 
@@ -234,7 +234,7 @@ accepted_challenges.each do |accepted_challenge|
     end
 
     # Create child comments (nested)
-    num_child_comments = rand(0..6)
+    num_child_comments = rand(0..3)
     child_comment_users = users.sample(num_child_comments).uniq
 
     child_comment_users.each do |child_comment_user|

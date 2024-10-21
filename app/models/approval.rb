@@ -10,10 +10,14 @@ class Approval < ApplicationRecord
   private
 
   def increment_approvals_count
-    accepted_challenge.increment!(:approvals_count)
+    accepted_challenge.with_lock do
+      accepted_challenge.increment!(:approvals_count)
+    end
   end
 
   def decrement_approvals_count
-    accepted_challenge.decrement!(:approvals_count)
+    accepted_challenge.with_lock do
+      accepted_challenge.decrement!(:approvals_count)
+    end
   end
 end

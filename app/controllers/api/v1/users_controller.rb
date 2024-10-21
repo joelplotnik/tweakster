@@ -14,65 +14,31 @@ class Api::V1::UsersController < ApplicationController
     users = User
             .paginate(page:, per_page: limit)
             .order(created_at: :asc)
-            .map do |user|
-      {
-        id: user.id,
-        username: user.username,
-        challenges_count: user.challenges.count,
-        avatar_url: user.avatar_url
-      }
-    end
+            .map { |user| format_user(user) }
 
     render json: users
   end
 
+  def top_users
+    limit = params[:limit] || 5
+    page = params[:page] || 1
+    point_in_time = params[:point_in_time] || Time.current
+
+    top_users = User
+                .with_attached_avatar
+                .joins(accepted_challenges: :approvals)
+                .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
+                .group('users.id')
+                .order('COUNT(approvals.id) DESC')
+                .paginate(page:, per_page: limit)
+                .select('users.*, COUNT(approvals.id) AS approvals_count')
+
+    render json: top_users.map { |user| format_user(user).merge(approvals_count: user.approvals_count) }, status: :ok
+  end
+
   def show
     user = User.find(params[:id])
-    page = params[:page] || 1
-    per_page = params[:per_page] || 10
-
-    challenges = user.challenges.paginate(page:, per_page:).order(created_at: :desc)
-
-    challenges_info = challenges.map do |challenge|
-      {
-        id: challenge.id,
-        title: challenge.title,
-        description: challenge.description,
-        created_at: challenge.created_at,
-        accepted_count: challenge.accepted_challenges.count
-      }
-    end
-
-    accepted_challenges = user.accepted_challenges.paginate(page:, per_page:).order(created_at: :desc)
-
-    accepted_challenges_info = accepted_challenges.map do |accepted_challenge|
-      {
-        id: accepted_challenge.id,
-        challenge_id: accepted_challenge.challenge_id,
-        challenge_title: accepted_challenge.challenge.title,
-        approved_count: accepted_challenge.approvals.count,
-        created_at: accepted_challenge.created_at
-      }
-    end
-
-    user_data = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      bio: user.bio,
-      avatar_url: user.avatar_url,
-      challenge_count: user.challenges.count,
-      accepted_challenge_count: user.accepted_challenges.count,
-      challenges: challenges_info,
-      accepted_challenges: accepted_challenges_info
-    }
-
-    if current_user
-      user_data['can_edit'] = current_user.id == user.id || current_user.admin?
-      user_data['following'] = current_user.followees.exists?(user.id)
-    end
-
-    render json: user_data
+    render json: format_user(user)
   end
 
   def update
@@ -204,7 +170,7 @@ class Api::V1::UsersController < ApplicationController
           {
             id: favorite_game.id,
             name: favorite_game.name,
-            cover_url: favorite_game.cover_url
+            image_url: favorite_game.image_url
           }
         end.compact
 
@@ -232,5 +198,11 @@ class Api::V1::UsersController < ApplicationController
   def render_updated_user(user)
     user_serializer = UserSerializer.new(user).serializable_hash[:data][:attributes]
     render json: user_serializer, status: :ok
+  end
+
+  def format_user(user)
+    user.as_json.merge({
+                         avatar_url: user.avatar_url,
+                       })
   end
 end
