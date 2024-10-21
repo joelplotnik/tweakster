@@ -2,6 +2,7 @@
   "name": "tweakster_ui",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@4.4.0",
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.16.0",
     "@bugsnag/js": "^7.25.0",
