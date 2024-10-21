@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { RiAddFill } from 'react-icons/ri'
-import InfiniteScroll from 'react-infinite-scroll-component'
 import { useDispatch } from 'react-redux'
 import { useParams, useRouteLoaderData } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -13,29 +12,25 @@ import Comment from './Comment'
 import classes from './Comments.module.css'
 import CommentForm from './Forms/CommentForm'
 
-const Comments = ({ piece, pieceClassModalRef }) => {
+const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
   const token = useRouteLoaderData('root')
   const [comments, setComments] = useState([])
-  const params = useParams()
-  const wildcardParam = params['*']
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [activeComment, setActiveComment] = useState(null)
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [commentsLeft, setCommentsLeft] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [newCommentIds, setNewCommentIds] = useState([])
-  const [selectedSortOption, setSelectedSortOption] = useState('top')
+  const [selectedSortOption, setSelectedSortOption] = useState('old')
   const selectedSortOptionRef = useRef(selectedSortOption)
-  const [isScrollableTargetAvailable, setScrollableTargetAvailable] =
-    useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showCommentForm, setShowCommentForm] = useState(false)
+  const [activeComment, setActiveComment] = useState(null)
+  const commentsTitle =
+    commentable.comments_count === 1 ? 'Comment' : 'Comments'
   const dispatch = useDispatch()
   const newCommentRef = useRef(null)
-
-  useEffect(() => {
-    if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
-      setScrollableTargetAvailable(true)
-    }
-  }, [pieceClassModalRef])
+  const params = useParams()
+  const wildcardParam = params['*']
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showAuthModal)
@@ -53,15 +48,23 @@ const Comments = ({ piece, pieceClassModalRef }) => {
     setHasMore(true)
   }, [])
 
-  const fetchComments = async currentPage => {
+  const fetchComments = async (currentPage, loadAll = false) => {
     try {
-      const response = await fetch(
-        `${API_URL}/channels/${piece.channel_id}/pieces/${
-          piece.id
+      let url = ''
+
+      if (commentableType === 'Piece') {
+        url = `${API_URL}/${wildcardParam}/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
+          newCommentIds
+        )}${loadAll ? '&load_all=true' : ''}`
+      } else if (commentableType === 'Tweak') {
+        url = `${API_URL}/${wildcardParam}/tweaks/${
+          commentable.id
         }/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
           newCommentIds
-        )}`
-      )
+        )}${loadAll ? '&load_all=true' : ''}`
+      }
+
+      const response = await fetch(url)
 
       if (!response.ok) {
         throw new Error('Failed to fetch comments')
@@ -75,28 +78,28 @@ const Comments = ({ piece, pieceClassModalRef }) => {
     }
   }
 
-  const fetchData = async () => {
-    if (!isLoading) {
+  const fetchData = async (loadAll = false) => {
+    if (!isLoading && hasMore) {
       setIsLoading(true)
 
-      const commentsFromServer = await fetchComments(page)
+      const commentsFromServer = await fetchComments(page, loadAll)
 
       if (commentsFromServer) {
-        setComments([...comments, ...commentsFromServer])
-
         if (selectedSortOption !== selectedSortOptionRef.current) {
           // If the selectedSortOption has changed, reset comments
           selectedSortOptionRef.current = selectedSortOption
-          setComments(commentsFromServer)
+          setComments(commentsFromServer.comments)
         } else {
           // If the sort option is the same, append fetched data
-          setComments([...comments, ...commentsFromServer])
+          setComments(prevComments => [
+            ...prevComments,
+            ...commentsFromServer.comments,
+          ])
         }
 
-        if (commentsFromServer.length === 0) {
-          setHasMore(false)
-        }
-        setPage(page + 1)
+        setHasMore(commentsFromServer.meta.has_more)
+        setCommentsLeft(commentsFromServer.meta.comments_left)
+        setPage(prevPage => prevPage + 1)
       }
 
       setIsLoading(false)
@@ -106,45 +109,15 @@ const Comments = ({ piece, pieceClassModalRef }) => {
   useEffect(() => {
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const findCommentById = (commentsArray, targetCommentId) => {
-    for (const comment of commentsArray) {
-      if (comment.comment.id === targetCommentId) {
-        return comment
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        const foundComment = findCommentById(
-          comment.child_comments,
-          targetCommentId
-        )
-        if (foundComment) {
-          return foundComment
-        }
-      }
-    }
-    return null
-  }
+  }, [selectedSortOption])
 
   const updateCommentMessage = (commentsArray, targetCommentId, newMessage) => {
     return commentsArray.map(comment => {
-      if (comment.comment.id === targetCommentId) {
+      if (comment.id === targetCommentId) {
         // If this is the edited comment, update its message
         return {
           ...comment,
-          comment: {
-            ...comment.comment,
-            message: newMessage,
-          },
-        }
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        // If there are child comments, recursively update them as well
-        return {
-          ...comment,
-          child_comments: updateCommentMessage(
-            comment.child_comments,
-            targetCommentId,
-            newMessage
-          ),
+          message: newMessage,
         }
       } else {
         return comment
@@ -154,21 +127,27 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
   const handleCommentSubmit = async (
     message,
-    pieceId,
-    parentCommentId = null,
+    commentableId,
     commentId = null
   ) => {
     try {
-      const url = commentId
-        ? `${API_URL}/${wildcardParam}/comments/${commentId}`
-        : `${API_URL}/${wildcardParam}/comments`
+      let url = ''
+      let method = commentId ? 'PUT' : 'POST'
 
-      const method = commentId ? 'PUT' : 'POST'
+      if (commentableType === 'Piece') {
+        url = commentId
+          ? `${API_URL}/${wildcardParam}/comments/${commentId}`
+          : `${API_URL}/${wildcardParam}/comments`
+      } else if (commentableType === 'Tweak') {
+        url = commentId
+          ? `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments/${commentId}`
+          : `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments`
+      }
 
       const commentData = {
         message: message,
-        piece_id: pieceId,
-        parent_comment_id: parentCommentId,
+        commentable_id: commentableId,
+        commentable_type: commentableType,
       }
 
       const response = await fetch(url, {
@@ -185,7 +164,7 @@ const Comments = ({ piece, pieceClassModalRef }) => {
       }
 
       const newComment = await response.json()
-      const newCommentId = newComment.comment.id
+      const newCommentId = newComment.id
 
       // Handle the state update based on the comment action
       if (commentId) {
@@ -193,24 +172,13 @@ const Comments = ({ piece, pieceClassModalRef }) => {
         setComments(prevComments => {
           return updateCommentMessage(prevComments, commentId, message)
         })
-      } else if (parentCommentId) {
-        // Reply comment
-        const parentComment = findCommentById(comments, parentCommentId)
-        if (parentComment) {
-          parentComment.child_comments.push(newComment)
-          setNewCommentIds(prevIds => [...prevIds, newCommentId])
-          setComments(prevComments => [...prevComments])
-          newCommentRef.current = newCommentId
-          dispatch(pieceActions.increaseCommentCount())
-        }
       } else {
         // New comment
         setNewCommentIds(prevIds => [...prevIds, newCommentId])
-        setComments(prevComments => [newComment, ...prevComments])
+        setComments(prevComments => [...prevComments, newComment])
         newCommentRef.current = newCommentId
         dispatch(pieceActions.increaseCommentCount())
       }
-
       setActiveComment(null)
     } catch (error) {
       console.error('Error: ', error.message)
@@ -220,14 +188,8 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
   const deleteComment = (commentsArray, targetCommentId) => {
     return commentsArray.filter(comment => {
-      if (comment.comment.id === targetCommentId) {
+      if (comment.id === targetCommentId) {
         return false
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        comment.child_comments = deleteComment(
-          comment.child_comments,
-          targetCommentId
-        )
-        return true
       } else {
         return !comment.deleted // Filter out deleted comments
       }
@@ -236,35 +198,16 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
   const markCommentAsDeleted = (commentsArray, targetCommentId) => {
     return commentsArray.map(comment => {
-      if (comment.comment.id === targetCommentId) {
+      if (comment.id === targetCommentId) {
         // Mark the comment as deleted
         return {
           ...comment,
           deleted: true,
         }
-      } else if (comment.child_comments && comment.child_comments.length > 0) {
-        // If there are child comments, recursively mark them as well
-        return {
-          ...comment,
-          child_comments: markCommentAsDeleted(
-            comment.child_comments,
-            targetCommentId
-          ),
-        }
       } else {
         return comment
       }
     })
-  }
-
-  const countComments = comment => {
-    let count = 1
-    if (comment.child_comments) {
-      for (const childComment of comment.child_comments) {
-        count += countComments(childComment)
-      }
-    }
-    return count
   }
 
   const handleDeleteComment = async commentId => {
@@ -286,14 +229,14 @@ const Comments = ({ piece, pieceClassModalRef }) => {
 
       setActiveComment(null)
 
-      // Find the deleted comment and its children in the state
-      const commentToDelete = findCommentById(comments, commentId)
+      // Find the deleted comment in the state
+      const commentToDelete = comments.find(comment => comment.id === commentId)
 
       if (!commentToDelete) {
         return // Comment not found, nothing to delete
       }
 
-      const decreaseCommentCountBy = countComments(commentToDelete)
+      const decreaseCommentCountBy = 1
       dispatch(pieceActions.decreaseCommentCount({ decreaseCommentCountBy }))
 
       setComments(prevComments => {
@@ -334,80 +277,82 @@ const Comments = ({ piece, pieceClassModalRef }) => {
     }
   }, [comments, pieceClassModalRef])
 
+  const handleShowAllComments = () => {
+    fetchData(true)
+  }
+
   return (
     <>
       <div className={classes.comments}>
-        {token ? (
+        {commentableType === 'Piece' && (
+          <div className={classes['header-container']}>
+            <h2 className={classes.title}>
+              {commentable.comments_count} {commentsTitle}
+            </h2>
+            {comments.length > 0 && (
+              <SortDropdown onSortChange={handleSortChange} />
+            )}
+          </div>
+        )}
+        <div className={classes.commentList}>
+          {comments.map(comment => (
+            <div
+              key={comment.id}
+              id={
+                comment.id === newCommentRef.current
+                  ? newCommentRef.current
+                  : undefined
+              }
+            >
+              <Comment
+                comment={comment}
+                commentable={commentable}
+                commentableType={commentableType}
+                onEdit={(message, commentId) =>
+                  handleCommentSubmit(message, commentable.id, commentId)
+                }
+                onDelete={commentId => handleDeleteComment(commentId)}
+                activeComment={activeComment}
+                setActiveComment={setActiveComment}
+              />
+            </div>
+          ))}
+        </div>
+        <div className={classes['buttons-container']}>
+          {hasMore ? (
+            <button
+              className={classes['comments-button']}
+              onClick={handleShowAllComments}
+              disabled={isLoading}
+            >
+              {isLoading
+                ? 'Loading...'
+                : commentsLeft === 1
+                ? 'Show 1 more comment'
+                : `Show ${commentsLeft} more comments`}
+            </button>
+          ) : token ? (
+            <button
+              className={classes['comments-button']}
+              onClick={() => setShowCommentForm(true)}
+            >
+              Leave A Comment
+            </button>
+          ) : (
+            <button
+              className={classes['comments-button']}
+              onClick={handleAuthModalToggle}
+            >
+              Leave A Comment
+            </button>
+          )}
+        </div>
+        {showCommentForm && (
           <CommentForm
-            onSubmit={(message, parentCommentId = null, commentId = null) =>
-              handleCommentSubmit(message, piece.id, parentCommentId, commentId)
-            }
-            showCancel={false}
+            onCancel={() => setShowCommentForm(false)}
+            onSubmit={message => handleCommentSubmit(message, commentable.id)}
+            showCancel={true}
           />
-        ) : (
-          <button
-            className={classes['comment-button']}
-            onClick={handleAuthModalToggle}
-          >
-            <RiAddFill />
-            Comment
-          </button>
-        )}
-        {comments.length > 0 && (
-          <SortDropdown
-            onSortChange={handleSortChange}
-            selectedSortOption={selectedSortOption}
-          />
-        )}
-        {isScrollableTargetAvailable && (
-          <InfiniteScroll
-            key={selectedSortOption}
-            dataLength={comments.length}
-            next={fetchData}
-            hasMore={hasMore}
-            scrollableTarget={pieceClassModalRef?.current}
-            loader={<h4>Loading...</h4>}
-            endMessage={<span></span>}
-          >
-            {comments
-              .filter(comment => !comment.parent_comment_id)
-              .map(comment => (
-                <div
-                  key={comment.comment.id}
-                  id={
-                    comment.comment.id === newCommentRef.current
-                      ? newCommentRef.current
-                      : undefined
-                  }
-                >
-                  <Comment
-                    comment={comment.comment}
-                    piece={piece}
-                    childComments={comment.child_comments}
-                    onReply={(message, parentCommentId) =>
-                      handleCommentSubmit(
-                        message,
-                        piece.id,
-                        parentCommentId,
-                        null
-                      )
-                    }
-                    onEdit={(message, parentCommentId, commentId) =>
-                      handleCommentSubmit(
-                        message,
-                        piece.id,
-                        parentCommentId,
-                        commentId
-                      )
-                    }
-                    onDelete={commentId => handleDeleteComment(commentId)}
-                    activeComment={activeComment}
-                    setActiveComment={setActiveComment}
-                    newCommentRef={newCommentRef}
-                  />
-                </div>
-              ))}
-          </InfiniteScroll>
         )}
       </div>
       {showAuthModal && (

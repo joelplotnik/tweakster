@@ -107,12 +107,6 @@ const PiecePage = () => {
     setShowDropdown(!showDropdown)
   }
 
-  const handleEditClick = () => {
-    if (piece.tweaks_count === 0) {
-      navigate(`edit`)
-    }
-  }
-
   const handleDeleteClick = async () => {
     try {
       const response = await fetch(
@@ -138,39 +132,41 @@ const PiecePage = () => {
   }
 
   const handleTweakClick = async () => {
-    try {
-      if (!token) {
-        setShowAuthModal(true)
-      } else {
-        const response = await fetch(
-          `${API_URL}/channels/${piece.channel_id}/check_channel_subscription`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
+    console.log('You are trying to tweak a piece')
 
-        if (response.status === 403) {
-          // User isn't subscribed to channel, show the subscription modal
-          setShowSubscriptionModal(true)
-        } else if (!response.ok) {
-          throw new Error('Failed to check channel subscription')
-        } else {
-          if (piece.content) {
-            setShowPopulateModal(true)
-          } else {
-            const queryParams = new URLSearchParams(tweakData).toString()
-            navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error handling tweak click')
-    }
+    // try {
+    //   if (!token) {
+    //     setShowAuthModal(true)
+    //   } else {
+    //     const response = await fetch(
+    //       `${API_URL}/channels/${piece.channel_id}/check_channel_subscription`,
+    //       {
+    //         method: 'GET',
+    //         headers: {
+    //           'Content-Type': 'application/json',
+    //           Authorization: `Bearer ${token}`,
+    //         },
+    //       }
+    //     )
+
+    //     if (response.status === 403) {
+    //       // User isn't subscribed to channel, show the subscription modal
+    //       setShowSubscriptionModal(true)
+    //     } else if (!response.ok) {
+    //       throw new Error('Failed to check channel subscription')
+    //     } else {
+    //       if (piece.content) {
+    //         setShowPopulateModal(true)
+    //       } else {
+    //         const queryParams = new URLSearchParams(tweakData).toString()
+    //         navigate(`/channels/${piece.channel_id}/pieces/new?${queryParams}`)
+    //       }
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error('Error: ', error.message)
+    //   toast.error('Error handling tweak click')
+    // }
   }
 
   const handleSubscribeClick = async () => {
@@ -197,7 +193,7 @@ const PiecePage = () => {
 
       setShowSubscriptionModal(false)
 
-      if (piece.content) {
+      if (piece.body) {
         setShowPopulateModal(true)
       } else {
         const queryParams = new URLSearchParams(tweakData).toString()
@@ -235,16 +231,16 @@ const PiecePage = () => {
   return (
     <>
       <div key={piece.id} className={classes.piece}>
-        <div className={classes.vote}>
-          <PieceVote
-            likes={piece.likes}
-            dislikes={piece.dislikes}
-            channelId={piece.channel_id}
-            pieceId={piece.id}
-            userVotes={piece.votes}
-          />
-        </div>
         <div className={classes['content-wrapper']}>
+          <div className={classes.vote}>
+            <PieceVote
+              upvotes={piece.upvotes}
+              downvotes={piece.downvotes}
+              channelId={piece.channel_id}
+              pieceId={piece.id}
+              userVotes={piece.votes}
+            />
+          </div>
           <div className={classes.header}>
             <div className={classes['user-info']}>
               <Link
@@ -294,12 +290,6 @@ const PiecePage = () => {
                   <div className={classes.dropdown}>
                     {token && (currentUser || userRole === 'admin') ? (
                       <>
-                        <button
-                          onClick={handleEditClick}
-                          disabled={piece.tweaks_count > 0}
-                        >
-                          <RiEditBoxLine /> Edit
-                        </button>
                         <button onClick={() => handleConfirmationModalToggle()}>
                           <RiDeleteBin7Line className={classes.danger} />
                           <span className={classes.danger}>Delete</span>
@@ -319,20 +309,6 @@ const PiecePage = () => {
             </div>
           </div>
           <div className={classes.main}>
-            {piece.parent_piece && (
-              <div className={classes['parent-piece-bar']}>
-                <p className={classes['parent-piece-text']}>
-                  Tweak of{' '}
-                  <Link
-                    to={`/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`}
-                  >
-                    {piece.parent_piece.title.length > 20
-                      ? `${piece.parent_piece.title.slice(0, 20)}...`
-                      : piece.parent_piece.title}
-                  </Link>
-                </p>
-              </div>
-            )}
             <div className={classes.body}>
               <h2>{piece.title}</h2>
               {(piece.images.length > 0 || piece.youtube_url) && (
@@ -346,22 +322,20 @@ const PiecePage = () => {
               )}
               <div
                 className={classes.content}
-                dangerouslySetInnerHTML={{ __html: piece.content }}
+                dangerouslySetInnerHTML={{ __html: piece.body }}
               />
             </div>
           </div>
           <div className={classes.footer}>
             <div className={classes['footer-container']}>
               <SharePopover url={window.location.href} type={'page'} />
-              {!piece.parent_piece_id && (
-                <button
-                  className={`${classes.link} ${classes.tweak}`}
-                  onClick={handleTweakClick}
-                >
-                  <RiFlaskLine className={classes['tweak-icon']} />
-                  <span className={classes.text}>Tweak</span>
-                </button>
-              )}
+              <button
+                className={`${classes.link} ${classes.tweak}`}
+                onClick={handleTweakClick}
+              >
+                <RiFlaskLine className={classes['tweak-icon']} />
+                <span className={classes.text}>Tweak</span>
+              </button>
             </div>
           </div>
           <div

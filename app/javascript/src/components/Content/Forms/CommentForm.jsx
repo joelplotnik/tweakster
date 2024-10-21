@@ -2,13 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import classes from './CommentForm.module.css'
 
-const PieceCommentForm = ({
-  comment,
-  parentId,
-  onCancel,
-  onSubmit,
-  showCancel,
-}) => {
+const PieceCommentForm = ({ comment, onCancel, onSubmit, showCancel }) => {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
@@ -22,7 +16,7 @@ const PieceCommentForm = ({
 
     const commentId = comment ? comment.id : null
 
-    onSubmit(message, parentId, commentId)
+    onSubmit(message, commentId)
     setMessage('')
     showCancel && onCancel()
   }

@@ -9,29 +9,30 @@ function AboutPage() {
       <div className={classes['about-page']}>
         <h1>Welcome to Tweakster</h1>
         <p className={classes['mission-statement']}>
-          Our mission is to empower individuals to make informed decisions by
-          providing a platform to rate the integrity of content pieces and
-          fine-tune them for accuracy and reliability.
+          Tweakster is the app that lets you reinvent the way you play! Gone are
+          the days of relying solely on game developers for achievements—now,
+          you create your own. With Tweakster, gamers can craft custom
+          challenges, share them with the community, and put others to the test.
         </p>
         <p className={classes.description}>
-          The name Tweakster represents the idea of refining information to make
-          it more accurate and reliable. At Tweakster, we believe that everyone
-          can contribute to a more informed and enlightened society by sharing
-          accurate information and working together to create a more accurate
-          and reliable picture of the world.
+          Whether you're designing a wild speedrun, a quirky challenge, or the
+          ultimate mastery test, your creations can take center stage. Players
+          can attempt these unique achievements, and once completed, validation
+          comes straight from the community—users confirm each other’s
+          accomplishments to keep things authentic. The best part? The most
+          innovative and exciting challenges rise to the top as players can
+          'like' their favorites, making it easy to find popular achievements
+          for each game.
         </p>
         <p className={classes.goal}>
-          Our platform allows users to rate content pieces considering several
-          criteria, including accuracy, factualness, and objectivity.
-          Additionally, users can fine-tune and refine content pieces for
-          accuracy and reliability, enabling them to actively participate in
-          promoting the highest standards of journalism. With just one click of
-          a button, users can contribute to helping others make informed
-          decisions based on reliable information.
+          Tweakster isn't just an achievement tracker—it's a platform where
+          gamers shape the experience for one another. Elevate your gameplay,
+          showcase your creativity, and discover a whole new way to play.
         </p>
         <p className={classes.thanks}>
-          Thank you for choosing Tweakster and joining us in our mission to
-          promote integrity and honesty in journalism.
+          Thank you for joining Tweakster! Together, we’re creating a new era of
+          gameplay—one driven by imagination, collaboration, and the joy of
+          shared challenges.
         </p>
       </div>
     </Card>

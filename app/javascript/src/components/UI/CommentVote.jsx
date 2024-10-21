@@ -14,8 +14,8 @@ import classes from './CommentVote.module.css'
 import { AuthModal } from './Modals/AuthModal'
 
 const CommentVote = ({
-  likes,
-  dislikes,
+  upvotes,
+  downvotes,
   channelId,
   pieceId,
   commentId,
@@ -23,7 +23,7 @@ const CommentVote = ({
 }) => {
   const token = useRouteLoaderData('root')
   const userId = useSelector(state => state.user.user?.id)
-  const [score, setScore] = useState(likes - dislikes)
+  const [score, setScore] = useState(upvotes - downvotes)
   const [voteType, setVoteType] = useState(0)
   const [showModal, setShowModal] = useState(false)
   const prevVoteTypeRef = useRef(0)

@@ -5,7 +5,6 @@ import {
   RiEditBoxLine,
   RiFlagLine,
   RiMoreFill,
-  RiReplyLine,
 } from 'react-icons/ri'
 import { Link, useRouteLoaderData } from 'react-router-dom'
 
@@ -19,43 +18,33 @@ import CommentForm from './Forms/CommentForm'
 
 const Comment = ({
   comment,
-  piece,
-  childComments,
-  onReply,
+  commentable,
+  commentableType,
   onEdit,
   onDelete,
   activeComment,
   setActiveComment,
-  newCommentRef,
 }) => {
   const token = useRouteLoaderData('root')
   const commentUserId = comment.user_id
   const { userId: userIdStr, userRole } = getUserData() || {}
   const userId = parseInt(userIdStr)
   const currentUser = commentUserId === userId
-  const [isReplyFormOpen, setIsReplyFormOpen] = useState(false)
   const [isEditFormOpen, setIsEditFormOpen] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const dropdownRef = useRef(null)
-
-  const handleReplyClick = () => {
-    if (!token) {
-      setShowAuthModal(true)
-    } else {
-      setIsReplyFormOpen(!isReplyFormOpen)
-      setIsEditFormOpen(false)
-    }
-  }
+  const [dropdownActive, setDropdownActive] = useState(false)
 
   const handleEditClick = () => {
     setActiveComment(null)
+    setDropdownActive(false)
     setIsEditFormOpen(!isEditFormOpen)
-    setIsReplyFormOpen(false)
   }
 
   const handleDeleteClick = () => {
+    setActiveComment(null)
     onDelete(comment.id)
   }
 
@@ -74,6 +63,7 @@ const Comment = ({
     }
 
     event.stopPropagation()
+    setDropdownActive(!dropdownActive)
     setActiveComment(activeComment === comment.id ? null : comment.id)
   }
 
@@ -88,6 +78,7 @@ const Comment = ({
   useEffect(() => {
     const handleClickOutside = event => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownActive(false)
         setActiveComment(null)
       }
     }
@@ -100,13 +91,33 @@ const Comment = ({
   }, [setActiveComment])
 
   const handleConfirmationModalToggle = () => {
+    setDropdownActive(false)
     setShowConfirmationModal(!showConfirmationModal)
   }
 
   return (
     <>
-      <div className={classes.comment}>
+      <div
+        className={
+          commentableType === 'Piece'
+            ? classes['piece-comment']
+            : classes['tweak-comment']
+        }
+      >
         <div className={classes['comment-info']}>
+          <Link
+            to={`/users/${comment.user_id}`}
+            className={classes['user-link']}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className={classes['photo-container']}>
+              <img
+                className={classes.photo}
+                src={comment.user.avatar_url || '/default-avatar.png'}
+                alt={`${comment.user.username}'s avatar`}
+              />
+            </div>
+          </Link>
           <div>
             <Link
               to={`/users/${comment.user_id}`}
@@ -124,37 +135,35 @@ const Comment = ({
         <p className={classes['comment-message']}>{comment.message}</p>
         <div className={classes['comment-icons']}>
           <CommentVote
-            likes={comment.likes}
-            dislikes={comment.dislikes}
-            channelId={piece.channel_id}
-            pieceId={comment.piece_id}
+            upvotes={comment.upvotes}
+            downvotes={comment.downvotes}
+            channelId={commentable.channel_id}
+            pieceId={comment.commentable_id}
             commentId={comment.id}
             userVotes={comment.votes}
           />
-          <span
-            className={`${classes['reply-button']}`}
-            onClick={() => handleReplyClick(comment.id)}
+          <div
+            className={`${classes['dropdown-container']} ${
+              dropdownActive ? classes.active : ''
+            }`}
+            ref={dropdownRef}
           >
-            <RiReplyLine className={classes['reply-icon']} />
-            <span className={classes['reply-text']}>Reply</span>
-          </span>
-          <div className={classes['dropdown-container']} ref={dropdownRef}>
             <RiMoreFill
               className={classes['more-icon']}
               onClick={handleDropdownClick}
             />
-            {activeComment === comment.id && (
+            {dropdownActive && (
               <div className={classes['dropdown-menu']}>
                 {token &&
                 (currentUser ||
                   userRole === 'admin' ||
-                  userId === piece.user_id) ? (
+                  userId === commentable.user_id) ? (
                   <>
-                    <button onClick={() => handleEditClick(comment.id)}>
+                    <button onClick={handleEditClick}>
                       <RiEditBoxLine />
                       Edit
                     </button>
-                    <button onClick={() => handleConfirmationModalToggle()}>
+                    <button onClick={handleConfirmationModalToggle}>
                       <RiDeleteBin7Line className={classes.delete} />
                       <span className={classes.delete}> Delete</span>
                     </button>
@@ -169,48 +178,13 @@ const Comment = ({
             )}
           </div>
         </div>
-        {isReplyFormOpen && (
-          <CommentForm
-            parentId={comment.parent_comment_id || comment.id}
-            onCancel={() => setIsReplyFormOpen(false)}
-            onSubmit={onReply}
-            showCancel={true}
-          />
-        )}
         {isEditFormOpen && (
           <CommentForm
             comment={comment}
-            parentId={comment.parent_comment_id}
             onCancel={() => setIsEditFormOpen(false)}
             onSubmit={onEdit}
             showCancel={true}
           />
-        )}
-        {childComments && childComments.length > 0 && (
-          <div className={classes['comment-nested']}>
-            {childComments.map(childComment => (
-              <div
-                key={childComment.comment.id}
-                id={
-                  childComment.comment.id === newCommentRef.current
-                    ? newCommentRef.current
-                    : undefined
-                }
-              >
-                <Comment
-                  key={childComment.comment.id}
-                  comment={childComment.comment}
-                  piece={piece}
-                  childComments={childComment.child_comments}
-                  onReply={onReply}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  activeComment={activeComment}
-                  setActiveComment={setActiveComment}
-                />
-              </div>
-            ))}
-          </div>
         )}
       </div>
       {showConfirmationModal && (
@@ -231,4 +205,5 @@ const Comment = ({
     </>
   )
 }
+
 export default Comment

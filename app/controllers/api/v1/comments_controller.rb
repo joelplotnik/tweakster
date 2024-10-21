@@ -1,62 +1,61 @@
 require 'will_paginate/array'
 
 class Api::V1::CommentsController < ApplicationController
-  include Commentable
-
-  load_and_authorize_resource except: :index
-  before_action :authenticate_user!, except: %i[index show]
+  load_and_authorize_resource
+  before_action :authenticate_user!, except: %i[index replies]
 
   rescue_from CanCan::AccessDenied do |exception|
     render json: { warning: exception }, status: :unauthorized
   end
 
   def index
-    piece = Piece.find(params[:piece_id])
-    comments = piece.comments.includes(:user, :votes)
-
-    excluded_comment_ids = JSON.parse(params[:exclude])
-    comments = comments.where.not(id: excluded_comment_ids)
-
-    comments = if params[:sort] == 'new'
-                 comments.order(created_at: :desc)
-               else
-                 comments.sort_by { |comment| calculate_comment_score(comment) }.reverse
-               end
-
-    root_comments = comments.select { |comment| comment.parent_comment_id.nil? }
-    comments_with_children = root_comments.map do |comment|
-      build_comment_tree(comment, sort_by_score: params[:sort] != 'new')
+    comments = Comment.where(commentable: find_commentable, parent_id: nil)
+                      .includes(user: { avatar_attachment: :blob })
+                      .order(likes_count: :desc)
+  
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_comments = comments.offset((page - 1) * per_page).limit(per_page)
+  
+    comments_with_replies_count = paginated_comments.map do |comment|
+      formatted_comment = format_comment(comment)
+      formatted_comment.merge('replies_count' => comment.children.count)
     end
-    paginated_comments = comments_with_children.paginate(page: params[:page], per_page: 10)
+  
+    render json: comments_with_replies_count
+  end
+  
 
-    render json: paginated_comments, include: {
-      user: { only: [:username] },
-      votes: { only: %i[user_id vote_type] },
-      child_comments: {
-        include: {
-          user: { only: [:username] },
-          votes: { only: %i[user_id vote_type] }
-        }
-      }
+  def replies
+    parent_comment = Comment.find(params[:id])
+    
+    replies = parent_comment.children.includes(user: { avatar_attachment: :blob }).order(likes_count: :desc)
+
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_replies = replies.offset((page - 1) * per_page).limit(per_page)
+
+    replies_json = paginated_replies.map { |reply| format_comment(reply) }
+
+    render json: {
+      replies: replies_json
     }
   end
+  
 
   def create
-    comment = Comment.new(comment_params)
+    commentable = find_commentable
+    comment = commentable.comments.new(comment_params)
     comment.user = current_user
 
-    if comment.save
-      CommentOnPieceNotifier.with(record: comment).deliver(comment.piece.user) unless comment.user == comment.piece.user
+    comment.parent_id = params[:id] if params[:id].present?
 
-      render json: build_comment_tree(comment), include: {
-        user: { only: [:username] },
-        votes: { only: %i[user_id vote_type] },
-        child_comments: {
-          include: {
-            user: { only: [:username] },
-            votes: { only: %i[user_id vote_type] }
-          }
-        }
+    if comment.save
+      CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == commentable.user
+
+      render json: comment, include: {
+        user: { only: [:username], methods: [:avatar_url] },
+        likes: { only: [:user_id] }
       }, status: :created
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
@@ -66,17 +65,11 @@ class Api::V1::CommentsController < ApplicationController
   def update
     comment = Comment.find(params[:id])
 
-    if comment.update(comment_params)
-      render json: build_comment_tree(comment), include: {
-        user: { only: [:username] },
-        votes: { only: %i[user_id vote_type] },
-        child_comments: {
-          include: {
-            user: { only: [:username] },
-            votes: { only: %i[user_id vote_type] }
-          }
-        }
-      }, status: :created
+    if comment.update(comment_params.except(:parent_id))
+      render json: comment, include: {
+        user: { only: [:username], methods: [:avatar_url] },
+        likes: { only: [:user_id] }
+      }, status: :ok
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
     end
@@ -87,7 +80,7 @@ class Api::V1::CommentsController < ApplicationController
     comment.destroy
 
     if comment.destroyed?
-      render json: { message: 'Comment and its children successfully deleted' }, status: :ok
+      render json: { message: 'Comment successfully deleted' }, status: :ok
     else
       render json: { error: 'Failed to delete comment' }, status: :unprocessable_entity
     end
@@ -102,6 +95,25 @@ class Api::V1::CommentsController < ApplicationController
   private
 
   def comment_params
-    params.require(:comment).permit(:message, :piece_id, :parent_comment_id)
+    params.require(:comment).permit(:message, :commentable_id, :commentable_type)
+  end
+
+  def find_commentable
+    if params[:challenge_id]
+      Challenge.find(params[:challenge_id])
+    elsif params[:accepted_challenge_id]
+      AcceptedChallenge.find(params[:accepted_challenge_id])
+    else
+      render json: { error: 'Commentable not found' }, status: :not_found
+    end
+  end
+
+  def format_comment(comment)
+    comment.as_json.merge({
+      user: {
+        username: comment.user.username,
+        avatar_url: comment.user.avatar.attached? ? url_for(comment.user.avatar) : nil
+      }
+    })
   end
 end

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { RiSortDesc } from 'react-icons/ri'
 
 import classes from './SortDropdown.module.css'
 
-const SortDropdown = ({ onSortChange, selectedSortOption }) => {
+const SortDropdown = ({ onSortChange }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const options = ['top', 'new']
+  const options = ['top', 'new', 'old']
   const dropdownRef = useRef(null)
 
   const handleSortChange = option => {
@@ -33,12 +34,10 @@ const SortDropdown = ({ onSortChange, selectedSortOption }) => {
     <div className={classes.container}>
       <div className={classes['custom-select-wrapper']} ref={dropdownRef}>
         <div className={classes['select-dropdown']} onClick={toggleDropdown}>
-          <span className={classes.label}>Sort By:</span>
-          {selectedSortOption.charAt(0).toUpperCase() +
-            selectedSortOption.slice(1)}
-          <div
-            className={isOpen ? classes['arrow-up'] : classes['arrow-down']}
-          ></div>
+          <div className={classes.icon}>
+            <RiSortDesc />
+          </div>
+          <span className={classes.label}>Sort by</span>
         </div>
         {isOpen && (
           <div className={classes['dropdown-menu']}>

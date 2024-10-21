@@ -39,13 +39,23 @@ const Piece = ({ piece }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
-
   const token = useRouteLoaderData('root')
-  const { userId, userRole } = getUserData() || {}
-  const pieceUserID = piece.user.id
-  const currentUser = pieceUserID === parseInt(userId, 10)
+  const { userRole } = getUserData() || {}
+  // const tweaked = !!piece.tweak
 
-  const tweaked = !!piece.tweak
+  const getTitle = (count, singular, plural) =>
+    count === 1 ? singular : plural
+  const commentsCount =
+    activePiece && activePiece.id === piece.id
+      ? activePiece.comments_count
+      : piece.comments_count
+  const tweaksCount =
+    activePiece && activePiece.id === piece.id
+      ? activePiece.tweaks_count
+      : piece.tweaks_count
+
+  const commentsTitle = getTitle(commentsCount, 'Comment', 'Comments')
+  const tweaksTitle = getTitle(tweaksCount, 'Tweak', 'Tweaks')
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showAuthModal)
@@ -62,21 +72,6 @@ const Piece = ({ piece }) => {
   const handleDropdownToggle = event => {
     event.stopPropagation()
     setShowDropdown(!showDropdown)
-  }
-
-  const handleEditClick = event => {
-    event.stopPropagation()
-    if (piece.tweaks_count === 0) {
-      navigate(`/channels/${piece.channel_id}/pieces/${piece.id}/edit`)
-    }
-  }
-
-  const handleParentPieceClick = event => {
-    event.stopPropagation()
-    window.open(
-      `/channels/${piece.parent_piece.channel.id}/pieces/${piece.parent_piece_id}`,
-      '_blank'
-    )
   }
 
   const handleDeleteClick = async () => {
@@ -174,8 +169,8 @@ const Piece = ({ piece }) => {
       <div onClick={handlePieceLinkClick} className={classes.piece}>
         <div className={classes.vote}>
           <PieceVote
-            likes={piece.likes}
-            dislikes={piece.dislikes}
+            upvotes={piece.upvotes}
+            downvotes={piece.downvotes}
             channelId={piece.channel_id}
             pieceId={piece.id}
             userVotes={piece.votes}
@@ -227,32 +222,20 @@ const Piece = ({ piece }) => {
               - {moment(piece.created_at).fromNow()}
             </p>
           </div>
-          <div className={tweaked ? classes['tweak-effect'] : classes.main}>
-            {piece.parent_piece && (
-              <div className={classes['parent-piece-bar']}>
-                <p className={classes['parent-piece-text']}>
-                  Tweak of{' '}
-                  <Link onClick={handleParentPieceClick}>
-                    {piece.parent_piece.title.length > 20
-                      ? `${piece.parent_piece.title.slice(0, 20)}...`
-                      : piece.parent_piece.title}
-                  </Link>
-                </p>
-              </div>
-            )}
+          <div className={classes.main}>
             <div className={classes.body}>
               <h2 className="title-container">{piece.title}</h2>
               <div className={classes.carousel}>
                 <PieceCarousel
                   pieceUrl={`/channels/${piece.channel.id}/pieces/${piece.id}`}
                   background={location}
-                  content={piece.content}
+                  body={piece.body}
                   images={piece.images}
                   youtubeUrl={piece.youtube_url}
                 />
               </div>
             </div>
-            {tweaked && (
+            {/* {tweaked && (
               <div className={classes['disclaimer-container']}>
                 <RiFlaskFill className={classes['disclaimer-icon']} />
                 <p className={classes['disclaimer-text']}>
@@ -280,25 +263,23 @@ const Piece = ({ piece }) => {
                   </Link>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
           <div className={classes.footer}>
             <div className={classes['footer-container']}>
-              {!piece.parent_piece_id && (
-                <div className={`${classes.link} ${classes.tweak}`}>
-                  <RiFlaskLine className={classes.icon} />
-                  <span className={classes.text}>
-                    {piece.tweaks_count} Tweaks
-                  </span>
-                </div>
-              )}
+              <div className={`${classes.link} ${classes.tweak}`}>
+                <RiFlaskLine className={classes.icon} />
+                <span className={classes.text}>
+                  {piece.tweaks_count} {tweaksTitle}
+                </span>
+              </div>
               <div className={`${classes.link} ${classes.comms}`}>
                 <RiChat3Line className={classes.icon} />
                 <span className={classes.text}>
                   {activePiece && activePiece.id === piece.id
                     ? activePiece.comments_count
                     : piece.comments_count}{' '}
-                  Comments
+                  {commentsTitle}
                 </span>
               </div>
               <SharePopover
@@ -314,14 +295,8 @@ const Piece = ({ piece }) => {
                 </div>
                 {showDropdown && (
                   <div className={classes.dropdown}>
-                    {token && (currentUser || userRole === 'admin') ? (
+                    {token && userRole === 'admin' ? (
                       <>
-                        <button
-                          onClick={handleEditClick}
-                          disabled={piece.tweaks_count > 0}
-                        >
-                          <RiEditBoxLine /> Edit
-                        </button>
                         <button onClick={() => handleConfirmationModalToggle()}>
                           <RiDeleteBin7Line className={classes.danger} />
                           <span className={classes.danger}>Delete</span>

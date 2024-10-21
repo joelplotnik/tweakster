@@ -4,7 +4,7 @@ class Api::V1::NotificationsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    notifications = current_user.notifications.includes(event: { record: %i[user piece] })
+    notifications = current_user.notifications.includes(event: { record: { user: [], callenge: [], accepted_challenge: [] } })
                                 .order(created_at: :desc)
                                 .paginate(page: params[:page], per_page: 10)
 
@@ -15,23 +15,32 @@ class Api::V1::NotificationsController < ApplicationController
                                          }
                                        })
 
-      additional_data = if notification.event.record_type == 'Comment'
+      additional_data = case notification.event.record_type
+                        when 'Comment'
+                          record = notification.event.record
                           {
-                            user_avatar_url: notification.event.record.user.avatar_url,
-                            username: notification.event.record.user.username,
-                            piece_id: notification.event.record.piece.id,
-                            piece_channel_id: notification.event.record.piece.channel_id,
-                            piece_title: notification.event.record.piece.title
+                            user_avatar_url: record.user.avatar_url,
+                            username: record.user.username,
+                            piece_id: record.commentable_id,
+                            piece_channel_id: record.commentable.channel_id,
+                            piece_title: record.commentable.title
                           }
-                        elsif notification.event.record_type == 'Piece'
+                        when 'Challenge'
+                          record = notification.event.record
                           {
-                            user_avatar_url: notification.event.record.user.avatar_url,
-                            username: notification.event.record.user.username,
-                            piece_id: notification.event.record.id,
-                            piece_channel_id: notification.event.record.channel_id,
-                            piece_title: notification.event.record.title,
-                            parent_piece_id: notification.event.record.parent_piece&.id,
-                            parent_piece_title: notification.event.record.parent_piece&.title
+                            user_avatar_url: record.user.avatar_url,
+                            username: record.user.username,
+                            challenge_id: record.id,
+                            challenge_title: record.title
+                          }
+                        when 'AcceptedChallenge'
+                          record = notification.event.record
+                          {
+                            user_avatar_url: record.user.avatar_url,
+                            username: record.user.username,
+                            accepted_challenge_id: record.id,
+                            challenge_title: record.challenge.title,
+                            accepted_at: record.accepted_at
                           }
                         else
                           {}

@@ -1,6 +1,6 @@
 .comments {
   margin: 0 auto;
-  padding-top: 10px;
+  padding-top: 0.25rem;
   margin-bottom: 2rem;
 }
 
@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 1rem;
+  margin-left: 3rem;
   margin-bottom: 0.5rem;
   font-weight: bold;
   background-color: #eaeaea;
@@ -26,4 +26,48 @@
 
 .comment-button svg {
   margin-right: 0.5rem;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 3rem;
+  color: #333;
+}
+
+.buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-left: 3.2rem;
+  margin-bottom: 1rem;
+}
+
+.comments-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  display: block;
+}
+
+.comments-button:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.comments-button:disabled {
+  color: #6c757d;
+  cursor: not-allowed;
+  text-decoration: none;
 }

@@ -7,63 +7,55 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      root 'home#index'
-
-      get 'mischief_makers', to: 'home#mischief_makers'
-      get 'personal_feed', to: 'home#personal_feed'
+      get 'top_users', to: 'users#top_users'
+      get 'top_games', to: 'games#top_games'
+      get 'top_challenges', to: 'challenges#top_challenges'
+      get 'top_accepted_challenges', to: 'accepted_challenges#top_accepted_challenges'
 
       resources :users, only: %i[show index update destroy] do
         member do
           post 'follow', to: 'relationships#create'
           delete 'unfollow', to: 'relationships#destroy'
-          get 'most_interacted_channels'
-          get 'most_interacted_users'
-          get 'subscriptions'
           get 'following'
-          put 'update_favorite_users'
-          put 'update_favorite_channels'
+          put 'update_favorite_games'
           get 'check_ownership'
         end
 
         collection do
           get 'search'
-          get 'popular'
-        end
-      end
-
-      resources :channels, only: %i[show index create update destroy] do
-        member do
-          get 'check_ownership'
         end
 
-        collection do
-          get 'search'
-          get 'popular'
-        end
-
-        resources :pieces, only: %i[show index create update destroy] do
-          member do
-            get 'check_ownership'
-            get 'tweaks', to: 'pieces#tweaks'
-          end
+        resources :accepted_challenges, only: %i[index show update destroy] do
+          resources :approvals, only: [:create]
 
           resources :comments, only: %i[index create update destroy] do
-            member do
-              get 'check_ownership'
-            end
+            resources :likes, only: [:create]
+            get 'replies', to: 'comments#replies', on: :member
           end
-
-          resources :votes, only: [:create]
         end
-
-        post 'subscribe', to: 'subscriptions#create'
-        delete 'unsubscribe', to: 'subscriptions#destroy'
-        get 'check_channel_subscription', to: 'subscriptions#check_channel_subscription'
       end
 
-      resources :subscriptions, only: [:index] do
+      resources :games, only: %i[show index create update destroy] do
         collection do
-          get 'check_user_subscriptions'
+          get 'search'
+        end
+
+        resources :challenges, only: %i[show index create update destroy] do
+          resources :likes, only: [:create]
+          resources :difficulty_ratings, only: [:create]
+
+          resources :comments, only: %i[index create update destroy] do
+            resources :likes, only: [:create]
+            get 'replies', to: 'comments#replies', on: :member
+          end
+
+          resources :accepted_challenges, only: %i[index create] do
+            resources :approvals, only: [:create]
+
+            resources :comments, only: %i[index create update destroy] do
+              resources :likes, only: [:create]
+            end
+          end
         end
       end
 

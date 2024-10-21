@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 import Comments from './Comments'
 import classes from './Interactions.module.css'
@@ -8,72 +8,63 @@ import Tweaks from './Tweaks'
 
 const Interactions = ({ pieceClassModalRef }) => {
   const location = useLocation()
-  const navigate = useNavigate()
   const piece = useSelector(state => state.piece.piece)
-  const [activeTab, setActiveTab] = useState('comments')
+  const [isScrollableTargetAvailable, setIsScrollableTargetAvailable] =
+    useState(false)
+  const targetSectionIdRef = useRef(null)
+
+  useEffect(() => {
+    if (pieceClassModalRef?.current || pieceClassModalRef === 'page') {
+      setIsScrollableTargetAvailable(true)
+    }
+  }, [pieceClassModalRef])
 
   useEffect(() => {
     const tabState = location.state && location.state.tab
+    const params = new URLSearchParams(location.search)
+    const tabParam = params.get('tab')
+    const targetSectionId = tabState || tabParam
 
-    if (tabState) {
-      setActiveTab(tabState)
-    } else {
-      const params = new URLSearchParams(location.search)
-      const tabParam = params.get('tab')
-
-      if (tabParam === 'tweaks') {
-        setActiveTab('tweaks')
-      } else {
-        setActiveTab('comments')
-      }
+    if (targetSectionId) {
+      targetSectionIdRef.current = `${targetSectionId}-section`
     }
   }, [location.state, location.search])
 
-  const handleTabClick = tab => {
-    const params = new URLSearchParams(location.search)
-    const tabParam = params.get('tab')
+  useEffect(() => {
+    if (isScrollableTargetAvailable && targetSectionIdRef.current) {
+      const targetSection = document.getElementById(targetSectionIdRef.current)
 
-    if (tabParam) {
-      params.set('tab', tab)
-      navigate(`${location.pathname}?${params}`, { replace: true })
+      if (targetSection) {
+        if (pieceClassModalRef === 'page') {
+          const topOffset = 48
+          const elementPosition = targetSection.getBoundingClientRect().top
+          const offsetPosition = elementPosition + window.scrollY - topOffset
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth',
+          })
+        } else {
+          targetSection.scrollIntoView({ behavior: 'smooth' })
+        }
+      }
+      targetSectionIdRef.current = null
     }
-
-    setActiveTab(tab)
-  }
+  }, [isScrollableTargetAvailable, pieceClassModalRef])
 
   return (
-    <>
-      <div className={classes['tab-container']}>
-        <button
-          className={`${classes.tab} ${
-            activeTab === 'comments' ? `${classes.active}` : ''
-          }`}
-          onClick={() => handleTabClick('comments')}
-        >
-          {piece.comments_count} Comments
-        </button>
-        <button
-          className={`${classes.tab} ${
-            activeTab === 'tweaks' ? `${classes.active}` : ''
-          }`}
-          onClick={() => handleTabClick('tweaks')}
-        >
-          {piece.tweaks_count} Tweaks
-        </button>
+    <div className={classes['section-container']}>
+      <div id="comments-section" className={classes.section}>
+        <Comments
+          commentable={piece}
+          commentableType={'Piece'}
+          pieceClassModalRef={pieceClassModalRef}
+        />
       </div>
-
-      {activeTab === 'comments' && (
-        <div>
-          <Comments piece={piece} pieceClassModalRef={pieceClassModalRef} />
-        </div>
-      )}
-
-      {activeTab === 'tweaks' && (
-        <div>
-          <Tweaks piece={piece} pieceClassModalRef={pieceClassModalRef} />
-        </div>
-      )}
-    </>
+      <div id="tweaks-section" className={classes.section}>
+        <Tweaks piece={piece} pieceClassModalRef={pieceClassModalRef} />
+      </div>
+    </div>
   )
 }
 
