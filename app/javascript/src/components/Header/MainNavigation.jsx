@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, useRouteLoaderData, useSubmit } from 'react-router-dom'
 
 import defaultAvatar from '../../assets/default-avatar.png'
-import Logo from '../../assets/logo.svg'
+import Logo from '../../assets/logo_color.svg'
 import { API_URL } from '../../constants/constants'
 import { CableContext } from '../../context/cable'
 import { notificationsActions } from '../../store/notifications'
@@ -268,7 +268,6 @@ const MainNavigation = () => {
           </div>
         </nav>
       </header>
-      {/* <img src={Banner} className={classes.banner} alt="Banner" /> */}
       <Sidebar isOpen={showSidebar} onClose={() => setShowSidebar(false)} />
       {showModal && (
         <AuthModal authType={authType} onClick={handleModalToggle} />

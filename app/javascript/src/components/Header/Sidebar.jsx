@@ -26,10 +26,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const fetchUsers = async limit => {
     try {
-      const response = await fetch(`${API_URL}/users?limit=${limit}`)
+      const response = await fetch(`${API_URL}/popular_users`)
       const data = await response.json()
-      setUsers(data)
-      setIsUsersEmpty(data.length === 0)
+      setUsers(data.users)
+      setIsUsersEmpty(data.users.length === 0)
     } catch (error) {
       console.error('Error fetching users:', error.message)
     }
@@ -37,10 +37,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   const fetchGames = async limit => {
     try {
-      const response = await fetch(`${API_URL}/games?limit=${limit}`)
+      const response = await fetch(`${API_URL}/popular_games`)
       const data = await response.json()
-      setGames(data)
-      setIsGamesEmpty(data.length === 0)
+      setGames(data.games)
+      setIsGamesEmpty(data.games.length === 0)
     } catch (error) {
       console.error('Error fetching games:', error.message)
     }
@@ -61,7 +61,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <span className={classes.name}>Home</span>
           </Link>
           <Link
-            to="/main"
+            to="/popular"
             className={classes.link}
             onClick={onClose}
             onMouseEnter={() => setHoveredLink('popular')}
@@ -71,9 +71,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             <span className={classes.name}>Popular</span>
           </Link>
           <hr className={classes.line} />
-          <div className={classes.header}>
-            {isGamesEmpty ? 'NO GAMES' : 'TOP GAMES'}
-          </div>
+          <div className={classes.header}>{'TOP GAMES'}</div>
           {games.map(game => (
             <Link
               key={game.id}
@@ -97,9 +95,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             See more
           </Link>
           <hr className={classes.line} />
-          <div className={classes.header}>
-            {isUsersEmpty ? 'NO USERS' : 'TOP USERS'}
-          </div>
+          <div className={classes.header}>{'TOP USERS'}</div>
           {users.map(user => (
             <Link
               key={user.id}

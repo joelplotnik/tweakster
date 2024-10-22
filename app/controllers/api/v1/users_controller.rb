@@ -12,6 +12,7 @@ class Api::V1::UsersController < ApplicationController
     page = params[:page] || 1
 
     users = User
+            .with_attached_avatar
             .paginate(page:, per_page: limit)
             .order(created_at: :asc)
             .map { |user| format_user(user) }
@@ -19,12 +20,12 @@ class Api::V1::UsersController < ApplicationController
     render json: users
   end
 
-  def top_users
+  def popular_users
     limit = params[:limit] || 5
     page = params[:page] || 1
     point_in_time = params[:point_in_time] || Time.current
-
-    top_users = User
+  
+    popular_users = User
                 .with_attached_avatar
                 .joins(accepted_challenges: :approvals)
                 .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
@@ -32,9 +33,11 @@ class Api::V1::UsersController < ApplicationController
                 .order('COUNT(approvals.id) DESC')
                 .paginate(page:, per_page: limit)
                 .select('users.*, COUNT(approvals.id) AS approvals_count')
-
-    render json: top_users.map { |user| format_user(user).merge(approvals_count: user.approvals_count) }, status: :ok
+                .map { |user| format_user(user) }
+  
+    render json: { users: popular_users, point_in_time: point_in_time }, status: :ok
   end
+  
 
   def show
     user = User.find(params[:id])

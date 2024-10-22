@@ -1,6 +1,6 @@
 class Api::V1::GamesController < ApplicationController
   load_and_authorize_resource
-  before_action :authenticate_user!, except: %i[index show top_games]
+  before_action :authenticate_user!, except: %i[index popular_games show search]
   before_action :set_game, only: %i[show update destroy]
 
   rescue_from CanCan::AccessDenied do |exception|
@@ -12,6 +12,7 @@ class Api::V1::GamesController < ApplicationController
     page = params[:page] || 1
 
     games = Game
+            .with_attached_image
             .paginate(page:, per_page: limit)
             .order(name: :asc)
             .map { |game| format_game(game) }
@@ -19,12 +20,12 @@ class Api::V1::GamesController < ApplicationController
     render json: games
   end
 
-  def top_games
+  def popular_games
     limit = params[:limit] || 5
     page = params[:page] || 1
     point_in_time = params[:point_in_time] || Time.current
 
-    top_games = Game
+    popular_games = Game
                 .with_attached_image
                 .left_joins(challenges: :accepted_challenges)
                 .where('accepted_challenges.created_at >= ? AND accepted_challenges.created_at <= ?', 7.days.ago, point_in_time)
@@ -33,7 +34,7 @@ class Api::V1::GamesController < ApplicationController
                 .paginate(page:, per_page: limit)
                 .map { |game| format_game(game) }
 
-    render json: { games: top_games, point_in_time: }
+    render json: { games: popular_games, point_in_time: }, status: :ok
   end
 
   def show

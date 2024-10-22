@@ -1,21 +1,22 @@
 import React from 'react'
+import { useRouteLoaderData } from 'react-router-dom'
 
-import ChannelList from '../components/Content/ChannelList'
-import PieceList from '../components/Content/PieceList'
 import classes from './HomePage.module.css'
+import PopularPage from './PopularPage'
 
 const HomePage = () => {
+  const token = useRouteLoaderData('root')
+
   return (
-    <div>
-      <div className={classes.container}>
-        <div className={classes['piece-list']}>
-          <PieceList isHomePage={true} />
+    <>
+      {token ? (
+        <div className={classes['home-page']}>
+          <div className={classes.container}>{'HOME PAGE'}</div>
         </div>
-        <div className={classes['channel-list']}>
-          <ChannelList />
-        </div>
-      </div>
-    </div>
+      ) : (
+        <PopularPage />
+      )}
+    </>
   )
 }
 

@@ -134,9 +134,9 @@ function SearchBar() {
                   className={classes['game-result']}
                   onClick={clearInput}
                 >
-                  <div className={classes['game-visual-container']}>
+                  <div className={classes['game-image-container']}>
                     <img
-                      src={result.visual_url || defaultVisual}
+                      src={result.image_url || defaultVisual}
                       alt="Game"
                       className={classes['game-visual']}
                     />

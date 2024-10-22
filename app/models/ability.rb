@@ -8,10 +8,10 @@ class Ability
     can :read, [User, Game, Challenge, AcceptedChallenge, Comment, Like, Approval, Difficulty, Report]
     can :search, User # allow users to search for users
     can :search, Game # allow users to search for games
-    can :top_games, Game # allow users to view top games
-    can :top_challenges, Challenge # allow users to view top challenges
-    can :top_accepted_challenges, AcceptedChallenge # allow users to view top accepted challenges
-    can :top_users, User # allow users to view top users
+    can :popular_games, Game # allow users to view popular games
+    can :popular_challenges, Challenge # allow users to view popular challenges
+    can :popular_accepted_challenges, AcceptedChallenge # allow users to view popular accepted challenges
+    can :popular_users, User # allow users to view popular users
     can :replies, Comment # allow users to view comment replies
 
     return unless user.present? # additional permissions for logged in users

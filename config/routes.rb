@@ -7,10 +7,10 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      get 'top_users', to: 'users#top_users'
-      get 'top_games', to: 'games#top_games'
-      get 'top_challenges', to: 'challenges#top_challenges'
-      get 'top_accepted_challenges', to: 'accepted_challenges#top_accepted_challenges'
+      get 'popular_users', to: 'users#popular_users'
+      get 'popular_games', to: 'games#popular_games'
+      get 'popular_challenges', to: 'challenges#popular_challenges'
+      get 'popular_accepted_challenges', to: 'accepted_challenges#popular_accepted_challenges'
 
       resources :users, only: %i[show index update destroy] do
         member do
