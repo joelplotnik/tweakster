@@ -1,5 +1,5 @@
 class Api::V1::ChallengesController < ApplicationController
-  before_action :doorkeeper_authorize!, except: %i[index show top_challenges]
+  before_action :doorkeeper_authorize!, except: %i[index show popular_challenges]
   before_action :set_game, only: %i[index show]
   before_action :set_challenge, only: %i[show update destroy]
 

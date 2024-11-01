@@ -1,5 +1,6 @@
 class Api::V1::UsersController < ApplicationController
   before_action :doorkeeper_authorize!, only: %i[update destroy following check_ownership]
+  before_action :current_user
 
   def index
     limit = params[:limit] || 25
@@ -18,20 +19,19 @@ class Api::V1::UsersController < ApplicationController
     limit = params[:limit] || 5
     page = params[:page] || 1
     point_in_time = params[:point_in_time] || Time.current
-  
+
     popular_users = User
-                .with_attached_avatar
-                .joins(accepted_challenges: :approvals)
-                .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
-                .group('users.id')
-                .order('COUNT(approvals.id) DESC')
-                .paginate(page:, per_page: limit)
-                .select('users.*, COUNT(approvals.id) AS approvals_count')
-                .map { |user| format_user(user) }
-  
-    render json: { users: popular_users, point_in_time: point_in_time }, status: :ok
+                    .with_attached_avatar
+                    .joins(accepted_challenges: :approvals)
+                    .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
+                    .group('users.id')
+                    .order('COUNT(approvals.id) DESC')
+                    .paginate(page:, per_page: limit)
+                    .select('users.*, COUNT(approvals.id) AS approvals_count')
+                    .map { |user| format_user(user) }
+
+    render json: { users: popular_users, point_in_time: }, status: :ok
   end
-  
 
   def show
     user = User.find(params[:id])
