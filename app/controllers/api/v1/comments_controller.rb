@@ -1,34 +1,28 @@
 require 'will_paginate/array'
 
 class Api::V1::CommentsController < ApplicationController
-  load_and_authorize_resource
-  before_action :authenticate_user!, except: %i[index replies]
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { warning: exception }, status: :unauthorized
-  end
+  before_action :doorkeeper_authorize!, except: %i[index replies]
 
   def index
     comments = Comment.where(commentable: find_commentable, parent_id: nil)
                       .includes(user: { avatar_attachment: :blob })
                       .order(likes_count: :desc)
-  
+
     per_page = 10
     page = params[:page].to_i.positive? ? params[:page].to_i : 1
     paginated_comments = comments.offset((page - 1) * per_page).limit(per_page)
-  
+
     comments_with_replies_count = paginated_comments.map do |comment|
       formatted_comment = format_comment(comment)
       formatted_comment.merge('replies_count' => comment.children.count)
     end
-  
+
     render json: comments_with_replies_count
   end
-  
 
   def replies
     parent_comment = Comment.find(params[:id])
-    
+
     replies = parent_comment.children.includes(user: { avatar_attachment: :blob }).order(likes_count: :desc)
 
     per_page = 10
@@ -41,7 +35,6 @@ class Api::V1::CommentsController < ApplicationController
       replies: replies_json
     }
   end
-  
 
   def create
     commentable = find_commentable
@@ -110,10 +103,10 @@ class Api::V1::CommentsController < ApplicationController
 
   def format_comment(comment)
     comment.as_json.merge({
-      user: {
-        username: comment.user.username,
-        avatar_url: comment.user.avatar.attached? ? url_for(comment.user.avatar) : nil
-      }
-    })
+                            user: {
+                              username: comment.user.username,
+                              avatar_url: comment.user.avatar.attached? ? url_for(comment.user.avatar) : nil
+                            }
+                          })
   end
 end

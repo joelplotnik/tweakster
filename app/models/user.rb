@@ -1,6 +1,4 @@
 class User < ApplicationRecord
-  include Devise::JWT::RevocationStrategies::JTIMatcher
-
   before_validation :strip_whitespace
 
   has_one_attached :avatar
@@ -26,13 +24,12 @@ class User < ApplicationRecord
   serialize :favorite_games, Array
 
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable,
-         :database_authenticatable, :jwt_authenticatable,
-         jwt_revocation_strategy: self
+         :recoverable, :rememberable, :validatable
 
   validate :validate_username
   validate :validate_favorite_games_count
 
+  validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :username, presence: true,
                        uniqueness: { case_sensitive: false },
                        length: { minimum: 2, maximum: 25 },
@@ -49,26 +46,9 @@ class User < ApplicationRecord
     end
   end
 
-  attr_writer :login
-
-  def login
-    login || username || email
-  end
-
-  def self.find_for_database_authentication(warden_conditions)
-    conditions = warden_conditions.dup
-    login = conditions.delete(:login)
-
-    if login
-      where(conditions.to_h).where(['lower(username) = :value OR lower(email) = :value',
-                                    { value: login.downcase }]).first
-    elsif conditions.key?(:username) || conditions.key?(:email)
-      where(conditions.to_h).first
-    end
-  end
-
-  def jwt_payload
-    super.merge({ username:, role: })
+  def self.authenticate(email, password)
+    user = User.find_for_authentication(email:)
+    user&.valid_password?(password) ? user : nil
   end
 
   def avatar_url

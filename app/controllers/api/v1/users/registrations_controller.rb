@@ -1,30 +1,27 @@
-class Api::V1::Users::RegistrationsController < Devise::RegistrationsController
-  respond_to :json
+class Api::V1::Users::RegistrationsController < ApplicationController
+  skip_before_action :doorkeeper_authorize!, only: %i[create]
+  include DoorkeeperRegisterable
 
   def create
-    super do |resource|
-      UserRegistrationService.call(resource)
+    client_app = Doorkeeper::Application.find_by(uid: user_params[:client_id])
+
+    unless client_app
+      render json: { error: I18n.t('doorkeeper.errors.messages.invalid_client') }, status: :unauthorized and return
+    end
+
+    allowed_params = user_params.except(:client_id)
+    user = User.new(allowed_params)
+
+    if user.save
+      render json: render_user(user, client_app), status: :ok
+    else
+      render json: { errors: user.errors }, status: :unprocessable_entity
     end
   end
 
   private
 
-  def respond_with(resource, _opts = {})
-    if resource.persisted?
-      render json: {
-        status: {
-          code: 200,
-          message: 'Successfully signed up user.',
-          data: resource.as_json(methods: [:avatar_url])
-        }
-      }
-    else
-      render json: {
-        status: {
-          message: 'Could not sign up user.',
-          errors: resource.errors.full_messages
-        }
-      }, status: :unprocessable_entity
-    end
+  def user_params
+    params.permit(:username, :email, :password, :client_id)
   end
 end

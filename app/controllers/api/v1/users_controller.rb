@@ -1,11 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  load_and_authorize_resource
-  before_action :authenticate_user!,
-                only: %i[update destroy following check_ownership]
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { warning: exception }, status: :unauthorized
-  end
+  before_action :doorkeeper_authorize!, only: %i[update destroy following check_ownership]
 
   def index
     limit = params[:limit] || 25
@@ -205,7 +199,7 @@ class Api::V1::UsersController < ApplicationController
 
   def format_user(user)
     user.as_json.merge({
-                         avatar_url: user.avatar_url,
+                         avatar_url: user.avatar_url
                        })
   end
 end

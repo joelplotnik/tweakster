@@ -1,11 +1,6 @@
 class Api::V1::GamesController < ApplicationController
-  load_and_authorize_resource
-  before_action :authenticate_user!, except: %i[index popular_games show search]
+  before_action :doorkeeper_authorize!, except: %i[index show top_games]
   before_action :set_game, only: %i[show update destroy]
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { warning: exception }, status: :unauthorized
-  end
 
   def index
     limit = params[:limit] || 5
@@ -26,13 +21,13 @@ class Api::V1::GamesController < ApplicationController
     point_in_time = params[:point_in_time] || Time.current
 
     popular_games = Game
-                .with_attached_image
-                .left_joins(challenges: :accepted_challenges)
-                .where('accepted_challenges.created_at >= ? AND accepted_challenges.created_at <= ?', 7.days.ago, point_in_time)
-                .group('games.id')
-                .order('COUNT(accepted_challenges.id) DESC')
-                .paginate(page:, per_page: limit)
-                .map { |game| format_game(game) }
+                    .with_attached_image
+                    .left_joins(challenges: :accepted_challenges)
+                    .where('accepted_challenges.created_at >= ? AND accepted_challenges.created_at <= ?', 7.days.ago, point_in_time)
+                    .group('games.id')
+                    .order('COUNT(accepted_challenges.id) DESC')
+                    .paginate(page:, per_page: limit)
+                    .map { |game| format_game(game) }
 
     render json: { games: popular_games, point_in_time: }, status: :ok
   end

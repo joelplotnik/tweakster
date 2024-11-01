@@ -1,13 +1,8 @@
 class Api::V1::AcceptedChallengesController < ApplicationController
-  load_and_authorize_resource
-  before_action :authenticate_user!, except: %i[index show popular_accepted_challenges]
+  before_action :doorkeeper_authorize!, except: %i[index show top_accepted_challenges]
   before_action :set_user, only: [:index]
   before_action :set_challenge, only: [:index]
   before_action :set_accepted_challenge, only: %i[show update destroy]
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { warning: exception.message }, status: :unauthorized
-  end
 
   # GET /api/v1/users/:user_id/accepted_challenges
   # GET /api/v1/games/:game_id/challenges/:challenge_id/accepted_challenges
@@ -30,13 +25,13 @@ class Api::V1::AcceptedChallengesController < ApplicationController
     point_in_time = params[:point_in_time] || Time.current
 
     popular_accepted_challenges = AcceptedChallenge
-                              .left_joins(:approvals)
-                              .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
-                              .group('accepted_challenges.id')
-                              .order('COUNT(approvals.id) DESC')
-                              .paginate(page:, per_page: limit)
-                              .includes(:challenge)
-                              .map { |accepted_challenge| format_accepted_challenge(accepted_challenge) }
+                                  .left_joins(:approvals)
+                                  .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
+                                  .group('accepted_challenges.id')
+                                  .order('COUNT(approvals.id) DESC')
+                                  .paginate(page:, per_page: limit)
+                                  .includes(:challenge)
+                                  .map { |accepted_challenge| format_accepted_challenge(accepted_challenge) }
 
     render json: { accepted_challenges: popular_accepted_challenges, point_in_time: }, status: :ok
   end

@@ -1,8 +1,6 @@
 require 'will_paginate/array'
 
 class Api::V1::NotificationsController < ApplicationController
-  before_action :authenticate_user!
-
   def index
     notifications = current_user.notifications.includes(event: { record: { user: [], callenge: [], accepted_challenge: [] } })
                                 .order(created_at: :desc)

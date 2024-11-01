@@ -1,12 +1,7 @@
 class Api::V1::DifficultiesController < ApplicationController
   include Difficultable
 
-  before_action :authenticate_user!
   before_action :set_challenge
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { warning: exception }, status: :unauthorized
-  end
 
   def create
     existing_difficulty = Difficulty.find_by(user_id: current_user.id, challenge_id: @challenge.id)

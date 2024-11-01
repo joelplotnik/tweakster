@@ -1,6 +1,4 @@
 class Api::V1::RelationshipsController < ApplicationController
-  before_action :authenticate_user!
-
   def create
     user_to_follow = User.find(params[:id])
 

@@ -1,12 +1,7 @@
 class Api::V1::ChallengesController < ApplicationController
-  load_and_authorize_resource
-  before_action :authenticate_user!, except: %i[index show popular_challenges]
+  before_action :doorkeeper_authorize!, except: %i[index show top_challenges]
   before_action :set_game, only: %i[index show]
   before_action :set_challenge, only: %i[show update destroy]
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { warning: exception }, status: :unauthorized
-  end
 
   def index
     challenges = @game.challenges.includes(:difficulties, :likes)
@@ -19,12 +14,12 @@ class Api::V1::ChallengesController < ApplicationController
     point_in_time = params[:point_in_time] || Time.current
 
     popular_challenges = Challenge
-                     .left_joins(:likes)
-                     .where('likes.created_at >= ? AND likes.created_at <= ?', 7.days.ago, point_in_time)
-                     .group('challenges.id')
-                     .order('COUNT(likes.id) DESC')
-                     .paginate(page:, per_page: limit)
-                     .map { |challenge| format_challenge(challenge) }
+                         .left_joins(:likes)
+                         .where('likes.created_at >= ? AND likes.created_at <= ?', 7.days.ago, point_in_time)
+                         .group('challenges.id')
+                         .order('COUNT(likes.id) DESC')
+                         .paginate(page:, per_page: limit)
+                         .map { |challenge| format_challenge(challenge) }
 
     render json: { challenges: popular_challenges, point_in_time: }, status: :ok
   end
