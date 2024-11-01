@@ -35,7 +35,12 @@ class Api::V1::UsersController < ApplicationController
 
   def show
     user = User.find(params[:id])
-    render json: format_user(user)
+
+    if current_user && current_user.id == user.id
+      render json: format_user(user).merge(extra_info: 'This is your profile!')
+    else
+      render json: format_user(user)
+    end
   end
 
   def update
