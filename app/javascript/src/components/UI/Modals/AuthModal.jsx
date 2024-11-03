@@ -5,9 +5,10 @@ import { useDispatch } from 'react-redux'
 import { Form, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import { API_URL } from '../../../constants/constants'
+import { API_URL, CLIENT_ID, CLIENT_SECRET } from '../../../constants/constants'
 import useInput from '../../../hooks/use-input'
 import { userActions } from '../../../store/user'
+import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
 import { Backdrop } from './Backdrop'
 
@@ -70,18 +71,14 @@ export function AuthModal({ authType, onClick }) {
 
   const storeUserData = async response => {
     const responseData = await response.json()
-    const user = Object.setPrototypeOf(responseData.status.data, null)
-    const { id, username, avatar_url } = user
-    const userData = { id, username, avatar_url }
-    dispatch(userActions.setUser(userData))
 
-    const headers = response.headers
-    const authorization = headers.get('authorization')
-    const token = authorization.replace('Bearer ', '')
-    const expiration = new Date()
-    expiration.setMinutes(expiration.getMinutes() + 120)
-    localStorage.setItem('token', token)
-    localStorage.setItem('expiration', expiration.toISOString())
+    const { id, username, access_token, refresh_token, expires_in } =
+      responseData
+    const avatar_url = responseData.avatar_url
+    const userData = { id, username, avatar_url }
+
+    dispatch(userActions.setUser(userData))
+    storeTokens(access_token, refresh_token, expires_in)
   }
 
   const handleSubmit = async event => {
@@ -98,12 +95,11 @@ export function AuthModal({ authType, onClick }) {
           return
         }
 
-        const userData = {
-          user: {
-            username: enteredUsername,
-            email: enteredEmail,
-            password: enteredPassword,
-          },
+        const signupData = {
+          client_id: CLIENT_ID,
+          email: enteredEmail,
+          username: enteredUsername,
+          password: enteredPassword,
         }
 
         const response = await fetch(`${API_URL}/users`, {
@@ -111,7 +107,7 @@ export function AuthModal({ authType, onClick }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify(signupData),
         })
 
         if (response.status === 422) {
@@ -137,19 +133,20 @@ export function AuthModal({ authType, onClick }) {
           return
         }
 
-        const userData = {
-          user: {
-            login: enteredUsername,
-            password: enteredPassword,
-          },
+        const loginData = {
+          grant_type: 'password',
+          email: enteredEmail,
+          password: enteredPassword,
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
         }
 
-        const response = await fetch(`${API_URL}/users/sign_in`, {
+        const response = await fetch(`${API_URL}/oauth/token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify(loginData),
         })
 
         if (response.status === 422 || response.status === 401) {
@@ -184,11 +181,7 @@ export function AuthModal({ authType, onClick }) {
   ) {
     formIsValid = true
   }
-  if (
-    modalType === 'login' &&
-    enteredUsernameIsValid &&
-    enteredPasswordIsValid
-  ) {
+  if (modalType === 'login' && enteredEmailIsValid && enteredPasswordIsValid) {
     formIsValid = true
   }
 
@@ -243,40 +236,40 @@ export function AuthModal({ authType, onClick }) {
                 </div>
               )}
               <Form onSubmit={handleSubmit}>
+                <div className={emailInvalidClass}>
+                  <label>
+                    <span>Email:</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    onChange={handleEmailChange}
+                    onBlur={handleEmailBlur}
+                  />
+                  {emailInputHasError && (
+                    <p className={classes['error-text']}>
+                      Please enter a valid email.
+                    </p>
+                  )}
+                </div>
                 {modalType === 'signup' && (
-                  <div className={emailInvalidClass}>
+                  <div className={usernameInvalidClass}>
                     <label>
-                      <span>Email:</span>
+                      <span>Username:</span>
                     </label>
                     <input
-                      type="email"
-                      id="email"
-                      onChange={handleEmailChange}
-                      onBlur={handleEmailBlur}
+                      type="text"
+                      id="username"
+                      onChange={handleUsernameChange}
+                      onBlur={handleUsernameBlur}
                     />
-                    {emailInputHasError && (
+                    {usernameInputHasError && (
                       <p className={classes['error-text']}>
-                        Please enter a valid email.
+                        Please enter a valid username.
                       </p>
                     )}
                   </div>
                 )}
-                <div className={usernameInvalidClass}>
-                  <label>
-                    <span>Username:</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    onChange={handleUsernameChange}
-                    onBlur={handleUsernameBlur}
-                  />
-                  {usernameInputHasError && (
-                    <p className={classes['error-text']}>
-                      Please enter a valid username.
-                    </p>
-                  )}
-                </div>
                 <div className={passwordInvalid}>
                   <label>
                     <span>Password:</span>
@@ -328,13 +321,13 @@ export function AuthModal({ authType, onClick }) {
                     id="swith-to-signup"
                     className={classes['switch-modal-btn']}
                     onClick={() => {
-                      const usernameInput = document.getElementById('username')
+                      const emailInput = document.getElementById('email')
                       const passwordInput = document.getElementById('password')
 
-                      usernameInput.value = ''
+                      emailInput.value = ''
                       passwordInput.value = ''
 
-                      resetUsernameInput()
+                      resetEmailInput()
                       resetPasswordInput()
                       setModalType('signup')
                     }}

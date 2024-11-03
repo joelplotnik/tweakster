@@ -1,9 +1,4 @@
-import 'react-quill/dist/quill.snow.css'
-
-import './Quill.css'
-
 import React, { useEffect, useState } from 'react'
-import ReactQuill from 'react-quill'
 import {
   Form,
   Link,
@@ -23,7 +18,7 @@ import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
 import SubscribePrompt from '../../UI/SubscribePrompt'
 import classes from './PieceForm.module.css'
 
-const PieceForm = ({ type, piece, tweakText }) => {
+const PieceForm = ({ type, piece }) => {
   const data = useActionData()
   const navigate = useNavigate()
   const navigation = useNavigation()
@@ -40,32 +35,6 @@ const PieceForm = ({ type, piece, tweakText }) => {
   const [images, setImages] = useState([])
   const submissionMethod = type === 'new' || type === 'tweak' ? 'POST' : 'PUT'
   const revalidator = useRevalidator()
-  const [quillContent, setQuillContent] = useState(() => {
-    if (type === 'edit' && piece && piece.body) {
-      return piece.body
-    } else if (type === 'tweak' && piece && piece.body && tweakText) {
-      return piece.body
-    } else {
-      return ''
-    }
-  })
-
-  useEffect(() => {
-    // Temporary fix: Suppress findDOMNode deprecation warning
-    // This warning originates from ReactQuill which internally uses findDOMNode.
-    // Consider switching to another rich text editor that does not use findDOMNode.
-    // Remove this suppression once a permanent solution is implemented.
-    const originalError = console.error
-    console.error = (...args) => {
-      if (/findDOMNode is deprecated/.test(args[0])) {
-        return
-      }
-      originalError.call(console, ...args)
-    }
-    return () => {
-      console.error = originalError
-    }
-  }, [])
 
   const handleModalToggle = () => {
     setShowModal(!showModal)
@@ -77,7 +46,6 @@ const PieceForm = ({ type, piece, tweakText }) => {
     const formData = new FormData(event.target)
 
     formData.append('piece[title]', formData.get('title'))
-    formData.append('piece[body]', quillContent)
     formData.append('piece[youtube_url]', formData.get('youtubeUrl'))
 
     for (let i = 0; i < images.length; i++) {
@@ -188,37 +156,6 @@ const PieceForm = ({ type, piece, tweakText }) => {
   const handleTitleChange = event => {
     const title = event.target.value
     setIsTitleValid(!!title)
-  }
-
-  const convertToAbsoluteLinks = content => {
-    return content.replace(/<a href="(.*?)"/g, (match, p1) => {
-      if (!p1.startsWith('http://') && !p1.startsWith('https://')) {
-        return `<a href="https://${p1}" target="_blank"`
-      }
-      return match
-    })
-  }
-
-  useEffect(() => {
-    // Convert relative links to absolute links before rendering
-    const contentWithAbsoluteLinks = convertToAbsoluteLinks(quillContent)
-    setQuillContent(contentWithAbsoluteLinks)
-  }, [quillContent])
-
-  let toolbarOptions = [
-    ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-    [],
-    ['link', 'blockquote'], // quotes
-    [],
-    [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-    [],
-    [{ list: 'ordered' }, { list: 'bullet' }], // lists
-    [],
-    ['clean'], // remove formatting button
-  ]
-
-  const modules = {
-    toolbar: toolbarOptions,
   }
 
   const handleYoutubeUrlChange = event => {
@@ -334,17 +271,6 @@ const PieceForm = ({ type, piece, tweakText }) => {
               onChange={handleTitleChange}
               required
             />
-            <ReactQuill
-              modules={modules}
-              className={classes['form-quill']}
-              id="body"
-              name="body"
-              value={quillContent}
-              onChange={value => {
-                setQuillContent(value)
-              }}
-              placeholder="Text"
-            />
             <p className={classes['optional-instruction']}>Optional:</p>
             <hr className={classes.divider} />
             <input
@@ -378,41 +304,40 @@ const PieceForm = ({ type, piece, tweakText }) => {
             )}
             <button
               type="submit"
-              className={`${classes['form-submit-button']} ${
-                isSubmitting || !selectedChannel || !isTitleValid
-                  ? classes.disabled
-                  : ''
+              className={`${classes['form-submit']} ${
+                isSubmitting && classes['loading']
               }`}
-              disabled={isSubmitting || !selectedChannel}
+              disabled={
+                !isTitleValid ||
+                !selectedChannel ||
+                (type === 'edit' && piece.images.length >= 0)
+              }
             >
-              {isSubmitting
-                ? 'Submitting'
-                : type === 'new'
-                ? 'Create'
-                : 'Submit'}
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
           </Form>
-          <div className={classes['delete-button-container']}>
-            {type === 'edit' && (
-              <div className={classes['delete-button-container']}>
-                <Link
-                  className={classes['delete-button']}
-                  onClick={() => handleModalToggle()}
-                >
-                  Delete piece
-                </Link>
-              </div>
-            )}
-          </div>
+          {(type === 'edit' || type === 'tweak') && (
+            <button
+              className={classes['form-delete']}
+              type="button"
+              onClick={handleModalToggle}
+            >
+              Delete
+            </button>
+          )}
           {showModal && (
             <ConfirmationModal
+              onClose={handleModalToggle}
               onConfirm={handleDelete}
-              onClick={handleModalToggle}
-            />
+              title="Delete Piece"
+              confirmText="Yes, delete this piece"
+            >
+              Are you sure you want to delete this piece?
+            </ConfirmationModal>
           )}
         </>
       )}
-      {channels.length === 0 && isSubmitting && <SubscribePrompt />}
+      <SubscribePrompt />
     </>
   )
 }

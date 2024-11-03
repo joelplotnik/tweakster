@@ -2,6 +2,20 @@ class Api::V1::UsersController < ApplicationController
   before_action :doorkeeper_authorize!, only: %i[update destroy following check_ownership]
   before_action :current_user
 
+  def me
+    if current_user
+      render json: {
+        id: current_user.id,
+        email: current_user.email,
+        username: current_user.username,
+        avatar_url: current_user&.avatar_url,
+        role: current_user.role
+      }
+    else
+      render json: { error: 'User not found' }, status: :not_found
+    end
+  end
+
   def index
     limit = params[:limit] || 25
     page = params[:page] || 1
@@ -35,12 +49,7 @@ class Api::V1::UsersController < ApplicationController
 
   def show
     user = User.find(params[:id])
-
-    if current_user && current_user.id == user.id
-      render json: format_user(user).merge(extra_info: 'This is your profile!')
-    else
-      render json: format_user(user)
-    end
+    render json: format_user(user)
   end
 
   def update
