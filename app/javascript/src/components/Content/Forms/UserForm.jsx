@@ -15,7 +15,6 @@ import defaultAvatar from '../../../assets/default-avatar.png'
 import { API_URL } from '../../../constants/constants'
 import useInput from '../../../hooks/use-input'
 import { userActions } from '../../../store/user'
-import { getUserData } from '../../../util/auth'
 import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
 import classes from './UserForm.module.css'
 
@@ -29,7 +28,7 @@ const UserForm = ({ method, user }) => {
   const [showModal, setShowModal] = useState(false)
   const dispatch = useDispatch()
   const token = useRouteLoaderData('root')
-  const { userId, userRole } = getUserData() || {}
+  const currentUser = useSelector(state => state.userPage.user)
   const [removeAvatar, setRemoveAvatar] = useState(false)
 
   const {
@@ -122,9 +121,9 @@ const UserForm = ({ method, user }) => {
 
   const handleDelete = async () => {
     try {
-      const userIdInt = parseInt(userId, 10)
+      const userIdInt = parseInt(currentUser.id, 10)
 
-      if (userRole === 'admin' || userIdInt === user.id) {
+      if (currentUser.role === 'admin' || userIdInt === user.id) {
         const response = await fetch(`${API_URL}/users/${user.id}`, {
           method: 'DELETE',
           headers: {
@@ -137,10 +136,10 @@ const UserForm = ({ method, user }) => {
           throw new Error('Could not delete user')
         }
 
-        if (userRole === 'admin' && userIdInt === user.id) {
+        if (currentUser.role === 'admin' && userIdInt === user.id) {
           dispatch(userActions.clearUser())
           localStorage.clear()
-        } else if (userRole !== 'admin' && userIdInt === user.id) {
+        } else if (currentUser.role !== 'admin' && userIdInt === user.id) {
           dispatch(userActions.clearUser())
           localStorage.clear()
         }
@@ -293,7 +292,7 @@ const UserForm = ({ method, user }) => {
             onChange={handlePasswordChange}
             onBlur={handlePasswordBlur}
             placeholder="Current Password"
-            required={userRole !== 'admin'}
+            required={currentUser.role !== 'admin'}
           />
         </div>
         {data && data.error && (

@@ -1,5 +1,6 @@
 namespace :api do
   namespace :v1 do
+    get 'me', to: 'users#show_current_user'
     get 'popular_users', to: 'users#popular_users'
     get 'popular_games', to: 'games#popular_games'
     get 'popular_challenges', to: 'challenges#popular_challenges'

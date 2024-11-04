@@ -71,14 +71,25 @@ export function AuthModal({ authType, onClick }) {
 
   const storeUserData = async response => {
     const responseData = await response.json()
+    const { access_token, refresh_token, expires_in } = responseData
 
-    const { id, username, access_token, refresh_token, expires_in } =
-      responseData
-    const avatar_url = responseData.avatar_url
-    const userData = { id, username, avatar_url }
-
-    dispatch(userActions.setUser(userData))
     storeTokens(access_token, refresh_token, expires_in)
+
+    const meResponse = await fetch(`${API_URL}/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    })
+
+    if (!meResponse.ok) {
+      throw new Error('Failed to fetch user data.')
+    }
+
+    const meData = await meResponse.json()
+    const { id, username, role, avatar_url } = meData
+
+    dispatch(userActions.setUser({ id, username, role, avatar_url }))
   }
 
   const handleSubmit = async event => {
@@ -129,7 +140,7 @@ export function AuthModal({ authType, onClick }) {
         onClick()
         navigate(location.pathname)
       } else {
-        if (!enteredUsernameIsValid || !enteredPasswordIsValid) {
+        if (!enteredEmailIsValid || !enteredPasswordIsValid) {
           return
         }
 

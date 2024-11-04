@@ -85,31 +85,6 @@ async function refreshAuthToken() {
   return access_token
 }
 
-export function getUserData() {
-  const token = getAuthToken()
-  const tokenDuration = getTokenDuration()
-
-  if (!token) {
-    return null
-  }
-
-  if (tokenDuration < 0) {
-    return EXPIRED_TOKEN
-  }
-
-  try {
-    const decodedToken = jwt_decode(token)
-    const userId = decodedToken.sub
-    const username = decodedToken.username
-    const userRole = decodedToken.role
-
-    return { userId, username, userRole }
-  } catch (error) {
-    console.error('Error decoding token:', error)
-    return null
-  }
-}
-
 export async function checkAuthLoader({ params }) {
   const token = getAuthToken()
 
@@ -142,22 +117,6 @@ export async function checkAuthLoader({ params }) {
         throw json({ message: 'Could not make request.' }, { status: 500 })
       }
     }
-  }
-
-  return null
-}
-
-export async function checkAdminAccess() {
-  const token = getAuthToken()
-
-  if (!token) {
-    return false
-  }
-
-  const { userRole } = getUserData() || {}
-
-  if (userRole !== 'admin') {
-    return redirect('/')
   }
 
   return null

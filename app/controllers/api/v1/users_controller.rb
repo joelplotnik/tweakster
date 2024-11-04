@@ -1,8 +1,8 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :doorkeeper_authorize!, only: %i[update destroy following check_ownership]
+  before_action :doorkeeper_authorize!, only: %i[me update destroy following check_ownership]
   before_action :current_user
 
-  def me
+  def show_current_user
     if current_user
       render json: {
         id: current_user.id,

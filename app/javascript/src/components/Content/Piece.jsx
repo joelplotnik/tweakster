@@ -21,7 +21,7 @@ import {
 import defaultAvatar from '../../assets/default-avatar.png'
 import { API_URL } from '../../constants/constants'
 import RefreshContext from '../../context/refresh'
-import { getUserData } from '../../util/auth'
+// import { getUserData } from '../../util/auth'
 import AuthModal from '../UI/Modals/AuthModal'
 import ConfirmationModal from '../UI/Modals/ConfirmationModal'
 import ReportModal from '../UI/Modals/ReportModal'
@@ -40,7 +40,7 @@ const Piece = ({ piece }) => {
   const [showReportModal, setShowReportModal] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const token = useRouteLoaderData('root')
-  const { userRole } = getUserData() || {}
+  // const { userRole } = getUserData() || {}
   // const tweaked = !!piece.tweak
 
   const getTitle = (count, singular, plural) =>

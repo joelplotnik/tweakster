@@ -21,7 +21,6 @@ import { API_URL } from '../../constants/constants'
 import { CableContext } from '../../context/cable'
 import { notificationsActions } from '../../store/notifications'
 import { userActions } from '../../store/user'
-import { getUserData } from '../../util/auth'
 import LoginButton from '../UI/Buttons/LoginButton'
 import SignupButton from '../UI/Buttons/SignupButton'
 import { AuthModal } from '../UI/Modals/AuthModal'
@@ -40,8 +39,8 @@ const MainNavigation = () => {
   const dropdownRef = useRef(null)
   const submit = useSubmit()
   const user = useSelector(state => state.user.user)
-  const { userId } = getUserData() || {}
   const dispatch = useDispatch()
+
   // const hasNewNotifications = useSelector(
   //   state => state.notifications.hasNewNotifications
   // )
@@ -211,7 +210,7 @@ const MainNavigation = () => {
               <div className={classes['dropdown-menu']}>
                 {token && (
                   <NavLink
-                    to={`users/${userId}`}
+                    to={`users/${user.id}`}
                     className={({ isActive }) =>
                       isActive ? classes.active : undefined
                     }
