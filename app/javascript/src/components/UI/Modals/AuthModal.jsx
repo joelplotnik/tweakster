@@ -1,11 +1,17 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
-import { RiCloseLine } from 'react-icons/ri'
+import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
 import { useDispatch } from 'react-redux'
 import { Form, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import { API_URL, CLIENT_ID, CLIENT_SECRET } from '../../../constants/constants'
+import {
+  API_URL,
+  CLIENT_ID,
+  CLIENT_SECRET,
+  TWITCH_CLIENT_ID,
+  TWITCH_REDIRECT_URI,
+} from '../../../constants/constants'
 import useInput from '../../../hooks/use-input'
 import { userActions } from '../../../store/user'
 import { storeTokens } from '../../../util/auth'
@@ -96,6 +102,11 @@ export function AuthModal({ authType, onClick }) {
     event.preventDefault()
 
     try {
+      if (buttonType === 'twitch') {
+        const twitchAuthUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${TWITCH_REDIRECT_URI}&scope=user:read:email`
+        window.location.href = twitchAuthUrl
+      }
+
       if (modalType === 'signup') {
         if (
           !enteredUsernameIsValid ||
@@ -318,9 +329,22 @@ export function AuthModal({ authType, onClick }) {
                 <button
                   type="submit"
                   className={classes['submit-btn']}
+                  data-type="regular"
                   disabled={!formIsValid}
                 >
-                  {modalType === 'login' ? 'Log In' : 'Sign Up'}
+                  {modalType === 'login' ? 'Log in' : 'Sign up'}
+                </button>
+                <button
+                  type="submit"
+                  className={classes['submit-btn-twitch']}
+                  data-type="twitch"
+                >
+                  <RiTwitchFill />
+                  <span className={classes['twitch-button-text']}>
+                    {modalType === 'login'
+                      ? 'Log in with Twitch'
+                      : 'Sign up with Twitch'}
+                  </span>
                 </button>
               </Form>
               {modalType === 'login' && (

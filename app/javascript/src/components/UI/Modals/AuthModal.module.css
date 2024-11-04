@@ -74,7 +74,8 @@
   color: #c3164b;
 }
 
-.modal-content .submit-btn {
+.submit-btn {
+  margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 20px;
@@ -87,17 +88,47 @@
   width: 100%;
 }
 
-.modal-content .submit-btn:hover {
+.submit-btn:hover {
   background-color: rgb(31, 117, 195);
 }
 
-.modal-content .submit-btn:disabled,
-.modal-content .submit-btn:disabled:hover,
-.modal-content .submit-btn:disabled:active {
+.submit-btn:disabled,
+.submit-btn:disabled:hover,
+.submit-btn:disabled:active {
   background-color: #ccc;
   color: #292929;
   border-color: #ccc;
   cursor: not-allowed;
+}
+
+.submit-btn-twitch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #9146ff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+.submit-btn-twitch svg {
+  font-size: 1.25em;
+  margin-right: 0px;
+}
+
+.twitch-button-text {
+  flex: 1;
+  text-align: center;
+}
+
+.submit-btn-twitch:hover {
+  background-color: #7a3ea5;
 }
 
 .close-icon {

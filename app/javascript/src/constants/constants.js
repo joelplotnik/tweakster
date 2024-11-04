@@ -11,4 +11,8 @@ export const WS_URL =
 export const CLIENT_ID = import.meta.env.VITE_APP_CLIENT_ID
 export const CLIENT_SECRET = import.meta.env.VITE_APP_CLIENT_SECRET
 
+export const TWITCH_REDIRECT_URI = import.meta.env.VITE_APP_TWITCH_REDIRECT_URI
+export const TWITCH_CLIENT_ID = import.meta.env.VITE_APP_TWITCH_CLIENT_ID
+export const TWITCH_SECRET = import.meta.env.VITE_APP_TWITCH_SECRET
+
 export const EXPIRED_TOKEN = import.meta.env.VITE_APP_EXPIRED_TOKEN
