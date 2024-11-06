@@ -5,6 +5,7 @@ import ErrorPage from './pages/ErrorPage'
 import HomePage from './pages/HomePage'
 import { action as logoutAction } from './pages/Logout'
 import NotificationsPage from './pages/NotificationsPage'
+import OauthCallback from './pages/Oauth'
 import NewPiecePage from './pages/Pieces/NewPiecePage'
 import PopularPage from './pages/PopularPage'
 import RootLayout from './pages/RootLayout'
@@ -80,6 +81,10 @@ const routes = [
       //   element: <NewPiecePage />,
       //   loader: checkAuthLoader,
       // },
+      {
+        path: 'auth/callback/twitch',
+        element: <OauthCallback />,
+      },
       {
         path: 'logout',
         action: logoutAction,

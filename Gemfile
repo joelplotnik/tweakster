@@ -30,6 +30,9 @@ gem 'devise'
 # OAuth 2.0 provider for user authentication and authorization.
 gem 'doorkeeper', '~> 5.7'
 
+# An OmniAuth strategy for Twitch
+gem 'omniauth-twitch'
+
 # Integrates Vite.js for modern JavaScript asset management.
 gem 'vite_rails', '~> 3.0'
 

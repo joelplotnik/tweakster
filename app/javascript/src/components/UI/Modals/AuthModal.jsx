@@ -100,10 +100,13 @@ export function AuthModal({ authType, onClick }) {
 
   const handleSubmit = async event => {
     event.preventDefault()
+    const buttonType = event.nativeEvent.submitter.dataset.type
 
     try {
       if (buttonType === 'twitch') {
-        const twitchAuthUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${TWITCH_REDIRECT_URI}&scope=user:read:email`
+        const currentPath = window.location.pathname
+        localStorage.setItem('previousPath', currentPath)
+        const twitchAuthUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${TWITCH_REDIRECT_URI}&scope=user:read:email&state=${CLIENT_ID}`
         window.location.href = twitchAuthUrl
       }
 

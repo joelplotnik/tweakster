@@ -15,6 +15,8 @@ module TweaksterApi
 
     config.autoload_paths << Rails.root.join('app/controllers/concerns')
 
+    config.middleware.use ActionDispatch::Session::CookieStore
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

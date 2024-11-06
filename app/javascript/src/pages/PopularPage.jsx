@@ -26,7 +26,7 @@ const PopularPage = () => {
     ))
 
   return (
-    <div className={classes.popularPage}>
+    <div className={classes['popular-page']}>
       <h2 className={classes.title}>Users</h2>
       <div className={classes.carousel}>{renderItems(popularUsers)}</div>
 
