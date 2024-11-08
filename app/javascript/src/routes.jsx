@@ -2,10 +2,12 @@ import React from 'react'
 
 import AboutPage from './pages/AboutPage'
 import ErrorPage from './pages/ErrorPage'
+import HomePage from './pages/HomePage'
 import { action as logoutAction } from './pages/Logout'
-import MainPage from './pages/MainPage'
 import NotificationsPage from './pages/NotificationsPage'
+import OauthCallback from './pages/Oauth'
 import NewPiecePage from './pages/Pieces/NewPiecePage'
+import PopularPage from './pages/PopularPage'
 import RootLayout from './pages/RootLayout'
 import EditUserPage, {
   action as editUserAction,
@@ -27,7 +29,7 @@ const routes = [
     children: [
       {
         index: true,
-        element: <MainPage />,
+        element: <HomePage />,
       },
       {
         path: 'users',
@@ -67,6 +69,10 @@ const routes = [
         loader: checkAuthLoader,
       },
       {
+        path: 'popular',
+        element: <PopularPage />,
+      },
+      {
         path: 'about',
         element: <AboutPage />,
       },
@@ -75,6 +81,10 @@ const routes = [
       //   element: <NewPiecePage />,
       //   loader: checkAuthLoader,
       // },
+      {
+        path: 'auth/callback/twitch',
+        element: <OauthCallback />,
+      },
       {
         path: 'logout',
         action: logoutAction,

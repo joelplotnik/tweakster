@@ -15,13 +15,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, useRouteLoaderData, useSubmit } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png'
-import Logo from '../../assets/logo.svg'
+import Logo from '../../assets/logo_color.svg'
 import { API_URL } from '../../constants/constants'
 import { CableContext } from '../../context/cable'
 import { notificationsActions } from '../../store/notifications'
 import { userActions } from '../../store/user'
-import { getUserData } from '../../util/auth'
 import LoginButton from '../UI/Buttons/LoginButton'
 import SignupButton from '../UI/Buttons/SignupButton'
 import { AuthModal } from '../UI/Modals/AuthModal'
@@ -40,8 +38,8 @@ const MainNavigation = () => {
   const dropdownRef = useRef(null)
   const submit = useSubmit()
   const user = useSelector(state => state.user.user)
-  const { userId } = getUserData() || {}
   const dispatch = useDispatch()
+
   // const hasNewNotifications = useSelector(
   //   state => state.notifications.hasNewNotifications
   // )
@@ -196,7 +194,7 @@ const MainNavigation = () => {
               {token ? (
                 <div className={classes['user-avatar']}>
                   <img
-                    src={user?.avatar_url || defaultAvatar}
+                    src={user?.avatar_url}
                     alt={`${user?.username}'s Avatar`}
                     className={classes['avatar-image']}
                   />
@@ -211,7 +209,7 @@ const MainNavigation = () => {
               <div className={classes['dropdown-menu']}>
                 {token && (
                   <NavLink
-                    to={`users/${userId}`}
+                    to={`users/${user.id}`}
                     className={({ isActive }) =>
                       isActive ? classes.active : undefined
                     }
@@ -268,7 +266,6 @@ const MainNavigation = () => {
           </div>
         </nav>
       </header>
-      {/* <img src={Banner} className={classes.banner} alt="Banner" /> */}
       <Sidebar isOpen={showSidebar} onClose={() => setShowSidebar(false)} />
       {showModal && (
         <AuthModal authType={authType} onClick={handleModalToggle} />

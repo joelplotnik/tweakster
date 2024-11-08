@@ -263,7 +263,7 @@ Devise.setup do |config|
   # should add them to the navigational formats lists.
   #
   # The "*/*" below is required to match Internet Explorer requests.
-  config.navigational_formats = []
+  # config.navigational_formats = ['*/*', :html]
 
   # The default HTTP method used to sign out a resource. Default is :delete.
   config.sign_out_via = :delete
@@ -311,14 +311,10 @@ Devise.setup do |config|
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
 
-  config.jwt do |jwt|
-    jwt.secret = Rails.application.secret_key_base
-    jwt.dispatch_requests = [
-      ['POST', %r{^/users/sign_in$}]
-    ]
-    jwt.revocation_requests = [
-      ['DELETE', %r{^/users/sign_out}]
-    ]
-    jwt.expiration_time = 121.minutes.to_i
-  end
+  config.omniauth :twitch,
+                  Rails.application.credentials.dig(:twitch, :client_id),
+                  Rails.application.credentials.dig(:twitch, :client_secret),
+                  scope: 'user:read:email',
+                  redirect_uri: Rails.application.credentials.dig(:twitch, :redirect_uri)[Rails.env.to_sym],
+                  provider_ignores_state: true
 end

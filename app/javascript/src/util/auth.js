@@ -3,6 +3,45 @@ import { json, redirect } from 'react-router-dom'
 
 import { API_URL, EXPIRED_TOKEN } from '../constants/constants'
 
+export function storeTokens(accessToken, refreshToken, expiresIn) {
+  localStorage.setItem('accessToken', accessToken)
+  localStorage.setItem('refreshToken', refreshToken)
+
+  const expirationDate = new Date()
+  expirationDate.setSeconds(expirationDate.getSeconds() + expiresIn)
+  localStorage.setItem('expiration', expirationDate.toISOString())
+}
+
+export function clearTokens() {
+  localStorage.removeItem('accessToken')
+  localStorage.removeItem('refreshToken')
+  localStorage.removeItem('expiration')
+}
+
+export function tokenLoader() {
+  return getAuthToken()
+}
+
+export async function getAuthToken() {
+  const token = localStorage.getItem('accessToken')
+  const tokenDuration = getTokenDuration()
+
+  if (!token) {
+    return null
+  }
+
+  if (tokenDuration < 0) {
+    const refreshedToken = await refreshAuthToken()
+    if (refreshedToken) {
+      return refreshedToken
+    } else {
+      return EXPIRED_TOKEN
+    }
+  }
+
+  return token
+}
+
 export function getTokenDuration() {
   const storedExpirationDate = localStorage.getItem('expiration')
   const expirationDate = new Date(storedExpirationDate)
@@ -12,48 +51,38 @@ export function getTokenDuration() {
   return duration
 }
 
-export function getAuthToken() {
-  const token = localStorage.getItem('token')
-  const tokenDuration = getTokenDuration()
+async function refreshAuthToken() {
+  const refreshToken = localStorage.getItem('refreshToken')
 
-  if (!token) {
+  if (!refreshToken) {
     return null
   }
 
-  if (tokenDuration < 0) {
-    return EXPIRED_TOKEN
-  }
+  const response = await fetch(`${API_URL}/oauth/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+    }),
+  })
 
-  return token
-}
-
-export function tokenLoader() {
-  return getAuthToken()
-}
-
-export function getUserData() {
-  const token = getAuthToken()
-  const tokenDuration = getTokenDuration()
-
-  if (!token) {
+  if (!response.ok) {
+    console.error('Failed to refresh token')
+    clearTokens()
     return null
   }
 
-  if (tokenDuration < 0) {
-    return EXPIRED_TOKEN
-  }
+  const data = await response.json()
+  const { access_token, refresh_token, expires_in } = data
 
-  try {
-    const decodedToken = jwt_decode(token)
-    const userId = decodedToken.sub
-    const username = decodedToken.username
-    const userRole = decodedToken.role
+  storeTokens(access_token, refresh_token, expires_in)
 
-    return { userId, username, userRole }
-  } catch (error) {
-    console.error('Error decoding token:', error)
-    return null
-  }
+  return access_token
 }
 
 export async function checkAuthLoader({ params }) {
@@ -88,22 +117,6 @@ export async function checkAuthLoader({ params }) {
         throw json({ message: 'Could not make request.' }, { status: 500 })
       }
     }
-  }
-
-  return null
-}
-
-export async function checkAdminAccess() {
-  const token = getAuthToken()
-
-  if (!token) {
-    return false
-  }
-
-  const { userRole } = getUserData() || {}
-
-  if (userRole !== 'admin') {
-    return redirect('/')
   }
 
   return null

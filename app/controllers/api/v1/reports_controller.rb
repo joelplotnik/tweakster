@@ -1,7 +1,4 @@
 class Api::V1::ReportsController < ApplicationController
-  load_and_authorize_resource
-  before_action :authenticate_user!
-
   def index
     if current_user.admin?
       per_page = 10

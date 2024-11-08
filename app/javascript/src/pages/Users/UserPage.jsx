@@ -10,8 +10,6 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, json, useParams, useRouteLoaderData } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png'
-import defaultVisual from '../../assets/default-visual.png'
 import Error from '../../components/Content/Error'
 import NoPieces from '../../components/Content/NoPieces'
 import Piece from '../../components/Content/Piece'
@@ -24,14 +22,13 @@ import ReportModal from '../../components/UI/Modals/ReportModal'
 import { API_URL } from '../../constants/constants'
 import store from '../../store'
 import { userPageActions } from '../../store/user-page'
-import { getAuthToken, getUserData } from '../../util/auth'
+import { getAuthToken } from '../../util/auth'
 import classes from './UserPage.module.css'
 
 const UserPage = () => {
   const { id } = useParams()
   const token = useRouteLoaderData('root')
   const dispatch = useDispatch()
-  const { userId } = getUserData() || {}
   const user = useSelector(state => state.userPage.user)
   const [pieces, setPieces] = useState([])
   const [pieceIds, setPieceIds] = useState(new Set())
@@ -189,7 +186,7 @@ const UserPage = () => {
                 {pieces.length === 0 ? (
                   <NoPieces
                     listPage={'user'}
-                    owner={user?.can_edit && id === userId}
+                    owner={user?.can_edit && id === user.id}
                   />
                 ) : (
                   <></>
@@ -212,7 +209,7 @@ const UserPage = () => {
               <div className={classes['photo-container']}>
                 <img
                   className={classes.photo}
-                  src={user?.avatar_url || defaultAvatar}
+                  src={user?.avatar_url}
                   alt="User"
                 />
               </div>
@@ -263,7 +260,7 @@ const UserPage = () => {
                 </div>
               </div>
             </div>
-            {token && userId !== id && (
+            {token && user.id !== id && (
               <div className={classes['button-container']}>
                 <FollowButton
                   userId={user?.id}
@@ -327,7 +324,7 @@ const UserPage = () => {
                       >
                         <Link to={`/channels/${favorite_channel.id}`}>
                           <img
-                            src={favorite_channel?.visual_url || defaultVisual}
+                            src={favorite_channel?.visual_url}
                             alt="Channel Visual"
                             className={classes.image}
                           />
@@ -363,7 +360,7 @@ const UserPage = () => {
                       >
                         <Link to={`/users/${favorite_user.id}`}>
                           <img
-                            src={favorite_user.avatar_url || defaultAvatar}
+                            src={favorite_user.avatar_url}
                             alt="Followee Avatar"
                             className={classes.image}
                           />

@@ -1,6 +1,7 @@
-class User < ApplicationRecord
-  include Devise::JWT::RevocationStrategies::JTIMatcher
+require 'open-uri'
+require 'mini_magick'
 
+class User < ApplicationRecord
   before_validation :strip_whitespace
 
   has_one_attached :avatar
@@ -8,7 +9,7 @@ class User < ApplicationRecord
   has_many :accepted_challenges, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :approvals, dependent: :destroy
-  has_many :difficulty_ratings, dependent: :destroy
+  has_many :difficulties, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :reports, foreign_key: 'reporter_id'
   has_many :notifications, as: :recipient, dependent: :destroy, class_name: 'Noticed::Notification'
@@ -27,18 +28,23 @@ class User < ApplicationRecord
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :database_authenticatable, :jwt_authenticatable,
-         jwt_revocation_strategy: self
+         :omniauthable, omniauth_providers: [:twitch]
 
   validate :validate_username
+  validate :unique_uid_for_provider, if: :provider_present?
   validate :validate_favorite_games_count
+  validate :password_presence_if_not_oauth, if: :password_required?
 
+  validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :username, presence: true,
                        uniqueness: { case_sensitive: false },
                        length: { minimum: 2, maximum: 25 },
                        format: { with: /^[a-zA-Z0-9_.]*$/, multiline: true }
   validates :url, allow_blank: true, length: { minimum: 7, maximum: 74 }
   validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
+
+  after_create :set_default_avatar, if: -> { !avatar.attached? }
+  before_destroy :retain_default_avatar_if_needed
 
   ROLES = %w[admin moderator advertiser user].freeze
 
@@ -49,30 +55,63 @@ class User < ApplicationRecord
     end
   end
 
-  attr_writer :login
+  def self.authenticate(email, password)
+    user = User.find_for_authentication(email:)
+    return user if user && user.provider.present?
 
-  def login
-    login || username || email
-  end
+    return unless user
 
-  def self.find_for_database_authentication(warden_conditions)
-    conditions = warden_conditions.dup
-    login = conditions.delete(:login)
-
-    if login
-      where(conditions.to_h).where(['lower(username) = :value OR lower(email) = :value',
-                                    { value: login.downcase }]).first
-    elsif conditions.key?(:username) || conditions.key?(:email)
-      where(conditions.to_h).first
-    end
-  end
-
-  def jwt_payload
-    super.merge({ username:, role: })
+    user.valid_password?(password) ? user : nil
   end
 
   def avatar_url
     Rails.application.routes.url_helpers.url_for(avatar) if avatar.attached?
+  end
+
+  def reset_avatar_to_default
+    avatar.purge if avatar.attached?
+
+    set_default_avatar
+  end
+
+  def set_default_avatar
+    return if avatar.attached?
+
+    default_avatar_path = Rails.root.join('app', 'assets', 'images', 'default_avatar.png')
+
+    if File.exist?(default_avatar_path)
+      avatar.attach(
+        io: File.open(default_avatar_path),
+        filename: 'default_avatar.png',
+        content_type: 'image/png'
+      )
+
+      save(validate: false)
+    else
+      Rails.logger.warn("Default avatar file not found at #{default_avatar_path}")
+    end
+  end
+
+  def self.find_or_create_from_auth_hash(auth_info)
+    user = User.find_by(provider: auth_info.provider, uid: auth_info.uid)
+
+    user ||= User.create(
+      email: auth_info.info.email,
+      username: auth_info.info.nickname,
+      encrypted_password: nil,
+      provider: auth_info.provider,
+      uid: auth_info.uid
+    )
+
+    if auth_info.info.image.present? && !auth_info.info.image.include?('user-default-pictures-uv')
+      image_url = auth_info.info.image
+      io = URI.parse(image_url).open
+      user.avatar.attach(io:, filename: "avatar_#{SecureRandom.hex(10)}.jpg", content_type: io.content_type)
+      user.save(validate: false)
+    elsif !user.avatar.attached?
+      user.set_default_avatar
+    end
+    user
   end
 
   private
@@ -83,6 +122,12 @@ class User < ApplicationRecord
     errors.add(:username, :invalid)
   end
 
+  def retain_default_avatar_if_needed
+    return unless avatar.attached? && avatar.filename.to_s == 'default_avatar.png'
+
+    avatar.detach
+  end
+
   def validate_favorite_games_count
     errors.add(:favorite_games, "can't have more than 5 favorite games") if favorite_games.size > 5
   end
@@ -90,5 +135,25 @@ class User < ApplicationRecord
   def strip_whitespace
     url&.strip!
     bio&.strip!
+  end
+
+  def password_presence_if_not_oauth
+    return unless provider.blank? && encrypted_password.blank?
+
+    errors.add(:encrypted_password, "can't be blank")
+  end
+
+  def password_required?
+    provider.blank?
+  end
+
+  def unique_uid_for_provider
+    return unless provider.present? && uid.present? && User.exists?(provider:, uid:)
+
+    errors.add(:uid, 'has already been taken for this provider')
+  end
+
+  def provider_present?
+    provider.present?
   end
 end

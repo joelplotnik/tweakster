@@ -18,7 +18,6 @@ import {
 } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import defaultAvatar from '../../../assets/default-avatar.png'
 import { API_URL } from '../../../constants/constants'
 import PieceModalContext from '../../../context/piecemodal'
 import RefreshContext from '../../../context/refresh'
@@ -326,7 +325,7 @@ const PieceModal = () => {
                             <div className={classes['photo-container']}>
                               <img
                                 className={classes.photo}
-                                src={piece.user?.avatar_url || defaultAvatar}
+                                src={piece.user?.avatar_url}
                                 alt="User"
                               />
                             </div>

@@ -10,7 +10,6 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useSelector } from 'react-redux'
 import { Link, json, useParams, useRouteLoaderData } from 'react-router-dom'
 
-import defaultVisual from '../../assets/default-visual.png'
 import Error from '../../components/Content/Error'
 import NoPieces from '../../components/Content/NoPieces'
 import Piece from '../../components/Content/Piece'
@@ -187,7 +186,7 @@ const ChannelPage = () => {
               <div className={classes['photo-container']}>
                 <img
                   className={classes.photo}
-                  src={channel.visual_url || defaultVisual}
+                  src={channel.visual_url}
                   alt="User"
                 />
               </div>

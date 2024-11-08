@@ -1,3 +1,7 @@
+if Doorkeeper::Application.count.zero?
+  Doorkeeper::Application.create!(name: 'Web Client', redirect_uri: '', scopes: '')
+  Doorkeeper::Application.create!(name: 'iOS Client', redirect_uri: '', scopes: '')
+end
 # Clear existing data to avoid duplication and ensure a clean state
 User.delete_all
 Relationship.delete_all

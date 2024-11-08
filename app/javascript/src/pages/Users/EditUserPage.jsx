@@ -6,7 +6,7 @@ import UserForm from '../../components/Content/Forms/UserForm'
 import { API_URL } from '../../constants/constants'
 import store from '../../store/index'
 import { userActions } from '../../store/user'
-import { getUserData, tokenLoader } from '../../util/auth'
+import { tokenLoader } from '../../util/auth'
 import classes from './EditUserPage.module.css'
 
 const EditUserPage = () => {
@@ -67,16 +67,16 @@ export const action = async ({ request, params }) => {
     throw json({ message: 'Could not edit user' }, { status: 500 })
   }
 
-  const { userId, userRole } = getUserData() || {}
-  const userIdParsed = parseInt(userId)
+  // const { userId, userRole } = getUserData() || {}
+  // const userIdParsed = parseInt(userId)
 
-  const user = await response.json()
+  // const user = await response.json()
 
-  if (userRole === 'admin' && userIdParsed === userIdParam) {
-    store.dispatch(userActions.setUser(user))
-  } else if (userRole !== 'admin' && userIdParsed === userIdParam) {
-    store.dispatch(userActions.setUser(user))
-  }
+  // if (userRole === 'admin' && userIdParsed === userIdParam) {
+  //   store.dispatch(userActions.setUser(user))
+  // } else if (userRole !== 'admin' && userIdParsed === userIdParam) {
+  //   store.dispatch(userActions.setUser(user))
+  // }
 
   return redirect(`/users/${user.id}`)
 }

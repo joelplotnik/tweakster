@@ -1,13 +1,20 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
-import { RiCloseLine } from 'react-icons/ri'
+import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
 import { useDispatch } from 'react-redux'
 import { Form, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import { API_URL } from '../../../constants/constants'
+import {
+  API_URL,
+  CLIENT_ID,
+  CLIENT_SECRET,
+  TWITCH_CLIENT_ID,
+  TWITCH_REDIRECT_URI,
+} from '../../../constants/constants'
 import useInput from '../../../hooks/use-input'
 import { userActions } from '../../../store/user'
+import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
 import { Backdrop } from './Backdrop'
 
@@ -70,24 +77,41 @@ export function AuthModal({ authType, onClick }) {
 
   const storeUserData = async response => {
     const responseData = await response.json()
-    const user = Object.setPrototypeOf(responseData.status.data, null)
-    const { id, username, avatar_url } = user
-    const userData = { id, username, avatar_url }
-    dispatch(userActions.setUser(userData))
+    const { access_token, refresh_token, expires_in } = responseData
 
-    const headers = response.headers
-    const authorization = headers.get('authorization')
-    const token = authorization.replace('Bearer ', '')
-    const expiration = new Date()
-    expiration.setMinutes(expiration.getMinutes() + 120)
-    localStorage.setItem('token', token)
-    localStorage.setItem('expiration', expiration.toISOString())
+    storeTokens(access_token, refresh_token, expires_in)
+
+    const meResponse = await fetch(`${API_URL}/me`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    })
+
+    if (!meResponse.ok) {
+      throw new Error('Failed to fetch user data.')
+    }
+
+    const meData = await meResponse.json()
+    const { id, username, avatar_url, role } = meData
+
+    console.log('ME DATA: ', meData)
+
+    dispatch(userActions.setUser({ id, username, avatar_url, role }))
   }
 
   const handleSubmit = async event => {
     event.preventDefault()
+    const buttonType = event.nativeEvent.submitter.dataset.type
 
     try {
+      if (buttonType === 'twitch') {
+        const currentPath = window.location.pathname
+        localStorage.setItem('previousPath', currentPath)
+        const twitchAuthUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${TWITCH_REDIRECT_URI}&scope=user:read:email&state=${CLIENT_ID}`
+        window.location.href = twitchAuthUrl
+      }
+
       if (modalType === 'signup') {
         if (
           !enteredUsernameIsValid ||
@@ -98,12 +122,11 @@ export function AuthModal({ authType, onClick }) {
           return
         }
 
-        const userData = {
-          user: {
-            username: enteredUsername,
-            email: enteredEmail,
-            password: enteredPassword,
-          },
+        const signupData = {
+          client_id: CLIENT_ID,
+          email: enteredEmail,
+          username: enteredUsername,
+          password: enteredPassword,
         }
 
         const response = await fetch(`${API_URL}/users`, {
@@ -111,7 +134,7 @@ export function AuthModal({ authType, onClick }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify(signupData),
         })
 
         if (response.status === 422) {
@@ -133,23 +156,24 @@ export function AuthModal({ authType, onClick }) {
         onClick()
         navigate(location.pathname)
       } else {
-        if (!enteredUsernameIsValid || !enteredPasswordIsValid) {
+        if (!enteredEmailIsValid || !enteredPasswordIsValid) {
           return
         }
 
-        const userData = {
-          user: {
-            login: enteredUsername,
-            password: enteredPassword,
-          },
+        const loginData = {
+          grant_type: 'password',
+          email: enteredEmail,
+          password: enteredPassword,
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
         }
 
-        const response = await fetch(`${API_URL}/users/sign_in`, {
+        const response = await fetch(`${API_URL}/oauth/token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(userData),
+          body: JSON.stringify(loginData),
         })
 
         if (response.status === 422 || response.status === 401) {
@@ -184,11 +208,7 @@ export function AuthModal({ authType, onClick }) {
   ) {
     formIsValid = true
   }
-  if (
-    modalType === 'login' &&
-    enteredUsernameIsValid &&
-    enteredPasswordIsValid
-  ) {
+  if (modalType === 'login' && enteredEmailIsValid && enteredPasswordIsValid) {
     formIsValid = true
   }
 
@@ -243,40 +263,40 @@ export function AuthModal({ authType, onClick }) {
                 </div>
               )}
               <Form onSubmit={handleSubmit}>
+                <div className={emailInvalidClass}>
+                  <label>
+                    <span>Email:</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    onChange={handleEmailChange}
+                    onBlur={handleEmailBlur}
+                  />
+                  {emailInputHasError && (
+                    <p className={classes['error-text']}>
+                      Please enter a valid email.
+                    </p>
+                  )}
+                </div>
                 {modalType === 'signup' && (
-                  <div className={emailInvalidClass}>
+                  <div className={usernameInvalidClass}>
                     <label>
-                      <span>Email:</span>
+                      <span>Username:</span>
                     </label>
                     <input
-                      type="email"
-                      id="email"
-                      onChange={handleEmailChange}
-                      onBlur={handleEmailBlur}
+                      type="text"
+                      id="username"
+                      onChange={handleUsernameChange}
+                      onBlur={handleUsernameBlur}
                     />
-                    {emailInputHasError && (
+                    {usernameInputHasError && (
                       <p className={classes['error-text']}>
-                        Please enter a valid email.
+                        Please enter a valid username.
                       </p>
                     )}
                   </div>
                 )}
-                <div className={usernameInvalidClass}>
-                  <label>
-                    <span>Username:</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    onChange={handleUsernameChange}
-                    onBlur={handleUsernameBlur}
-                  />
-                  {usernameInputHasError && (
-                    <p className={classes['error-text']}>
-                      Please enter a valid username.
-                    </p>
-                  )}
-                </div>
                 <div className={passwordInvalid}>
                   <label>
                     <span>Password:</span>
@@ -314,9 +334,22 @@ export function AuthModal({ authType, onClick }) {
                 <button
                   type="submit"
                   className={classes['submit-btn']}
+                  data-type="regular"
                   disabled={!formIsValid}
                 >
-                  {modalType === 'login' ? 'Log In' : 'Sign Up'}
+                  {modalType === 'login' ? 'Log in' : 'Sign up'}
+                </button>
+                <button
+                  type="submit"
+                  className={classes['submit-btn-twitch']}
+                  data-type="twitch"
+                >
+                  <RiTwitchFill />
+                  <span className={classes['twitch-button-text']}>
+                    {modalType === 'login'
+                      ? 'Log in with Twitch'
+                      : 'Sign up with Twitch'}
+                  </span>
                 </button>
               </Form>
               {modalType === 'login' && (
@@ -328,13 +361,13 @@ export function AuthModal({ authType, onClick }) {
                     id="swith-to-signup"
                     className={classes['switch-modal-btn']}
                     onClick={() => {
-                      const usernameInput = document.getElementById('username')
+                      const emailInput = document.getElementById('email')
                       const passwordInput = document.getElementById('password')
 
-                      usernameInput.value = ''
+                      emailInput.value = ''
                       passwordInput.value = ''
 
-                      resetUsernameInput()
+                      resetEmailInput()
                       resetPasswordInput()
                       setModalType('signup')
                     }}

@@ -1,12 +1,6 @@
 class Api::V1::ApprovalsController < ApplicationController
   include Approveable
 
-  before_action :authenticate_user!
-
-  rescue_from CanCan::AccessDenied do |exception|
-    render json: { warning: exception }, status: :unauthorized
-  end
-
   def create
     existing_approval = current_user.approvals.find_by(accepted_challenge_id: approval_params[:accepted_challenge_id])
 

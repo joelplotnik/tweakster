@@ -1,9 +1,21 @@
 export const API_URL =
   Tweakster.Config.env === 'development'
-    ? 'http://localhost:5100/api/v1'
-    : 'https://tweakster.com/api/v1'
+    ? import.meta.env.VITE_APP_API_URL_DEV
+    : import.meta.env.VITE_APP_API_URL_PROD
+
 export const WS_URL =
   Tweakster.Config.env === 'development'
-    ? 'ws://localhost:5100/cable'
-    : 'ws://tweakster.com/cable'
-export const EXPIRED_TOKEN = 'EXPIRED'
+    ? import.meta.env.VITE_APP_WS_URL_DEV
+    : import.meta.env.VITE_APP_WS_URL_PROD
+
+export const CLIENT_ID = import.meta.env.VITE_APP_CLIENT_ID
+export const CLIENT_SECRET = import.meta.env.VITE_APP_CLIENT_SECRET
+
+export const TWITCH_REDIRECT_URI =
+  Tweakster.Config.env === 'development'
+    ? import.meta.env.VITE_APP_TWITCH_REDIRECT_URI_DEV
+    : import.meta.env.VITE_APP_TWITCH_REDIRECT_URI_PROD
+export const TWITCH_CLIENT_ID = import.meta.env.VITE_APP_TWITCH_CLIENT_ID
+export const TWITCH_SECRET = import.meta.env.VITE_APP_TWITCH_SECRET
+
+export const EXPIRED_TOKEN = import.meta.env.VITE_APP_EXPIRED_TOKEN

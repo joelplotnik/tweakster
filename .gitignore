@@ -45,5 +45,8 @@ node_modules
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-# Because Joel doesn't have this in his global .gitignore
+# Misc
 .DS_Store
+
+# Ignore the .env file
+.env

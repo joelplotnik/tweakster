@@ -10,7 +10,6 @@ import {
 } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import defaultVisual from '../../../assets/default-visual.png'
 import { API_URL } from '../../../constants/constants'
 import useInput from '../../../hooks/use-input'
 import { getUserData } from '../../../util/auth'
@@ -23,7 +22,7 @@ const ChannelForm = ({ method, channel, type }) => {
   const navigate = useNavigate()
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
-  const [visual, setVisual] = useState(channel?.visual_url || defaultVisual)
+  const [visual, setVisual] = useState(channel?.visual_url)
   const fileInput = useRef(null)
   const [showModal, setShowModal] = useState(false)
   const token = useRouteLoaderData('root')
@@ -58,7 +57,6 @@ const ChannelForm = ({ method, channel, type }) => {
 
   const handleRemoveVisual = event => {
     event.preventDefault()
-    setVisual(defaultVisual)
     setRemoveVisual(true)
     fileInput.current.value = null
   }
@@ -128,7 +126,7 @@ const ChannelForm = ({ method, channel, type }) => {
           >
             <RiImageAddLine />
           </button>
-          {visual !== defaultVisual && (
+          {visual && (
             <div className={classes['remove-visual-button-container']}>
               <button
                 className={classes['remove-visual-button']}

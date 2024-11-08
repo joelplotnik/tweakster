@@ -1,0 +1,42 @@
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 85vh;
+  background-color: #141414;
+  text-align: center;
+}
+
+.animated-logo {
+  width: 100px;
+  height: 100px;
+  animation: bounce 1.5s infinite ease-in-out;
+}
+
+.loading-text {
+  font-size: 1.5rem;
+  margin-top: 20px;
+  color: #eeeeee;
+  animation: pulse 1.5s ease-in-out infinite;
+}
