@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { RiAddFill } from 'react-icons/ri'
 import { Link, useRouteLoaderData } from 'react-router-dom'
 
-import defaultVisual from '../../assets/default-visual.png'
 import { API_URL } from '../../constants/constants'
 import classes from './ChannelList.module.css'
 import { Error } from './Error'
@@ -56,7 +55,7 @@ const ChannelList = () => {
             <li className={classes['channel-item']}>
               <div className={classes['channel-info']}>
                 <img
-                  src={channel?.visual_url || defaultVisual}
+                  src={channel?.visual_url}
                   alt="User"
                   className={classes['channel-visual']}
                 />

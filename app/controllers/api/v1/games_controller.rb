@@ -1,5 +1,5 @@
 class Api::V1::GamesController < ApplicationController
-  before_action :doorkeeper_authorize!, except: %i[index show popular_games]
+  before_action :doorkeeper_authorize!, except: %i[index search show popular_games]
   before_action :set_game, only: %i[show update destroy]
 
   def index

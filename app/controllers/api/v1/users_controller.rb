@@ -8,7 +8,7 @@ class Api::V1::UsersController < ApplicationController
         id: current_user.id,
         email: current_user.email,
         username: current_user.username,
-        avatar_url: current_user&.avatar_url,
+        avatar_url: current_user.avatar_url,
         role: current_user.role
       }
     else
@@ -59,7 +59,7 @@ class Api::V1::UsersController < ApplicationController
       if params[:user][:avatar].present?
         user.avatar.attach(params[:user][:avatar])
       elsif params[:user][:remove_avatar] == 'true'
-        user.avatar.purge
+        user.reset_avatar_to_default
       end
 
       if params[:user][:new_password].present?
@@ -77,7 +77,7 @@ class Api::V1::UsersController < ApplicationController
       if params[:user][:avatar].present?
         user.avatar.attach(params[:user][:avatar])
       elsif params[:user][:remove_avatar] == 'true'
-        user.avatar.purge
+        user.reset_avatar_to_default
       end
 
       if params[:user][:new_password].present?

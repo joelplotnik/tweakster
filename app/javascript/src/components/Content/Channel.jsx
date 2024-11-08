@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import defaultVisual from '../../assets/default-visual.png'
 import classes from './Channel.module.css'
 
 const Channel = ({ channel }) => {
@@ -11,7 +10,7 @@ const Channel = ({ channel }) => {
         <div className={classes['channel-info']}>
           <div className={classes['channel-visual-container']}>
             <img
-              src={channel?.visual_url || defaultVisual}
+              src={channel?.visual_url}
               alt="User"
               className={classes['channel-visual']}
             />

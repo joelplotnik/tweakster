@@ -93,9 +93,11 @@ export function AuthModal({ authType, onClick }) {
     }
 
     const meData = await meResponse.json()
-    const { id, username, role, avatar_url } = meData
+    const { id, username, avatar_url, role } = meData
 
-    dispatch(userActions.setUser({ id, username, role, avatar_url }))
+    console.log('ME DATA: ', meData)
+
+    dispatch(userActions.setUser({ id, username, avatar_url, role }))
   }
 
   const handleSubmit = async event => {

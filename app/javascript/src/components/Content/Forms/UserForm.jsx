@@ -11,7 +11,6 @@ import {
 } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import defaultAvatar from '../../../assets/default-avatar.png'
 import { API_URL } from '../../../constants/constants'
 import useInput from '../../../hooks/use-input'
 import { userActions } from '../../../store/user'
@@ -23,7 +22,7 @@ const UserForm = ({ method, user }) => {
   const navigate = useNavigate()
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
-  const [avatar, setAvatar] = useState(user?.avatar_url || defaultAvatar)
+  const [avatar, setAvatar] = useState(user?.avatar_url)
   const fileInput = useRef(null)
   const [showModal, setShowModal] = useState(false)
   const dispatch = useDispatch()
@@ -110,7 +109,6 @@ const UserForm = ({ method, user }) => {
 
   const handleRemoveAvatar = event => {
     event.preventDefault()
-    setAvatar(defaultAvatar)
     setRemoveAvatar(true)
     fileInput.current.value = null
   }
@@ -180,7 +178,7 @@ const UserForm = ({ method, user }) => {
           >
             <RiImageAddLine />
           </button>
-          {avatar !== defaultAvatar && (
+          {avatar && (
             <div className={classes['remove-avatar-button-container']}>
               <button
                 className={classes['remove-avatar-button']}

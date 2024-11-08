@@ -1,3 +1,6 @@
+require 'open-uri'
+require 'mini_magick'
+
 class User < ApplicationRecord
   before_validation :strip_whitespace
 
@@ -28,6 +31,7 @@ class User < ApplicationRecord
          :omniauthable, omniauth_providers: [:twitch]
 
   validate :validate_username
+  validate :unique_uid_for_provider, if: :provider_present?
   validate :validate_favorite_games_count
   validate :password_presence_if_not_oauth, if: :password_required?
 
@@ -38,6 +42,9 @@ class User < ApplicationRecord
                        format: { with: /^[a-zA-Z0-9_.]*$/, multiline: true }
   validates :url, allow_blank: true, length: { minimum: 7, maximum: 74 }
   validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
+
+  after_create :set_default_avatar, if: -> { !avatar.attached? }
+  before_destroy :retain_default_avatar_if_needed
 
   ROLES = %w[admin moderator advertiser user].freeze
 
@@ -61,16 +68,49 @@ class User < ApplicationRecord
     Rails.application.routes.url_helpers.url_for(avatar) if avatar.attached?
   end
 
+  def reset_avatar_to_default
+    avatar.purge if avatar.attached?
+
+    set_default_avatar
+  end
+
+  def set_default_avatar
+    return if avatar.attached?
+
+    default_avatar_path = Rails.root.join('app', 'assets', 'images', 'default_avatar.png')
+
+    if File.exist?(default_avatar_path)
+      avatar.attach(
+        io: File.open(default_avatar_path),
+        filename: 'default_avatar.png',
+        content_type: 'image/png'
+      )
+
+      save(validate: false)
+    else
+      Rails.logger.warn("Default avatar file not found at #{default_avatar_path}")
+    end
+  end
+
   def self.find_or_create_from_auth_hash(auth_info)
     user = User.find_by(provider: auth_info.provider, uid: auth_info.uid)
 
     user ||= User.create(
-      provider: auth_info.provider,
-      uid: auth_info.uid,
       email: auth_info.info.email,
       username: auth_info.info.nickname,
-      encrypted_password: nil
+      encrypted_password: nil,
+      provider: auth_info.provider,
+      uid: auth_info.uid
     )
+
+    if auth_info.info.image.present? && !auth_info.info.image.include?('user-default-pictures-uv')
+      image_url = auth_info.info.image
+      io = URI.parse(image_url).open
+      user.avatar.attach(io:, filename: "avatar_#{SecureRandom.hex(10)}.jpg", content_type: io.content_type)
+      user.save(validate: false)
+    elsif !user.avatar.attached?
+      user.set_default_avatar
+    end
     user
   end
 
@@ -80,6 +120,12 @@ class User < ApplicationRecord
     return unless User.where(email: username).exists?
 
     errors.add(:username, :invalid)
+  end
+
+  def retain_default_avatar_if_needed
+    return unless avatar.attached? && avatar.filename.to_s == 'default_avatar.png'
+
+    avatar.detach
   end
 
   def validate_favorite_games_count
@@ -99,5 +145,15 @@ class User < ApplicationRecord
 
   def password_required?
     provider.blank?
+  end
+
+  def unique_uid_for_provider
+    return unless provider.present? && uid.present? && User.exists?(provider:, uid:)
+
+    errors.add(:uid, 'has already been taken for this provider')
+  end
+
+  def provider_present?
+    provider.present?
   end
 end

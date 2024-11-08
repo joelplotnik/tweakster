@@ -2,7 +2,6 @@ import React from 'react'
 import { RiVipCrownLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
-import defaultVisual from '../../assets/default-visual.png'
 import TopFiveButton from '../UI/Buttons/TopFiveButton'
 import classes from './Entity.module.css'
 
@@ -30,11 +29,7 @@ const Entity = ({
         <div className={classes['item-info']}>
           <div className={classes['item-visual-container']}>
             <img
-              src={
-                isChannel
-                  ? item?.visual_url || defaultVisual
-                  : item?.avatar_url || defaultVisual
-              }
+              src={isChannel ? item?.visual_url : item?.avatar_url}
               alt={isChannel ? 'Channel Visual' : 'User Avatar'}
               className={classes['item-image']}
             />

@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { RiCloseLine, RiSearchLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png'
-import defaultVisual from '../../assets/default-visual.png'
 import { API_URL } from '../../constants/constants'
 import classes from './SearchBar.module.css'
 
@@ -110,7 +108,7 @@ function SearchBar() {
                 >
                   <div className={classes['user-avatar-container']}>
                     <img
-                      src={result.avatar_url || defaultAvatar}
+                      src={result.avatar_url}
                       alt="User"
                       className={classes['user-avatar']}
                     />
@@ -136,7 +134,7 @@ function SearchBar() {
                 >
                   <div className={classes['game-image-container']}>
                     <img
-                      src={result.image_url || defaultVisual}
+                      src={result.image_url}
                       alt="Game"
                       className={classes['game-visual']}
                     />

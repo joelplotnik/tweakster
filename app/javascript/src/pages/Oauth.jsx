@@ -18,12 +18,19 @@ const OauthCallback = () => {
       try {
         const decodedData = atob(hash)
         const userTokenData = JSON.parse(decodedData)
-        const { access_token, refresh_token, expires_in, id, username, role } =
-          userTokenData
+        const {
+          access_token,
+          refresh_token,
+          expires_in,
+          id,
+          username,
+          avatar_url,
+          role,
+        } = userTokenData
 
         storeTokens(access_token, refresh_token, expires_in)
 
-        dispatch(userActions.setUser({ id, username, role }))
+        dispatch(userActions.setUser({ id, username, avatar_url, role }))
       } catch (error) {
         console.error('Error decoding data:', error)
         toast.error('Failed to parse OAuth callback data.')

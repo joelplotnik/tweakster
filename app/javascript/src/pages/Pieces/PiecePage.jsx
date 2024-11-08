@@ -16,7 +16,6 @@ import {
 } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import defaultAvatar from '../../assets/default-avatar.png'
 import Interactions from '../../components/Content/Interactions'
 import { AuthModal } from '../../components/UI/Modals/AuthModal'
 import ConfirmationModal from '../../components/UI/Modals/ConfirmationModal'
@@ -251,7 +250,7 @@ const PiecePage = () => {
                 <div className={classes['photo-container']}>
                   <img
                     className={classes.photo}
-                    src={piece.user?.avatar_url || defaultAvatar}
+                    src={piece.user?.avatar_url}
                     alt="User"
                   />
                 </div>

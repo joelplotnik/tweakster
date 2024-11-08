@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png'
 import classes from './User.module.css'
 
 const User = ({ user }) => {
@@ -11,7 +10,7 @@ const User = ({ user }) => {
         <div className={classes['user-info']}>
           <div className={classes['user-avatar-container']}>
             <img
-              src={user?.avatar_url || defaultAvatar}
+              src={user?.avatar_url}
               alt="User"
               className={classes['user-avatar']}
             />

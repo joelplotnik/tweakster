@@ -18,7 +18,6 @@ import {
   useRouteLoaderData,
 } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png'
 import { API_URL } from '../../constants/constants'
 import RefreshContext from '../../context/refresh'
 // import { getUserData } from '../../util/auth'
@@ -190,7 +189,7 @@ const Piece = ({ piece }) => {
                     <div className={classes['photo-container']}>
                       <img
                         className={classes.photo}
-                        src={piece?.user?.avatar_url || defaultAvatar}
+                        src={piece?.user?.avatar_url}
                         alt="User"
                       />
                     </div>

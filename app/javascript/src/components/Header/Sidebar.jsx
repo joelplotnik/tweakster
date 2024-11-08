@@ -7,8 +7,6 @@ import {
 } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png'
-import defaultVisual from '../../assets/default-visual.png'
 import { API_URL } from '../../constants/constants'
 import classes from './Sidebar.module.css'
 
@@ -83,7 +81,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             >
               <div className={classes.info}>
                 <img
-                  src={game?.image_url || defaultVisual}
+                  src={game?.image_url}
                   alt="Game"
                   className={classes.image}
                 />
@@ -107,7 +105,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             >
               <div className={classes.info}>
                 <img
-                  src={user?.avatar_url || defaultAvatar}
+                  src={user?.avatar_url}
                   alt="User"
                   className={classes.image}
                 />

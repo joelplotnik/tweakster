@@ -15,7 +15,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, useRouteLoaderData, useSubmit } from 'react-router-dom'
 
-import defaultAvatar from '../../assets/default-avatar.png'
 import Logo from '../../assets/logo_color.svg'
 import { API_URL } from '../../constants/constants'
 import { CableContext } from '../../context/cable'
@@ -195,7 +194,7 @@ const MainNavigation = () => {
               {token ? (
                 <div className={classes['user-avatar']}>
                   <img
-                    src={user?.avatar_url || defaultAvatar}
+                    src={user?.avatar_url}
                     alt={`${user?.username}'s Avatar`}
                     className={classes['avatar-image']}
                   />
