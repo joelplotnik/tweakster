@@ -7,18 +7,18 @@
   background-color: #1a1a1b;
   align-items: center;
   display: flex;
-  border-radius: 20px;
+  border-radius: 5px;
   border: 1px solid #424242;
 }
 
 .search:hover {
-  border: 1px solid #eeeeee;
+  border: 1px solid #ff5e57;
   background-color: #141414;
 }
 
 .search-input[type='text'] {
   border: none;
-  border-radius: 20px;
+  border-radius: 5px;
   background-color: rgba(3, 3, 3, 0);
   color: #eeeeee;
   font-size: 0.9rem;

@@ -3,18 +3,18 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 20px;
+  border-radius: 5px;
   padding: 0.4rem 0.8rem;
   font-size: 0.8rem;
   font-weight: bold;
   cursor: pointer;
-  background-color: #eeeeee;
-  color: #030303;
+  background-color: #ff5e57;
+  color: #eeeeee;
   margin: 5px;
   transition: all 0.2s ease;
 }
 
 .button:hover {
-  background-color: #e0e0e0;
+  background-color: #cc4b44;
   transform: translateY(-2px);
 }

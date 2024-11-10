@@ -4,17 +4,17 @@
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--info {
-  background-color: #1f75c3;
+  background-color: #17a2b8;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--success {
-  background-color: #53b781;
+  background-color: #28a745;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--warning {
-  background-color: #fac42e;
+  background-color: #ffc107;
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--error {
-  background-color: #d92563;
+  background-color: #ff5e57;
 }

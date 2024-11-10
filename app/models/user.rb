@@ -33,7 +33,6 @@ class User < ApplicationRecord
   validate :validate_username
   validate :unique_uid_for_provider, if: :provider_present?
   validate :validate_favorite_games_count
-  validate :password_presence_if_not_oauth, if: :password_required?
 
   validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :username, presence: true,
@@ -57,8 +56,6 @@ class User < ApplicationRecord
 
   def self.authenticate(email, password)
     user = User.find_for_authentication(email:)
-    return user if user && user.provider.present?
-
     return unless user
 
     user.valid_password?(password) ? user : nil
@@ -98,7 +95,7 @@ class User < ApplicationRecord
     user ||= User.create(
       email: auth_info.info.email,
       username: auth_info.info.nickname,
-      encrypted_password: nil,
+      encrypted_password: SecureRandom.hex(16),
       provider: auth_info.provider,
       uid: auth_info.uid
     )
@@ -135,16 +132,6 @@ class User < ApplicationRecord
   def strip_whitespace
     url&.strip!
     bio&.strip!
-  end
-
-  def password_presence_if_not_oauth
-    return unless provider.blank? && encrypted_password.blank?
-
-    errors.add(:encrypted_password, "can't be blank")
-  end
-
-  def password_required?
-    provider.blank?
   end
 
   def unique_uid_for_provider

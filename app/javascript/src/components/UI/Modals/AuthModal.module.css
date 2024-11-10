@@ -23,7 +23,7 @@
 }
 
 .modal-content {
-  background-color: white;
+  background-color: #1a1a1b;
   padding: 3rem;
   border-radius: 0.5rem;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
@@ -33,10 +33,13 @@
 }
 
 .modal-content h2 {
+  color: #eeeeee;
   margin-top: 0;
 }
 
 .modal label {
+  font-size: 14px;
+  color: #eeeeee;
   display: block;
   margin-bottom: 1rem;
 }
@@ -49,39 +52,49 @@
 
 .modal input {
   display: block;
+  background-color: #1a1a1b;
+  color: #eeeeee;
   margin-bottom: 1rem;
   padding: 0.5rem;
-  border: none;
-  border-bottom: 1px solid #ccc;
-  font-size: 1rem;
+  border: 1px solid #424242;
+  border-radius: 5px;
+  font-size: 14px;
   outline: none;
-  width: 100%;
+  width: 92%;
 }
 
 .modal input:focus {
-  border-bottom-color: #000;
+  border: 1px solid #ff5e57;
 }
 
 .invalid input {
-  border-bottom: 2px solid #c3164b;
+  font-size: 14px;
+  border: 1px solid #ff5e57;
 }
 
 .invalid input:focus {
-  border-bottom-color: #ff9c40;
+  font-size: 14px;
+  border-bottom-color: #ff5e57;
 }
 
 .error-text {
-  color: #c3164b;
+  font-size: 14px;
+  color: #ff5e57;
+}
+
+.question {
+  font-size: 14px;
+  color: #eeeeee;
 }
 
 .submit-btn {
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 20px;
-  font-size: 1rem;
+  border-radius: 5px;
+  font-size: 14px;
   font-weight: bold;
-  background-color: rgb(51, 153, 255);
+  background-color: #ff5e57;
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
@@ -89,15 +102,15 @@
 }
 
 .submit-btn:hover {
-  background-color: rgb(31, 117, 195);
+  background-color: #cc4b44;
 }
 
 .submit-btn:disabled,
 .submit-btn:disabled:hover,
 .submit-btn:disabled:active {
-  background-color: #ccc;
-  color: #292929;
-  border-color: #ccc;
+  background-color: #424242;
+  color: #eeeeee;
+  border-color: #424242;
   cursor: not-allowed;
 }
 
@@ -107,8 +120,8 @@
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 20px;
-  font-size: 1rem;
+  border-radius: 5px;
+  font-size: 14px;
   font-weight: bold;
   background-color: #9146ff;
   color: white;
@@ -118,11 +131,12 @@
 }
 
 .submit-btn-twitch svg {
-  font-size: 1.25em;
+  font-size: 1.2em;
   margin-right: 0px;
 }
 
 .twitch-button-text {
+  font-size: 14px;
   flex: 1;
   text-align: center;
 }
@@ -136,7 +150,7 @@
   top: 0.5rem;
   right: 0.5rem;
   font-size: 1.5rem;
-  color: #999;
+  color: #eeeeee;
   cursor: pointer;
   transition: color 0.2s ease-in-out;
   z-index: 22;
@@ -145,15 +159,15 @@
 }
 
 .close-icon:hover {
-  color: #000;
+  color: white;
 }
 
 .modal-content .switch-modal-btn {
+  font-size: 14px;
   background-color: transparent;
   border: none;
-  color: rgb(51, 153, 255);
+  color: #ff5e57;
   cursor: pointer;
-  font-size: 1rem;
   font-weight: bold;
   text-decoration: none;
   margin-top: 30px;
@@ -161,4 +175,21 @@
 
 .modal-content .switch-modal-btn:hover {
   text-decoration: none;
+}
+
+.trouble-link {
+  font-size: 14px;
+  color: #ff5e57;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.trouble-link:hover {
+  text-decoration: underline;
+}
+
+.modal input:-webkit-autofill {
+  -webkit-box-shadow: 0 1000px 0 1000px #1a1a1b inset;
+  -webkit-text-fill-color: #eeeeee;
 }
