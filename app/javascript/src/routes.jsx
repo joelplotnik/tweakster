@@ -74,6 +74,11 @@ const routes = [
               //           index: true,
               //           element: <ChallengePage />,
               //         },
+              //         {
+              //           path: 'edit',
+              //           element: <EditChallengePage />,
+              //           loader: checkAuthLoader,
+              //         },
               //       ],
               //     },
               //   ],
