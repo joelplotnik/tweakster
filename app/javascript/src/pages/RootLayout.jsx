@@ -9,7 +9,7 @@ import { ToastContainer } from 'react-toastify'
 
 import Footer from '../components/Footer/Footer'
 import MainNavigation from '../components/Header/MainNavigation'
-import ScrollToTop from '../components/ScrollToTop'
+import ScrollToTop from '../components/Misc/ScrollToTop'
 import { EXPIRED_TOKEN } from '../constants/constants'
 import { CableProvider } from '../context/cable'
 import RefreshContext from '../context/refresh'

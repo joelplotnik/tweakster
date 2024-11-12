@@ -1,13 +1,13 @@
 import React from 'react'
 
-import AboutPage from './pages/AboutPage'
-import ErrorPage from './pages/ErrorPage'
-import HomePage from './pages/HomePage'
-import { action as logoutAction } from './pages/Logout'
-import NotificationsPage from './pages/NotificationsPage'
-import OauthCallback from './pages/Oauth'
-import PopularPage from './pages/PopularPage'
+import AboutPage from './pages/General/AboutPage'
+import ErrorPage from './pages/General/ErrorPage'
+import NotificationsPage from './pages/General/NotificationsPage'
+import HomePage from './pages/Main/HomePage'
+import PopularPage from './pages/Main/PopularPage'
 import RootLayout from './pages/RootLayout'
+import { action as logoutAction } from './pages/Sessions/Logout'
+import OauthCallback from './pages/Sessions/Oauth'
 import EditUserPage, {
   action as editUserAction,
 } from './pages/Users/EditUserPage'
@@ -84,21 +84,21 @@ const routes = [
               //   ],
               // },
               // {
-              //   path: 'activity',
-              //   element: <ActivitiesLayout />,
+              //   path: 'attempts',
+              //   element: <AttemptsLayout />,
               //   children: [
               //     {
               //       index: true,
-              //       element: <ActivitiesPage />,
+              //       element: <AttemptsPage />,
               //     },
               //     {
               //       path: ':id',
-              //       id: 'activity',
-              //       loader: activityLoader,
+              //       id: 'attempts',
+              //       loader: attemptsLoader,
               //       children: [
               //         {
               //           index: true,
-              //           element: <ActivityPage />,
+              //           element: <AttemptPage />,
               //         },
               //       ],
               //     },

@@ -156,6 +156,13 @@
   margin-right: 0.75rem;
 }
 
+.avatar-placeholder {
+  width: 1.75rem;
+  height: 1.75rem;
+  background-color: #1a1a1b;
+  border-radius: 50%;
+}
+
 .username {
   font-weight: bold;
   font-size: 16px;
