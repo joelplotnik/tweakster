@@ -22,10 +22,10 @@ class Api::V1::GamesController < ApplicationController
 
     popular_games = Game
                     .with_attached_image
-                    .left_joins(challenges: :accepted_challenges)
-                    .where('accepted_challenges.created_at >= ? AND accepted_challenges.created_at <= ?', 7.days.ago, point_in_time)
+                    .left_joins(challenges: :attempts)
+                    .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
                     .group('games.id')
-                    .order('COUNT(accepted_challenges.id) DESC')
+                    .order('COUNT(attempts.id) DESC')
                     .paginate(page:, per_page: limit)
                     .map { |game| format_game(game) }
 

@@ -36,7 +36,7 @@ class Api::V1::UsersController < ApplicationController
 
     popular_users = User
                     .with_attached_avatar
-                    .joins(accepted_challenges: :approvals)
+                    .joins(attempts: :approvals)
                     .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
                     .group('users.id')
                     .order('COUNT(approvals.id) DESC')

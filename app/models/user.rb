@@ -6,7 +6,7 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
   has_many :challenges
-  has_many :accepted_challenges, dependent: :destroy
+  has_many :attempts, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :approvals, dependent: :destroy
   has_many :difficulties, dependent: :destroy

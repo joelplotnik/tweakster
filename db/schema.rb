@@ -10,19 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_11_201028) do
-  create_table "accepted_challenges", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "challenge_id", null: false
-    t.string "status", default: "To Do"
-    t.datetime "completed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "approvals_count", default: 0
-    t.index ["challenge_id"], name: "index_accepted_challenges_on_challenge_id"
-    t.index ["user_id"], name: "index_accepted_challenges_on_user_id"
-  end
-
+ActiveRecord::Schema[7.0].define(version: 2024_11_12_172708) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -52,12 +40,24 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_11_201028) do
   end
 
   create_table "approvals", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "accepted_challenge_id", null: false
+    t.bigint "attempt_id", null: false
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["accepted_challenge_id"], name: "index_approvals_on_accepted_challenge_id"
+    t.index ["attempt_id"], name: "index_approvals_on_attempt_id"
     t.index ["user_id"], name: "index_approvals_on_user_id"
+  end
+
+  create_table "attempts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "challenge_id", null: false
+    t.string "status", default: "To Do"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "approvals_count", default: 0
+    t.index ["challenge_id"], name: "index_attempts_on_challenge_id"
+    t.index ["user_id"], name: "index_attempts_on_user_id"
   end
 
   create_table "challenges", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -68,7 +68,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_11_201028) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "hidden", default: false
-    t.integer "accepted_count", default: 0
+    t.integer "attempt_count", default: 0
     t.bigint "user_id", null: false
     t.float "difficulty_rating", default: 0.0
     t.index ["game_id"], name: "index_challenges_on_game_id"
@@ -204,12 +204,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_11_201028) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  add_foreign_key "accepted_challenges", "challenges"
-  add_foreign_key "accepted_challenges", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "approvals", "accepted_challenges"
+  add_foreign_key "approvals", "attempts"
   add_foreign_key "approvals", "users"
+  add_foreign_key "attempts", "challenges"
+  add_foreign_key "attempts", "users"
   add_foreign_key "challenges", "games"
   add_foreign_key "challenges", "users"
   add_foreign_key "comments", "comments", column: "parent_id"

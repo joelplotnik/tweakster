@@ -7,7 +7,7 @@ User.delete_all
 Relationship.delete_all
 Game.delete_all
 Challenge.delete_all
-AcceptedChallenge.delete_all
+Attempt.delete_all
 Comment.delete_all
 Like.delete_all
 Approval.delete_all
@@ -131,25 +131,25 @@ challenges = []
   end
 end
 
-# Create Accepted Challenges
-accepted_challenges = []
+# Create Attempts
+attempts = []
 statuses = ['To Do', 'In Progress', 'Complete']
 
 60.times do
-  next if AcceptedChallenge.exists?(challenge: challenges.sample)
+  next if Attempt.exists?(challenge: challenges.sample)
 
   status = statuses.sample # Sample status
 
   begin
-    accepted_challenge = AcceptedChallenge.create!(
+    attempt = Attempt.create!(
       challenge: challenges.sample,
       user: users.sample,
       status:,
       completed_at: status == 'Complete' ? Faker::Date.between(from: '2023-01-01', to: '2024-01-01') : nil
     )
-    accepted_challenges << accepted_challenge
+    attempts << attempt
   rescue ActiveRecord::RecordInvalid => e
-    puts "Validation error for Accepted Challenge: #{e.message}. Skipping this accepted challenge."
+    puts "Validation error for Attempt: #{e.message}. Skipping this attempt."
   end
 end
 
@@ -218,8 +218,8 @@ challenges.each do |challenge|
   end
 end
 
-# Create Comments on Accepted Challenges
-accepted_challenges.each do |accepted_challenge|
+# Create Comments on Attempts
+attempts.each do |attempt|
   num_comments = rand(0..5)
 
   comment_users = users.sample(num_comments)
@@ -228,14 +228,12 @@ accepted_challenges.each do |accepted_challenge|
     parent_comment = Comment.create!(
       message: Faker::Lorem.sentence,
       user: comment_user,
-      commentable: accepted_challenge
+      commentable: attempt
     )
 
-    next unless parent_comment.persisted? && comment_user != accepted_challenge.user
+    next unless parent_comment.persisted? && comment_user != attempt.user
 
-    if accepted_challenge.respond_to?(:user)
-      CommentNotifier.with(record: parent_comment).deliver(accepted_challenge.user)
-    end
+    CommentNotifier.with(record: parent_comment).deliver(attempt.user) if attempt.respond_to?(:user)
 
     # Create child comments (nested)
     num_child_comments = rand(0..3)
@@ -247,7 +245,7 @@ accepted_challenges.each do |accepted_challenge|
       child_comment = Comment.create!(
         message: Faker::Lorem.sentence,
         user: child_comment_user,
-        commentable: accepted_challenge,
+        commentable: attempt,
         parent_id: parent_comment.id
       )
 
@@ -256,10 +254,8 @@ accepted_challenges.each do |accepted_challenge|
       # Notify the parent commenter
       CommentNotifier.with(record: child_comment).deliver(parent_comment.user) if parent_comment.respond_to?(:user)
 
-      # Notify the accepted_challenge creator
-      if accepted_challenge.respond_to?(:user)
-        CommentNotifier.with(record: child_comment).deliver(accepted_challenge.user)
-      end
+      # Notify the attempt creator
+      CommentNotifier.with(record: child_comment).deliver(attempt.user) if attempt.respond_to?(:user)
     end
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Comment: #{e.message}. Skipping this comment."
@@ -309,26 +305,26 @@ comments.each do |comment|
   end
 end
 
-# Create Approvals on Accepted Challenges
-accepted_challenges.each do |accepted_challenge|
-  next unless accepted_challenge.status == 'Complete'
+# Create Approvals on Attempts
+attempts.each do |attempt|
+  next unless attempt.status == 'Complete'
 
   num_approvals = rand(0..10)
   approvers = users.sample(num_approvals).uniq
 
   approvers.each do |approver|
-    next if Approval.exists?(user: approver, accepted_challenge:)
+    next if Approval.exists?(user: approver, attempt:)
 
     begin
       Approval.create!(
         user: approver,
-        accepted_challenge:
+        attempt:
       )
 
-      # Notify the accepted challenge creator about the approval
-      # ApprovalNotifier.with(record: approval).deliver(accepted_challenge.user) if accepted_challenge.respond_to?(:user)
+      # Notify the attempt creator about the approval
+      # ApprovalNotifier.with(record: approval).deliver(attempt.user) if attempt.respond_to?(:user)
     rescue ActiveRecord::RecordInvalid => e
-      puts "Validation error for Approval on Accepted Challenge: #{e.message}. Skipping this approval."
+      puts "Validation error for Approval on Attempt: #{e.message}. Skipping this approval."
     end
   end
 end

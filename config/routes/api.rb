@@ -4,7 +4,7 @@ namespace :api do
     get 'popular_users', to: 'users#popular_users'
     get 'popular_games', to: 'games#popular_games'
     get 'popular_challenges', to: 'challenges#popular_challenges'
-    get 'popular_accepted_challenges', to: 'accepted_challenges#popular_accepted_challenges'
+    get 'popular_attempts', to: 'attempts#popular_attempts'
 
     scope :users, module: :users do
       post '/', to: 'registrations#create'
@@ -23,7 +23,7 @@ namespace :api do
         get 'search'
       end
 
-      resources :accepted_challenges, only: %i[index show update destroy] do
+      resources :attempts, only: %i[index show update destroy] do
         resources :approvals, only: [:create]
 
         resources :comments, only: %i[index create update destroy] do
@@ -47,7 +47,7 @@ namespace :api do
           get 'replies', to: 'comments#replies', on: :member
         end
 
-        resources :accepted_challenges, only: %i[index create] do
+        resources :attempts, only: %i[index create] do
           resources :approvals, only: [:create]
 
           resources :comments, only: %i[index create update destroy] do
