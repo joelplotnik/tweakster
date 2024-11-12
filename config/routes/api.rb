@@ -15,7 +15,6 @@ namespace :api do
         post 'follow', to: 'relationships#create'
         delete 'unfollow', to: 'relationships#destroy'
         get 'following'
-        put 'update_favorite_games'
         get 'check_ownership'
       end
 

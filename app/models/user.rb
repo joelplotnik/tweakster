@@ -24,15 +24,12 @@ class User < ApplicationRecord
                              class_name: 'Relationship', dependent: :destroy
   has_many :followers, through: :following_users, dependent: :destroy
 
-  serialize :favorite_games, Array
-
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: [:twitch]
 
   validate :validate_username
   validate :unique_uid_for_provider, if: :provider_present?
-  validate :validate_favorite_games_count
 
   validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :username, presence: true,
@@ -123,10 +120,6 @@ class User < ApplicationRecord
     return unless avatar.attached? && avatar.filename.to_s == 'default_avatar.png'
 
     avatar.detach
-  end
-
-  def validate_favorite_games_count
-    errors.add(:favorite_games, "can't have more than 5 favorite games") if favorite_games.size > 5
   end
 
   def strip_whitespace

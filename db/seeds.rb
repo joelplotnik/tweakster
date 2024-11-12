@@ -29,7 +29,8 @@ users = []
     password: 'Password11!!',
     username: Faker::Internet.username,
     url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100)
+    bio: Faker::Lorem.paragraph_by_chars(number: 100),
+    currently_playing: Faker::Game.title
   )
 
   avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
@@ -61,7 +62,8 @@ unless User.exists?(email: admin_email)
     username: 'superadmin',
     role: 'admin',
     url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100)
+    bio: Faker::Lorem.paragraph_by_chars(number: 100),
+    currently_playing: Faker::Game.title
   )
 
   avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
