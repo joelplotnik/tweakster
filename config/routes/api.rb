@@ -38,7 +38,7 @@ namespace :api do
       end
 
       resources :challenges, only: %i[show index create update destroy] do
-        resources :likes, only: [:create]
+        # resources :likes, only: [:create]
         resources :difficulty_ratings, only: [:create]
 
         resources :comments, only: %i[index create update destroy] do

@@ -4,7 +4,6 @@ class Challenge < ApplicationRecord
 
   has_many :attempts, dependent: :restrict_with_error
   has_many :comments, as: :commentable, dependent: :destroy
-  has_many :likes, as: :likeable, dependent: :destroy
   has_many :difficulties, dependent: :destroy
 
   attribute :hidden, :boolean, default: false

@@ -10,7 +10,7 @@ module Likeable
     like = current_user.likes.build(like_params)
 
     if like.save
-      render json: { success: true, message: 'Like added successfully', like: like }, status: :created
+      render json: { success: true, message: 'Like added successfully', like: }, status: :created
     else
       render json: { success: false, errors: like.errors.full_messages }, status: :unprocessable_entity
     end

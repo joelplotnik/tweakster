@@ -264,42 +264,21 @@ attempts.each do |attempt|
   end
 end
 
-# Create Likes on Challenges
-challenges.each do |challenge|
-  num_likes = rand(0..20)
-  likers = users.sample(num_likes).uniq
-  likers.each do |liker|
-    next if Like.exists?(user: liker, likeable: challenge)
-
-    begin
-      Like.create!(
-        user: liker,
-        likeable: challenge
-      )
-
-    # # Notify the challenge creator about the like
-    # LikeNotifier.with(record: like).deliver(challenge.user) if challenge.respond_to?(:user)
-    rescue ActiveRecord::RecordInvalid => e
-      puts "Validation error for Like on Challenge: #{e.message}. Skipping this like."
-    end
-  end
-end
-
 # Create Likes on Comments
 comments = Comment.all
 comments.each do |comment|
   num_likes = rand(0..20)
   likers = users.sample(num_likes).uniq
   likers.each do |liker|
-    next if Like.exists?(user: liker, likeable: comment)
+    next if Like.exists?(user: liker, comment_id: comment.id)
 
     begin
       Like.create!(
         user: liker,
-        likeable: comment
+        comment_id: comment.id
       )
 
-      # Notify the comment creator about the like
+      # Optionally, notify the comment creator about the like
       # LikeNotifier.with(record: like).deliver(comment.user) if comment.respond_to?(:user)
     rescue ActiveRecord::RecordInvalid => e
       puts "Validation error for Like on Comment: #{e.message}. Skipping this like."

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_12_181838) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_12_200314) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -64,7 +64,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_12_181838) do
     t.string "title", null: false
     t.text "description"
     t.bigint "game_id", null: false
-    t.integer "likes_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "hidden", default: false
@@ -108,11 +107,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_12_181838) do
 
   create_table "likes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "likeable_type", null: false
-    t.bigint "likeable_id", null: false
+    t.bigint "comment_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["likeable_type", "likeable_id"], name: "index_likes_on_likeable"
+    t.index ["comment_id"], name: "index_likes_on_comment_id"
     t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
@@ -215,6 +213,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_12_181838) do
   add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "difficulties", "challenges"
   add_foreign_key "difficulties", "users"
+  add_foreign_key "likes", "comments"
   add_foreign_key "likes", "users"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end

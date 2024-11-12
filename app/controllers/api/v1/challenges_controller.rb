@@ -4,7 +4,7 @@ class Api::V1::ChallengesController < ApplicationController
   before_action :set_challenge, only: %i[show update destroy]
 
   def index
-    challenges = @game.challenges.includes(:difficulties, :likes)
+    challenges = @game.challenges.includes(:difficulties)
     render json: challenges.map { |challenge| format_challenge(challenge) }, status: :ok
   end
 
@@ -14,10 +14,10 @@ class Api::V1::ChallengesController < ApplicationController
     point_in_time = params[:point_in_time] || Time.current
 
     popular_challenges = Challenge
-                         .left_joins(:likes)
-                         .where('likes.created_at >= ? AND likes.created_at <= ?', 7.days.ago, point_in_time)
+                         .left_joins(:attempts)
+                         .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
                          .group('challenges.id')
-                         .order('COUNT(likes.id) DESC')
+                         .order('COUNT(attempts.id) DESC')
                          .paginate(page:, per_page: limit)
                          .map { |challenge| format_challenge(challenge) }
 

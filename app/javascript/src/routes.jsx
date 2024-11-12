@@ -52,11 +52,11 @@ const routes = [
                 action: editUserAction,
                 loader: checkAuthLoader,
               },
-              // {
-              //   path: 'following',
-              //   element: <FollowingPage />,
-              //   loader: checkAuthLoader,
-              // },
+              {
+                path: 'following',
+                element: <FollowingPage />,
+                loader: checkAuthLoader,
+              },
               // {
               //   path: 'challenges',
               //   element: <ChallengesLayout />,
