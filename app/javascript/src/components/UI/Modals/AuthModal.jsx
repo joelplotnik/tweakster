@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
 import { useDispatch } from 'react-redux'
 import { Form, Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
+import Logo from '../../../assets/logo_color.svg'
 import {
   API_URL,
   CLIENT_ID,
@@ -25,6 +26,11 @@ export function AuthModal({ authType, onClick }) {
   const [loginError, setLoginError] = useState(null)
   const navigate = useNavigate()
   const location = useLocation()
+  const emailInputRef = useRef(null)
+
+  useEffect(() => {
+    emailInputRef.current?.focus()
+  }, [modalType])
 
   const {
     value: enteredUsername,
@@ -246,8 +252,11 @@ export function AuthModal({ authType, onClick }) {
               className={classes['modal-content']}
               onClick={e => e.stopPropagation()}
             >
-              {modalType === 'login' && <h2>Log In</h2>}
-              {modalType === 'signup' && <h2>Sign Up</h2>}
+              <div className={classes.header}>
+                <img className={classes.icon} src={Logo} alt="Tweakster" />
+                {modalType === 'login' && <h2>Log in</h2>}
+                {modalType === 'signup' && <h2>Sign up</h2>}
+              </div>
               {signupError && (
                 <div className={classes['error-text']}>
                   {signupError.map(error => (
@@ -270,6 +279,7 @@ export function AuthModal({ authType, onClick }) {
                   <input
                     type="email"
                     id="email"
+                    ref={emailInputRef}
                     onChange={handleEmailChange}
                     onBlur={handleEmailBlur}
                   />

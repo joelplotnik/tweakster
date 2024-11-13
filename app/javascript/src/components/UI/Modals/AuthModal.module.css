@@ -6,7 +6,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 21;
+  z-index: 12;
   overflow: hidden;
 }
 
@@ -14,12 +14,18 @@
   overflow: hidden;
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+.header {
   position: relative;
+  color: #eeeeee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
 }
 
 .modal-content {
@@ -30,11 +36,6 @@
   width: 250px;
   position: relative;
   overflow: auto;
-}
-
-.modal-content h2 {
-  color: #eeeeee;
-  margin-top: 0;
 }
 
 .modal label {
@@ -147,19 +148,24 @@
 
 .close-icon {
   position: absolute;
-  top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  top: 0.75rem;
   right: 0.5rem;
   font-size: 1.5rem;
   color: #eeeeee;
   cursor: pointer;
-  transition: color 0.2s ease-in-out;
-  z-index: 22;
+  transition: background-color 0.2s ease-in-out;
+  z-index: 12;
   background-color: transparent;
   border: none;
+  border-radius: 5px;
 }
 
 .close-icon:hover {
-  color: white;
+  background-color: #424242;
 }
 
 .modal-content .switch-modal-btn {
