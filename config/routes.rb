@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   use_doorkeeper
   devise_for :users, path: 'api/v1/users', controllers: {
-      omniauth_callbacks: 'api/v1/users/omniauth_callbacks'
-    }, skip: [:registrations]
+    omniauth_callbacks: 'api/v1/users/omniauth_callbacks'
+  }, skip: [:registrations]
 
   mount ActionCable.server => '/cable'
 

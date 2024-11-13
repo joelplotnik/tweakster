@@ -22,12 +22,21 @@ namespace :api do
         get 'search'
       end
 
-      resources :attempts, only: %i[index show update destroy] do
-        resources :approvals, only: [:create]
+      resources :challenges, only: %i[show index create update destroy] do
+        resources :votes, only: %i[create]
+        resources :difficulty_ratings, only: [:create]
 
         resources :comments, only: %i[index create update destroy] do
           resources :likes, only: [:create]
           get 'replies', to: 'comments#replies', on: :member
+        end
+
+        resources :attempts, only: %i[index create] do
+          resources :approvals, only: [:create]
+
+          resources :comments, only: %i[index create update destroy] do
+            resources :likes, only: [:create]
+          end
         end
       end
     end
@@ -38,7 +47,7 @@ namespace :api do
       end
 
       resources :challenges, only: %i[show index create update destroy] do
-        # resources :likes, only: [:create]
+        resources :votes, only: %i[create]
         resources :difficulty_ratings, only: [:create]
 
         resources :comments, only: %i[index create update destroy] do

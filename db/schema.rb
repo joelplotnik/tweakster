@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_13_052432) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_13_054941) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -71,6 +71,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_13_052432) do
     t.bigint "user_id", null: false
     t.float "difficulty_rating", default: 0.0
     t.string "category"
+    t.integer "upvotes", default: 0
+    t.integer "downvotes", default: 0
     t.index ["game_id"], name: "index_challenges_on_game_id"
     t.index ["user_id"], name: "index_challenges_on_user_id"
   end
@@ -203,6 +205,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_13_052432) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  create_table "votes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "vote_type", null: false
+    t.bigint "user_id", null: false
+    t.bigint "challenge_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["challenge_id"], name: "index_votes_on_challenge_id"
+    t.index ["user_id"], name: "index_votes_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "approvals", "attempts"
@@ -217,4 +229,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_13_052432) do
   add_foreign_key "likes", "comments"
   add_foreign_key "likes", "users"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "votes", "challenges"
+  add_foreign_key "votes", "users"
 end

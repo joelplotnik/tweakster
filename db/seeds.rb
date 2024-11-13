@@ -85,6 +85,25 @@ unless User.exists?(email: admin_email)
   end
 end
 
+# Create Relationships
+users.each do |follower|
+  relationships_count = rand(1..[users.size - 1, 3].min)
+  followees = users.reject { |user| user == follower }.sample(relationships_count)
+
+  followees.each do |followee|
+    next if Relationship.exists?(follower_id: follower.id, followee_id: followee.id)
+
+    begin
+      Relationship.create!(
+        follower_id: follower.id,
+        followee_id: followee.id
+      )
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Relationship: #{e.message}. Skipping this relationship."
+    end
+  end
+end
+
 # Create Games
 games = []
 PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
@@ -147,6 +166,45 @@ challenges = []
   end
 end
 
+# Create Difficulties on Challenges
+challenges.each do |challenge|
+  num_difficulties = rand(1..6)
+  difficulty_users = users.sample(num_difficulties).uniq
+
+  difficulty_users.each do |difficulty_user|
+    Difficulty.create!(
+      challenge:,
+      user: difficulty_user,
+      rating: rand(1..5)
+    )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Difficulty on Challenge: #{e.message}. Skipping this difficulty."
+  end
+end
+
+# Create Votes on Challenges
+challenges.each do |challenge|
+  num_votes = rand(1..users.size)
+
+  voters = users.sample(num_votes).uniq
+
+  voters.each do |voter|
+    next if Vote.exists?(user: voter, challenge:)
+
+    vote_type = [1, -1].sample
+
+    begin
+      Vote.create!(
+        user: voter,
+        challenge:,
+        vote_type:
+      )
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Vote: #{e.message}. Skipping this vote."
+    end
+  end
+end
+
 # Create Attempts
 attempts = []
 statuses = ['To Do', 'In Progress', 'Complete']
@@ -169,21 +227,26 @@ statuses = ['To Do', 'In Progress', 'Complete']
   end
 end
 
-# Create Relationships
-users.each do |follower|
-  relationships_count = rand(1..[users.size - 1, 3].min)
-  followees = users.reject { |user| user == follower }.sample(relationships_count)
+# Create Approvals on Attempts
+attempts.each do |attempt|
+  next unless attempt.status == 'Complete'
 
-  followees.each do |followee|
-    next if Relationship.exists?(follower_id: follower.id, followee_id: followee.id)
+  num_approvals = rand(0..10)
+  approvers = users.sample(num_approvals).uniq
+
+  approvers.each do |approver|
+    next if Approval.exists?(user: approver, attempt:)
 
     begin
-      Relationship.create!(
-        follower_id: follower.id,
-        followee_id: followee.id
+      Approval.create!(
+        user: approver,
+        attempt:
       )
+
+      # Notify the attempt creator about the approval
+      # ApprovalNotifier.with(record: approval).deliver(attempt.user) if attempt.respond_to?(:user)
     rescue ActiveRecord::RecordInvalid => e
-      puts "Validation error for Relationship: #{e.message}. Skipping this relationship."
+      puts "Validation error for Approval on Attempt: #{e.message}. Skipping this approval."
     end
   end
 end
@@ -300,50 +363,8 @@ comments.each do |comment|
   end
 end
 
-# Create Approvals on Attempts
-attempts.each do |attempt|
-  next unless attempt.status == 'Complete'
-
-  num_approvals = rand(0..10)
-  approvers = users.sample(num_approvals).uniq
-
-  approvers.each do |approver|
-    next if Approval.exists?(user: approver, attempt:)
-
-    begin
-      Approval.create!(
-        user: approver,
-        attempt:
-      )
-
-      # Notify the attempt creator about the approval
-      # ApprovalNotifier.with(record: approval).deliver(attempt.user) if attempt.respond_to?(:user)
-    rescue ActiveRecord::RecordInvalid => e
-      puts "Validation error for Approval on Attempt: #{e.message}. Skipping this approval."
-    end
-  end
-end
-
-# Create Difficulties on Challenges
-challenges.each do |challenge|
-  num_difficulties = rand(1..6)
-  difficulty_users = users.sample(num_difficulties).uniq
-
-  difficulty_users.each do |difficulty_user|
-    Difficulty.create!(
-      challenge:,
-      user: difficulty_user,
-      rating: rand(1..5)
-    )
-  rescue ActiveRecord::RecordInvalid => e
-    puts "Validation error for Difficulty on Challenge: #{e.message}. Skipping this difficulty."
-  end
-end
-
-# Define reasons for reporting
-report_reasons = %w[spam inappropriate offensive harassing]
-
 # Create Reports
+report_reasons = %w[spam inappropriate offensive harassing]
 users.each do |user|
   # Challenges
   challenges_to_report = Challenge.where.not(user_id: user.id)
