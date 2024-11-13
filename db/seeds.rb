@@ -115,6 +115,19 @@ PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
 end
 
 # Create Challenges
+categories = [
+  'Perfectionist',
+  'Strategic Planning',
+  'Meticulous Collection',
+  'Precision-Based',
+  'Resource Management',
+  'Puzzle and Logic',
+  'Time-Efficiency',
+  'Skill Mastery',
+  'Completionist',
+  'Self-Improvement'
+]
+
 challenges = []
 40.times do
   title = Faker::Lorem.sentence(word_count: 3, supplemental: true).chomp('.')
@@ -125,7 +138,8 @@ challenges = []
       title:,
       description: Faker::Lorem.paragraph(sentence_count: 5),
       game: games.sample,
-      user: users.sample
+      user: users.sample,
+      category: categories.sample
     )
     challenges << challenge
   rescue ActiveRecord::RecordInvalid => e

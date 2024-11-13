@@ -9,6 +9,20 @@ class Challenge < ApplicationRecord
   attribute :hidden, :boolean, default: false
   attribute :attempt_count, :integer, default: 0
 
+  CATEGORIES = [
+    'Perfectionist',
+    'Strategic Planning',
+    'Meticulous Collection',
+    'Precision-Based',
+    'Resource Management',
+    'Puzzle and Logic',
+    'Time-Efficiency',
+    'Skill Mastery',
+    'Completionist',
+    'Self-Improvement'
+  ].freeze
+
   validates :title, presence: true
   validates :description, presence: true
+  validates :category, inclusion: { in: CATEGORIES }
 end
