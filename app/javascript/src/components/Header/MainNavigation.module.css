@@ -149,11 +149,18 @@
 
 .avatar-image {
   object-fit: cover;
-  background-color: white;
+  background-color: #eeeeee;
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 50%;
   margin-right: 0.75rem;
+}
+
+.avatar-placeholder {
+  width: 1.75rem;
+  height: 1.75rem;
+  background-color: #1a1a1b;
+  border-radius: 50%;
 }
 
 .username {
@@ -167,8 +174,8 @@
   align-items: center;
   justify-content: space-between;
   border: none;
-  border-radius: 20px;
-  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  padding: 0.25rem 0.8rem;
   font-size: 0.8rem;
   cursor: pointer;
   background-color: #1a1a1b;
@@ -178,7 +185,8 @@
 }
 
 .dropdown-button:hover {
-  color: #e0e0e0;
+  border: #424242;
+  background-color: #424242;
 }
 
 /* Dropdown menu */
@@ -191,7 +199,7 @@
   position: absolute;
   top: calc(100% + 5px);
   right: 0;
-  background-color: #ffffff;
+  background-color: #1a1a1b;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   padding: 0.5rem;
@@ -202,7 +210,7 @@
 }
 
 .dropdown-menu a {
-  color: #333333;
+  color: #eeeeee;
   text-decoration: none;
   padding: 0.5rem;
   font-size: 0.9rem;
@@ -216,11 +224,11 @@
 
 .dropdown-menu a:hover,
 .dropdown-menu a.active {
-  background-color: #eeeeee;
+  background-color: #424242;
 }
 
 .dropdown-menu button {
-  color: #333333;
+  color: #eeeeee;
   text-decoration: none;
   padding: 0.5rem;
   font-size: 0.9rem;
@@ -236,7 +244,7 @@
 }
 
 .dropdown-menu button:hover {
-  background-color: #eeeeee;
+  background-color: #424242;
 }
 
 .notification-dot {

@@ -4,7 +4,7 @@ class Comment < ApplicationRecord
   belongs_to :parent, class_name: 'Comment', optional: true
 
   has_many :children, class_name: 'Comment', foreign_key: :parent_id, dependent: :destroy
-  has_many :likes, as: :likeable, dependent: :destroy
+  has_many :likes, dependent: :destroy
   has_many :notification_mentions, as: :record, dependent: :destroy, class_name: 'Noticed::Event'
 
   validates :user_id, presence: true

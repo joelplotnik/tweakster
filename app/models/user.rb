@@ -6,8 +6,9 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
   has_many :challenges
-  has_many :accepted_challenges, dependent: :destroy
+  has_many :attempts, dependent: :destroy
   has_many :likes, dependent: :destroy
+  has_many :votes, dependent: :destroy
   has_many :approvals, dependent: :destroy
   has_many :difficulties, dependent: :destroy
   has_many :comments, dependent: :destroy
@@ -24,16 +25,12 @@ class User < ApplicationRecord
                              class_name: 'Relationship', dependent: :destroy
   has_many :followers, through: :following_users, dependent: :destroy
 
-  serialize :favorite_games, Array
-
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: [:twitch]
 
   validate :validate_username
   validate :unique_uid_for_provider, if: :provider_present?
-  validate :validate_favorite_games_count
-  validate :password_presence_if_not_oauth, if: :password_required?
 
   validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :username, presence: true,
@@ -57,8 +54,6 @@ class User < ApplicationRecord
 
   def self.authenticate(email, password)
     user = User.find_for_authentication(email:)
-    return user if user && user.provider.present?
-
     return unless user
 
     user.valid_password?(password) ? user : nil
@@ -98,7 +93,7 @@ class User < ApplicationRecord
     user ||= User.create(
       email: auth_info.info.email,
       username: auth_info.info.nickname,
-      encrypted_password: nil,
+      encrypted_password: SecureRandom.hex(16),
       provider: auth_info.provider,
       uid: auth_info.uid
     )
@@ -128,23 +123,9 @@ class User < ApplicationRecord
     avatar.detach
   end
 
-  def validate_favorite_games_count
-    errors.add(:favorite_games, "can't have more than 5 favorite games") if favorite_games.size > 5
-  end
-
   def strip_whitespace
     url&.strip!
     bio&.strip!
-  end
-
-  def password_presence_if_not_oauth
-    return unless provider.blank? && encrypted_password.blank?
-
-    errors.add(:encrypted_password, "can't be blank")
-  end
-
-  def password_required?
-    provider.blank?
   end
 
   def unique_uid_for_provider

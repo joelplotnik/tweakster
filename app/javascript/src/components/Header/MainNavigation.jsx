@@ -17,14 +17,14 @@ import { Link, NavLink, useRouteLoaderData, useSubmit } from 'react-router-dom'
 
 import Logo from '../../assets/logo_color.svg'
 import { API_URL } from '../../constants/constants'
-import { CableContext } from '../../context/cable'
+import { CableContext } from '../../context/Cable'
 import { notificationsActions } from '../../store/notifications'
 import { userActions } from '../../store/user'
 import LoginButton from '../UI/Buttons/LoginButton'
 import SignupButton from '../UI/Buttons/SignupButton'
 import { AuthModal } from '../UI/Modals/AuthModal'
-import SearchBar from '../UI/SearchBar'
 import classes from './MainNavigation.module.css'
+import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
 
 const MainNavigation = () => {
@@ -193,11 +193,15 @@ const MainNavigation = () => {
             >
               {token ? (
                 <div className={classes['user-avatar']}>
-                  <img
-                    src={user?.avatar_url}
-                    alt={`${user?.username}'s Avatar`}
-                    className={classes['avatar-image']}
-                  />
+                  {user?.avatar_url ? (
+                    <img
+                      src={user?.avatar_url}
+                      alt={`${user?.username}'s Avatar`}
+                      className={classes['avatar-image']}
+                    />
+                  ) : (
+                    <div className={classes['avatar-placeholder']}></div>
+                  )}
                   <span className={classes.username}>{user?.username}</span>
                 </div>
               ) : (

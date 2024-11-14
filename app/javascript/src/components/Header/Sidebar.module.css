@@ -51,7 +51,7 @@
 }
 
 .link:hover {
-  background-color: #343436;
+  background-color: #424242;
 }
 
 .link svg {
@@ -70,7 +70,7 @@
 .line {
   position: center;
   width: 85%;
-  border: 1px solid #343436;
+  border: 1px solid #424242;
 }
 
 .header {

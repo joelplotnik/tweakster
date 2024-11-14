@@ -4,7 +4,7 @@ import { useRouteLoaderData } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../../constants/constants'
-import { userPageActions } from '../../../store/user-page'
+import { userPageActions } from '../../../store/userPage'
 import classes from './FollowButton.module.css'
 
 const FollowButton = ({ userId, isFollowing, followerCount }) => {

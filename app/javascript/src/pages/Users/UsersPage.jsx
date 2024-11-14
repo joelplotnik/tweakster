@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { ClipLoader } from 'react-spinners'
 
-import { Error } from '../../components/Content/Error'
-import User from '../../components/Content/User'
+import User from '../../components/Content/Users/User'
 import { API_URL } from '../../constants/constants'
 import classes from './UsersPage.module.css'
 
@@ -52,10 +51,6 @@ const UsersPage = () => {
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  if (error) {
-    return <Error message={`Error: ${error}`} />
-  }
 
   return (
     <InfiniteScroll

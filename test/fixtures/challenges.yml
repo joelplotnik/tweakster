@@ -5,11 +5,9 @@ one:
   description: MyText
   difficulty: 1
   game: one
-  likes_count: 1
 
 two:
   title: MyString
   description: MyText
   difficulty: 1
   game: two
-  likes_count: 1

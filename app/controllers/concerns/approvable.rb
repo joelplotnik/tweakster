@@ -7,7 +7,7 @@ module Approvable
   end
 
   def create_new_approval
-    approval = current_user.approvals.build(accepted_challenge: @accepted_challenge)
+    approval = current_user.approvals.build(attempt: @attempt)
 
     if approval.save
       render json: { success: true, message: 'Approval added successfully' }, status: :created

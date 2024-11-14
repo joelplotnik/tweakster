@@ -36,7 +36,7 @@ class Api::V1::UsersController < ApplicationController
 
     popular_users = User
                     .with_attached_avatar
-                    .joins(accepted_challenges: :approvals)
+                    .joins(attempts: :approvals)
                     .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
                     .group('users.id')
                     .order('COUNT(approvals.id) DESC')
@@ -148,50 +148,6 @@ class Api::V1::UsersController < ApplicationController
     end
 
     render json: followees_data
-  end
-
-  def update_favorite_games
-    user = User.find_by(id: params[:id])
-
-    if !current_user.admin? && current_user != user
-      render json: { error: 'Unauthorized' }, status: :unauthorized
-      return
-    end
-
-    if user.present?
-      request_body = JSON.parse(request.body.read)
-      new_favorite_games = request_body['favorite_games']
-
-      new_favorite_games ||= []
-
-      new_favorite_games = new_favorite_games.uniq.reject { |id| id.blank? || !Game.exists?(id:) }
-
-      if new_favorite_games.empty?
-        user.favorite_games = []
-      else
-        new_favorite_games = new_favorite_games.select { |id| user.games.exists?(id:) }
-        user.favorite_games = new_favorite_games
-      end
-
-      if user.save
-        favorite_games = user.favorite_games.map do |favorite_game_id|
-          favorite_game = Game.find_by(id: favorite_game_id)
-          next unless favorite_game
-
-          {
-            id: favorite_game.id,
-            name: favorite_game.name,
-            image_url: favorite_game.image_url
-          }
-        end.compact
-
-        render json: { favorite_games: }, status: :ok
-      else
-        render json: { error: 'Failed to update favorite games' }, status: :unprocessable_entity
-      end
-    else
-      render json: { error: 'User not found' }, status: :not_found
-    end
   end
 
   def check_ownership

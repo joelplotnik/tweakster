@@ -4,17 +4,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams, useRouteLoaderData } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 
-import Entity from '../../components/Content/Entity'
-import { Error } from '../../components/Content/Error'
-import TopFive from '../../components/Content/TopFive'
 import { API_URL } from '../../constants/constants'
-import { userPageActions } from '../../store/user-page'
 import classes from './FollowingPage.module.css'
 
 const FollowingPage = () => {
   const user = useSelector(state => state.userPage.user)
-  const dispatch = useDispatch()
-  const favoriteUsers = user.favorite_users
   const [following, setFollowing] = useState([])
   const { id } = useParams()
   const token = useRouteLoaderData('root')
@@ -66,76 +60,15 @@ const FollowingPage = () => {
     }
   }
 
-  const updateFavoriteUsers = async updatedFavoriteUserIds => {
-    try {
-      const response = await fetch(
-        `${API_URL}/users/${id}/update_favorite_users`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            favorite_users: updatedFavoriteUserIds,
-          }),
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to update favorite users')
-      }
-
-      const data = await response.json()
-
-      dispatch(userPageActions.updateFaveUsers(data.favorite_users))
-    } catch (error) {
-      console.error('Error: ', error.message)
-      setError(error.message)
-    }
-  }
-
   useEffect(() => {
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleTopFiveClick = user => {
-    const isUserInFavorites = favoriteUsers.some(
-      favUser => favUser.id === user.id
-    )
-
-    let updatedFavoriteUserIds = [...favoriteUsers].map(favUser => favUser.id)
-
-    if (isUserInFavorites) {
-      updatedFavoriteUserIds = updatedFavoriteUserIds.filter(
-        id => id !== user.id
-      )
-    } else {
-      if (favoriteUsers.length < 5) {
-        updatedFavoriteUserIds.push(user.id)
-      } else {
-        return
-      }
-    }
-
-    if (
-      JSON.stringify(updatedFavoriteUserIds) !==
-      JSON.stringify(favoriteUsers.map(user => user.id))
-    ) {
-      updateFavoriteUsers(updatedFavoriteUserIds)
-    }
-  }
-
-  if (error) {
-    return <Error message={`Error: ${error}`} />
-  }
-
   return (
     <div className={classes.container}>
       <h1 className={classes.heading}>Following</h1>
       <hr className={classes.divider} />
-      <TopFive entityType={'user'} favorites={favoriteUsers} />
       <p className={classes.note}>Add a user to your Top 5</p>
       <InfiniteScroll
         dataLength={following.length}
@@ -151,18 +84,7 @@ const FollowingPage = () => {
         }
         endMessage={<></>}
       >
-        <div className={classes['user-list']}>
-          {following.map(user => (
-            <Entity
-              key={user.id}
-              entityType={'user'}
-              item={user}
-              isFavorite={favoriteUsers.some(favUser => favUser.id === user.id)}
-              favoriteCount={favoriteUsers.length}
-              onTopFiveClick={handleTopFiveClick}
-            />
-          ))}
-        </div>
+        <div className={classes['user-list']}></div>
       </InfiniteScroll>
     </div>
   )

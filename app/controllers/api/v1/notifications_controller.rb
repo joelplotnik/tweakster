@@ -2,7 +2,7 @@ require 'will_paginate/array'
 
 class Api::V1::NotificationsController < ApplicationController
   def index
-    notifications = current_user.notifications.includes(event: { record: { user: [], callenge: [], accepted_challenge: [] } })
+    notifications = current_user.notifications.includes(event: { record: { user: [], callenge: [], attempt: [] } })
                                 .order(created_at: :desc)
                                 .paginate(page: params[:page], per_page: 10)
 
@@ -31,14 +31,14 @@ class Api::V1::NotificationsController < ApplicationController
                             challenge_id: record.id,
                             challenge_title: record.title
                           }
-                        when 'AcceptedChallenge'
+                        when 'Attempt'
                           record = notification.event.record
                           {
                             user_avatar_url: record.user.avatar_url,
                             username: record.user.username,
-                            accepted_challenge_id: record.id,
+                            attempt_id: record.id,
                             challenge_title: record.challenge.title,
-                            accepted_at: record.accepted_at
+                            created_at: record.created_at
                           }
                         else
                           {}

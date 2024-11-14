@@ -7,7 +7,7 @@ User.delete_all
 Relationship.delete_all
 Game.delete_all
 Challenge.delete_all
-AcceptedChallenge.delete_all
+Attempt.delete_all
 Comment.delete_all
 Like.delete_all
 Approval.delete_all
@@ -29,7 +29,8 @@ users = []
     password: 'Password11!!',
     username: Faker::Internet.username,
     url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100)
+    bio: Faker::Lorem.paragraph_by_chars(number: 100),
+    currently_playing: Faker::Game.title
   )
 
   avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
@@ -61,7 +62,8 @@ unless User.exists?(email: admin_email)
     username: 'superadmin',
     role: 'admin',
     url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100)
+    bio: Faker::Lorem.paragraph_by_chars(number: 100),
+    currently_playing: Faker::Game.title
   )
 
   avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
@@ -80,6 +82,25 @@ unless User.exists?(email: admin_email)
     admin_user.save!
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Admin User: #{e.message}. Skipping this user."
+  end
+end
+
+# Create Relationships
+users.each do |follower|
+  relationships_count = rand(1..[users.size - 1, 3].min)
+  followees = users.reject { |user| user == follower }.sample(relationships_count)
+
+  followees.each do |followee|
+    next if Relationship.exists?(follower_id: follower.id, followee_id: followee.id)
+
+    begin
+      Relationship.create!(
+        follower_id: follower.id,
+        followee_id: followee.id
+      )
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Relationship: #{e.message}. Skipping this relationship."
+    end
   end
 end
 
@@ -113,6 +134,19 @@ PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
 end
 
 # Create Challenges
+categories = [
+  'Perfectionist',
+  'Strategic Planning',
+  'Meticulous Collection',
+  'Precision-Based',
+  'Resource Management',
+  'Puzzle and Logic',
+  'Time-Efficiency',
+  'Skill Mastery',
+  'Completionist',
+  'Self-Improvement'
+]
+
 challenges = []
 40.times do
   title = Faker::Lorem.sentence(word_count: 3, supplemental: true).chomp('.')
@@ -123,7 +157,8 @@ challenges = []
       title:,
       description: Faker::Lorem.paragraph(sentence_count: 5),
       game: games.sample,
-      user: users.sample
+      user: users.sample,
+      category: categories.sample
     )
     challenges << challenge
   rescue ActiveRecord::RecordInvalid => e
@@ -131,43 +166,87 @@ challenges = []
   end
 end
 
-# Create Accepted Challenges
-accepted_challenges = []
+# Create Difficulties on Challenges
+challenges.each do |challenge|
+  num_difficulties = rand(1..6)
+  difficulty_users = users.sample(num_difficulties).uniq
+
+  difficulty_users.each do |difficulty_user|
+    Difficulty.create!(
+      challenge:,
+      user: difficulty_user,
+      rating: rand(1..5)
+    )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Difficulty on Challenge: #{e.message}. Skipping this difficulty."
+  end
+end
+
+# Create Votes on Challenges
+challenges.each do |challenge|
+  num_votes = rand(1..users.size)
+
+  voters = users.sample(num_votes).uniq
+
+  voters.each do |voter|
+    next if Vote.exists?(user: voter, challenge:)
+
+    vote_type = [1, -1].sample
+
+    begin
+      Vote.create!(
+        user: voter,
+        challenge:,
+        vote_type:
+      )
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Vote: #{e.message}. Skipping this vote."
+    end
+  end
+end
+
+# Create Attempts
+attempts = []
 statuses = ['To Do', 'In Progress', 'Complete']
 
 60.times do
-  next if AcceptedChallenge.exists?(challenge: challenges.sample)
+  next if Attempt.exists?(challenge: challenges.sample)
 
   status = statuses.sample # Sample status
 
   begin
-    accepted_challenge = AcceptedChallenge.create!(
+    attempt = Attempt.create!(
       challenge: challenges.sample,
       user: users.sample,
       status:,
       completed_at: status == 'Complete' ? Faker::Date.between(from: '2023-01-01', to: '2024-01-01') : nil
     )
-    accepted_challenges << accepted_challenge
+    attempts << attempt
   rescue ActiveRecord::RecordInvalid => e
-    puts "Validation error for Accepted Challenge: #{e.message}. Skipping this accepted challenge."
+    puts "Validation error for Attempt: #{e.message}. Skipping this attempt."
   end
 end
 
-# Create Relationships
-users.each do |follower|
-  relationships_count = rand(1..[users.size - 1, 3].min)
-  followees = users.reject { |user| user == follower }.sample(relationships_count)
+# Create Approvals on Attempts
+attempts.each do |attempt|
+  next unless attempt.status == 'Complete'
 
-  followees.each do |followee|
-    next if Relationship.exists?(follower_id: follower.id, followee_id: followee.id)
+  num_approvals = rand(0..10)
+  approvers = users.sample(num_approvals).uniq
+
+  approvers.each do |approver|
+    next if Approval.exists?(user: approver, attempt:)
 
     begin
-      Relationship.create!(
-        follower_id: follower.id,
-        followee_id: followee.id
+      Approval.create!(
+        user: approver,
+        attempt:
       )
+
+      # Notify the attempt creator about the approval
+      # ApprovalNotifier.with(record: approval).deliver(attempt.user) if attempt.respond_to?(:user)
     rescue ActiveRecord::RecordInvalid => e
-      puts "Validation error for Relationship: #{e.message}. Skipping this relationship."
+      puts "Validation error for Approval on Attempt: #{e.message}. Skipping this approval."
     end
   end
 end
@@ -218,8 +297,8 @@ challenges.each do |challenge|
   end
 end
 
-# Create Comments on Accepted Challenges
-accepted_challenges.each do |accepted_challenge|
+# Create Comments on Attempts
+attempts.each do |attempt|
   num_comments = rand(0..5)
 
   comment_users = users.sample(num_comments)
@@ -228,14 +307,12 @@ accepted_challenges.each do |accepted_challenge|
     parent_comment = Comment.create!(
       message: Faker::Lorem.sentence,
       user: comment_user,
-      commentable: accepted_challenge
+      commentable: attempt
     )
 
-    next unless parent_comment.persisted? && comment_user != accepted_challenge.user
+    next unless parent_comment.persisted? && comment_user != attempt.user
 
-    if accepted_challenge.respond_to?(:user)
-      CommentNotifier.with(record: parent_comment).deliver(accepted_challenge.user)
-    end
+    CommentNotifier.with(record: parent_comment).deliver(attempt.user) if attempt.respond_to?(:user)
 
     # Create child comments (nested)
     num_child_comments = rand(0..3)
@@ -247,7 +324,7 @@ accepted_challenges.each do |accepted_challenge|
       child_comment = Comment.create!(
         message: Faker::Lorem.sentence,
         user: child_comment_user,
-        commentable: accepted_challenge,
+        commentable: attempt,
         parent_id: parent_comment.id
       )
 
@@ -256,34 +333,11 @@ accepted_challenges.each do |accepted_challenge|
       # Notify the parent commenter
       CommentNotifier.with(record: child_comment).deliver(parent_comment.user) if parent_comment.respond_to?(:user)
 
-      # Notify the accepted_challenge creator
-      if accepted_challenge.respond_to?(:user)
-        CommentNotifier.with(record: child_comment).deliver(accepted_challenge.user)
-      end
+      # Notify the attempt creator
+      CommentNotifier.with(record: child_comment).deliver(attempt.user) if attempt.respond_to?(:user)
     end
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Comment: #{e.message}. Skipping this comment."
-  end
-end
-
-# Create Likes on Challenges
-challenges.each do |challenge|
-  num_likes = rand(0..20)
-  likers = users.sample(num_likes).uniq
-  likers.each do |liker|
-    next if Like.exists?(user: liker, likeable: challenge)
-
-    begin
-      Like.create!(
-        user: liker,
-        likeable: challenge
-      )
-
-    # # Notify the challenge creator about the like
-    # LikeNotifier.with(record: like).deliver(challenge.user) if challenge.respond_to?(:user)
-    rescue ActiveRecord::RecordInvalid => e
-      puts "Validation error for Like on Challenge: #{e.message}. Skipping this like."
-    end
   end
 end
 
@@ -293,15 +347,15 @@ comments.each do |comment|
   num_likes = rand(0..20)
   likers = users.sample(num_likes).uniq
   likers.each do |liker|
-    next if Like.exists?(user: liker, likeable: comment)
+    next if Like.exists?(user: liker, comment_id: comment.id)
 
     begin
       Like.create!(
         user: liker,
-        likeable: comment
+        comment_id: comment.id
       )
 
-      # Notify the comment creator about the like
+      # Optionally, notify the comment creator about the like
       # LikeNotifier.with(record: like).deliver(comment.user) if comment.respond_to?(:user)
     rescue ActiveRecord::RecordInvalid => e
       puts "Validation error for Like on Comment: #{e.message}. Skipping this like."
@@ -309,50 +363,8 @@ comments.each do |comment|
   end
 end
 
-# Create Approvals on Accepted Challenges
-accepted_challenges.each do |accepted_challenge|
-  next unless accepted_challenge.status == 'Complete'
-
-  num_approvals = rand(0..10)
-  approvers = users.sample(num_approvals).uniq
-
-  approvers.each do |approver|
-    next if Approval.exists?(user: approver, accepted_challenge:)
-
-    begin
-      Approval.create!(
-        user: approver,
-        accepted_challenge:
-      )
-
-      # Notify the accepted challenge creator about the approval
-      # ApprovalNotifier.with(record: approval).deliver(accepted_challenge.user) if accepted_challenge.respond_to?(:user)
-    rescue ActiveRecord::RecordInvalid => e
-      puts "Validation error for Approval on Accepted Challenge: #{e.message}. Skipping this approval."
-    end
-  end
-end
-
-# Create Difficulties on Challenges
-challenges.each do |challenge|
-  num_difficulties = rand(1..6)
-  difficulty_users = users.sample(num_difficulties).uniq
-
-  difficulty_users.each do |difficulty_user|
-    Difficulty.create!(
-      challenge:,
-      user: difficulty_user,
-      rating: rand(1..5)
-    )
-  rescue ActiveRecord::RecordInvalid => e
-    puts "Validation error for Difficulty on Challenge: #{e.message}. Skipping this difficulty."
-  end
-end
-
-# Define reasons for reporting
-report_reasons = %w[spam inappropriate offensive harassing]
-
 # Create Reports
+report_reasons = %w[spam inappropriate offensive harassing]
 users.each do |user|
   # Challenges
   challenges_to_report = Challenge.where.not(user_id: user.id)

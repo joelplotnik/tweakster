@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
 import { useDispatch } from 'react-redux'
-import { Form, useLocation, useNavigate } from 'react-router-dom'
+import { Form, Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
+import Logo from '../../../assets/logo_color.svg'
 import {
   API_URL,
   CLIENT_ID,
@@ -12,7 +13,7 @@ import {
   TWITCH_CLIENT_ID,
   TWITCH_REDIRECT_URI,
 } from '../../../constants/constants'
-import useInput from '../../../hooks/use-input'
+import useInput from '../../../hooks/useInput'
 import { userActions } from '../../../store/user'
 import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
@@ -25,6 +26,11 @@ export function AuthModal({ authType, onClick }) {
   const [loginError, setLoginError] = useState(null)
   const navigate = useNavigate()
   const location = useLocation()
+  const emailInputRef = useRef(null)
+
+  useEffect(() => {
+    emailInputRef.current?.focus()
+  }, [modalType])
 
   const {
     value: enteredUsername,
@@ -94,8 +100,6 @@ export function AuthModal({ authType, onClick }) {
 
     const meData = await meResponse.json()
     const { id, username, avatar_url, role } = meData
-
-    console.log('ME DATA: ', meData)
 
     dispatch(userActions.setUser({ id, username, avatar_url, role }))
   }
@@ -246,8 +250,11 @@ export function AuthModal({ authType, onClick }) {
               className={classes['modal-content']}
               onClick={e => e.stopPropagation()}
             >
-              {modalType === 'login' && <h2>Log In</h2>}
-              {modalType === 'signup' && <h2>Sign Up</h2>}
+              <div className={classes.header}>
+                <img className={classes.icon} src={Logo} alt="Tweakster" />
+                {modalType === 'login' && <h2>Log in</h2>}
+                {modalType === 'signup' && <h2>Sign up</h2>}
+              </div>
               {signupError && (
                 <div className={classes['error-text']}>
                   {signupError.map(error => (
@@ -265,11 +272,12 @@ export function AuthModal({ authType, onClick }) {
               <Form onSubmit={handleSubmit}>
                 <div className={emailInvalidClass}>
                   <label>
-                    <span>Email:</span>
+                    <span>Email</span>
                   </label>
                   <input
                     type="email"
                     id="email"
+                    ref={emailInputRef}
                     onChange={handleEmailChange}
                     onBlur={handleEmailBlur}
                   />
@@ -282,7 +290,7 @@ export function AuthModal({ authType, onClick }) {
                 {modalType === 'signup' && (
                   <div className={usernameInvalidClass}>
                     <label>
-                      <span>Username:</span>
+                      <span>Username</span>
                     </label>
                     <input
                       type="text"
@@ -299,7 +307,7 @@ export function AuthModal({ authType, onClick }) {
                 )}
                 <div className={passwordInvalid}>
                   <label>
-                    <span>Password:</span>
+                    <span>Password</span>
                   </label>
                   <input
                     type="password"
@@ -316,7 +324,7 @@ export function AuthModal({ authType, onClick }) {
                 {modalType === 'signup' && (
                   <div className={confirmPasswordInvalidClass}>
                     <label>
-                      <span>Confirm Password:</span>
+                      <span>Confirm Password</span>
                     </label>
                     <input
                       type="password"
@@ -330,6 +338,17 @@ export function AuthModal({ authType, onClick }) {
                       </p>
                     )}
                   </div>
+                )}
+                {modalType === 'login' && (
+                  <Link
+                    // to="/account-recovery"
+                    to="#"
+                    className={classes['trouble-link']}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Trouble logging in?
+                  </Link>
                 )}
                 <button
                   type="submit"
@@ -353,7 +372,7 @@ export function AuthModal({ authType, onClick }) {
                 </button>
               </Form>
               {modalType === 'login' && (
-                <div>
+                <div className={classes.question}>
                   {' '}
                   New to Tweakster?
                   <button
@@ -377,7 +396,7 @@ export function AuthModal({ authType, onClick }) {
                 </div>
               )}
               {modalType === 'signup' && (
-                <div>
+                <div className={classes.question}>
                   {' '}
                   Already have an account?
                   <button
