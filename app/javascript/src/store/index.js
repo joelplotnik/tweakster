@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit'
 
 import notificationsSlice from './notifications'
 import userSlice from './user'
-import userPageSlice from './user-page'
+import userPageSlice from './userPage'
 
 const rootReducer = combineReducers({
   user: userSlice,

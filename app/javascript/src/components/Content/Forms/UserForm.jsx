@@ -12,7 +12,7 @@ import {
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../../constants/constants'
-import useInput from '../../../hooks/use-input'
+import useInput from '../../../hooks/useInput'
 import { userActions } from '../../../store/user'
 import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
 import classes from './UserForm.module.css'

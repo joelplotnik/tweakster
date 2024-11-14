@@ -16,7 +16,7 @@ import ReportModal from '../../components/UI/Modals/ReportModal'
 import ProfileSkeleton from '../../components/UI/Skeletons/ProfileSkeleton'
 import { API_URL } from '../../constants/constants'
 import store from '../../store'
-import { userPageActions } from '../../store/user-page'
+import { userPageActions } from '../../store/userPage'
 import { getAuthToken } from '../../util/auth'
 import classes from './UserPage.module.css'
 

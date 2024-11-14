@@ -17,7 +17,7 @@ import { Link, NavLink, useRouteLoaderData, useSubmit } from 'react-router-dom'
 
 import Logo from '../../assets/logo_color.svg'
 import { API_URL } from '../../constants/constants'
-import { CableContext } from '../../context/cable'
+import { CableContext } from '../../context/Cable'
 import { notificationsActions } from '../../store/notifications'
 import { userActions } from '../../store/user'
 import LoginButton from '../UI/Buttons/LoginButton'

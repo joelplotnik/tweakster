@@ -13,7 +13,7 @@ import {
   TWITCH_CLIENT_ID,
   TWITCH_REDIRECT_URI,
 } from '../../../constants/constants'
-import useInput from '../../../hooks/use-input'
+import useInput from '../../../hooks/useInput'
 import { userActions } from '../../../store/user'
 import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
@@ -100,8 +100,6 @@ export function AuthModal({ authType, onClick }) {
 
     const meData = await meResponse.json()
     const { id, username, avatar_url, role } = meData
-
-    console.log('ME DATA: ', meData)
 
     dispatch(userActions.setUser({ id, username, avatar_url, role }))
   }
