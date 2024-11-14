@@ -1,5 +1,5 @@
 import ErrorPage from '../pages/General/ErrorPage'
-import HomePage from '../pages/Main/HomePage'
+import HomePage from '../pages/General/HomePage'
 import RootLayout from '../pages/RootLayout'
 import { tokenLoader } from '../util/auth'
 import authRoutes from './AuthRoutes'

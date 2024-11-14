@@ -1,6 +1,6 @@
 import AboutPage from '../pages/General/AboutPage'
 import NotificationsPage from '../pages/General/NotificationsPage'
-import PopularPage from '../pages/Main/PopularPage'
+import PopularPage from '../pages/General/PopularPage'
 import { checkAuthLoader } from '../util/auth'
 
 const generalRoutes = [

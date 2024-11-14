@@ -6,6 +6,7 @@ import UserPage, { loader as userLoader } from '../pages/Users/UserPage'
 import UsersLayout from '../pages/Users/UsersLayout'
 import UsersPage from '../pages/Users/UsersPage'
 import { checkAuthLoader } from '../util/auth'
+import challengesRoutes from './ChallengesRoutes'
 
 const usersRoutes = [
   {
@@ -36,7 +37,7 @@ const usersRoutes = [
             element: <FollowingPage />,
             loader: checkAuthLoader,
           },
-          //   ...challengesRoutes,
+          ...challengesRoutes,
         ],
       },
     ],
