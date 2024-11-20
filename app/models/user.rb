@@ -26,7 +26,7 @@ class User < ApplicationRecord
   has_many :followers, through: :following_users, dependent: :destroy
 
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable,
+         :recoverable, :rememberable, :validatable, :api,
          :omniauthable, omniauth_providers: [:twitch]
 
   validate :validate_username
@@ -90,22 +90,26 @@ class User < ApplicationRecord
   def self.find_or_create_from_auth_hash(auth_info)
     user = User.find_by(provider: auth_info.provider, uid: auth_info.uid)
 
-    user ||= User.create(
-      email: auth_info.info.email,
-      username: auth_info.info.nickname,
-      encrypted_password: SecureRandom.hex(16),
-      provider: auth_info.provider,
-      uid: auth_info.uid
-    )
+    unless user
+      user = User.new(
+        email: auth_info.info.email,
+        username: auth_info.info.nickname,
+        provider: auth_info.provider,
+        uid: auth_info.uid,
+        password: SecureRandom.hex(16)
+      )
 
-    if auth_info.info.image.present? && !auth_info.info.image.include?('user-default-pictures-uv')
-      image_url = auth_info.info.image
-      io = URI.parse(image_url).open
-      user.avatar.attach(io:, filename: "avatar_#{SecureRandom.hex(10)}.jpg", content_type: io.content_type)
-      user.save(validate: false)
-    elsif !user.avatar.attached?
-      user.set_default_avatar
+      if auth_info.info.image.present? && !auth_info.info.image.include?('user-default-pictures-uv')
+        image_url = auth_info.info.image
+        io = URI.parse(image_url).open
+        user.avatar.attach(io:, filename: "avatar_#{SecureRandom.hex(10)}.jpg", content_type: io.content_type)
+      else
+        user.set_default_avatar
+      end
+
+      user.save!
     end
+
     user
   end
 

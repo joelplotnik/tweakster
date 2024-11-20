@@ -1,20 +1,19 @@
-import jwt_decode from 'jwt-decode'
 import { json, redirect } from 'react-router-dom'
 
 import { API_URL, EXPIRED_TOKEN } from '../constants/constants'
 
-export function storeTokens(accessToken, refreshToken, expiresIn) {
-  localStorage.setItem('accessToken', accessToken)
-  localStorage.setItem('refreshToken', refreshToken)
+export function storeTokens(token, refresh, expiration) {
+  localStorage.setItem('token', token)
+  localStorage.setItem('refresh', refresh)
 
   const expirationDate = new Date()
-  expirationDate.setSeconds(expirationDate.getSeconds() + expiresIn)
+  expirationDate.setSeconds(expirationDate.getSeconds() + expiration)
   localStorage.setItem('expiration', expirationDate.toISOString())
 }
 
-export function clearTokens() {
-  localStorage.removeItem('accessToken')
-  localStorage.removeItem('refreshToken')
+export function clearLocalStorage() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('refresh')
   localStorage.removeItem('expiration')
 }
 
@@ -23,7 +22,7 @@ export function tokenLoader() {
 }
 
 export async function getAuthToken() {
-  const token = localStorage.getItem('accessToken')
+  const token = localStorage.getItem('token')
   const tokenDuration = getTokenDuration()
 
   if (!token) {
@@ -52,37 +51,32 @@ export function getTokenDuration() {
 }
 
 async function refreshAuthToken() {
-  const refreshToken = localStorage.getItem('refreshToken')
+  const refresh = localStorage.getItem('refresh')
 
-  if (!refreshToken) {
+  if (!refresh) {
     return null
   }
 
-  const response = await fetch(`${API_URL}/oauth/token`, {
+  const response = await fetch(`${API_URL}/users/tokens/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${refresh}`,
     },
-    body: JSON.stringify({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-    }),
   })
 
   if (!response.ok) {
     console.error('Failed to refresh token')
-    clearTokens()
+    clearLocalStorage()
     return null
   }
 
   const data = await response.json()
-  const { access_token, refresh_token, expires_in } = data
+  const { token, refresh_token, expires_in } = data
 
-  storeTokens(access_token, refresh_token, expires_in)
+  storeTokens(token, refresh_token, expires_in)
 
-  return access_token
+  return token
 }
 
 export async function checkAuthLoader({ params }) {

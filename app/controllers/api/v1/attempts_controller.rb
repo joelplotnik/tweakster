@@ -1,5 +1,4 @@
 class Api::V1::AttempsController < ApplicationController
-  before_action :doorkeeper_authorize!, except: %i[index show popular_attempts]
   before_action :set_user, only: [:index]
   before_action :set_challenge, only: [:index]
   before_action :set_attempt, only: %i[show update destroy]

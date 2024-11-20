@@ -20,15 +20,11 @@ end
 
 namespace :api do
   namespace :v1 do
-    get 'me', to: 'users#show_current_user'
+    get 'restricted', to: 'users#restricted'
     get 'popular_users', to: 'users#popular_users'
     get 'popular_games', to: 'games#popular_games'
     get 'popular_challenges', to: 'challenges#popular_challenges'
     get 'popular_attempts', to: 'attempts#popular_attempts'
-
-    scope :users, module: :users do
-      post '/', to: 'registrations#create'
-    end
 
     resources :users, only: %i[show index update destroy] do
       member do
@@ -61,13 +57,5 @@ namespace :api do
     end
 
     resources :reports, only: %i[index create destroy]
-  end
-end
-
-scope :api do
-  scope :v1 do
-    use_doorkeeper do
-      skip_controllers :authorizations, :applications, :authorized_applications
-    end
   end
 end

@@ -8,8 +8,6 @@ import { toast } from 'react-toastify'
 import Logo from '../../../assets/logo_color.svg'
 import {
   API_URL,
-  CLIENT_ID,
-  CLIENT_SECRET,
   TWITCH_CLIENT_ID,
   TWITCH_REDIRECT_URI,
 } from '../../../constants/constants'
@@ -83,23 +81,12 @@ export function AuthModal({ authType, onClick }) {
 
   const storeUserData = async response => {
     const responseData = await response.json()
-    const { access_token, refresh_token, expires_in } = responseData
 
-    storeTokens(access_token, refresh_token, expires_in)
+    const { token, refresh_token, expires_in, resource_owner } = responseData
 
-    const meResponse = await fetch(`${API_URL}/me`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
+    storeTokens(token, refresh_token, expires_in)
 
-    if (!meResponse.ok) {
-      throw new Error('Failed to fetch user data.')
-    }
-
-    const meData = await meResponse.json()
-    const { id, username, avatar_url, role } = meData
+    const { id, username, avatar_url, role } = resource_owner
 
     dispatch(userActions.setUser({ id, username, avatar_url, role }))
   }
@@ -111,8 +98,8 @@ export function AuthModal({ authType, onClick }) {
     try {
       if (buttonType === 'twitch') {
         const currentPath = window.location.pathname
-        localStorage.setItem('previousPath', currentPath)
-        const twitchAuthUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${TWITCH_REDIRECT_URI}&scope=user:read:email&state=${CLIENT_ID}`
+        localStorage.setItem('previous', currentPath)
+        const twitchAuthUrl = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${TWITCH_CLIENT_ID}&redirect_uri=${TWITCH_REDIRECT_URI}&scope=user:read:email`
         window.location.href = twitchAuthUrl
       }
 
@@ -127,13 +114,12 @@ export function AuthModal({ authType, onClick }) {
         }
 
         const signupData = {
-          client_id: CLIENT_ID,
           email: enteredEmail,
           username: enteredUsername,
           password: enteredPassword,
         }
 
-        const response = await fetch(`${API_URL}/users`, {
+        const response = await fetch(`${API_URL}/users/tokens/sign_up`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -168,11 +154,9 @@ export function AuthModal({ authType, onClick }) {
           grant_type: 'password',
           email: enteredEmail,
           password: enteredPassword,
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
         }
 
-        const response = await fetch(`${API_URL}/oauth/token`, {
+        const response = await fetch(`${API_URL}/users/tokens/sign_in`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

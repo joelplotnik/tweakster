@@ -1,7 +1,4 @@
 class Api::V1::GamesController < ApplicationController
-  before_action :doorkeeper_authorize!, except: %i[index search show popular_games]
-  before_action :set_game, only: %i[show update destroy]
-
   def index
     limit = params[:limit] || 5
     page = params[:page] || 1

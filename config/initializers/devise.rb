@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'devise/api/responses/token_response_decorator'
+
 # Assuming you have not yet modified this file, each configuration option below
 # is set to its default value. Note that some are commented out while others
 # are not: uncommented lines are intended to protect your configuration from
@@ -46,7 +48,7 @@ Devise.setup do |config|
   # session. If you need permissions, you should implement that in a before filter.
   # You can also supply a hash where the value is a boolean determining whether
   # or not authentication should be aborted when the value is not present.
-  config.authentication_keys = [:login]
+  # config.authentication_keys = [:login]
 
   # Configure parameters from the request object used for authentication. Each entry
   # given should be a request method and it will automatically be passed to the
@@ -318,3 +320,5 @@ Devise.setup do |config|
                   redirect_uri: Rails.application.credentials.dig(:twitch, :redirect_uri)[Rails.env.to_sym],
                   provider_ignores_state: true
 end
+
+Devise::Api::Responses::TokenResponse.prepend Devise::Api::Responses::TokenResponseDecorator
