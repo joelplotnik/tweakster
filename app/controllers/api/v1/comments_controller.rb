@@ -1,8 +1,6 @@
 require 'will_paginate/array'
 
 class Api::V1::CommentsController < ApplicationController
-  before_action :doorkeeper_authorize!, except: %i[index replies]
-
   def index
     comments = Comment.where(commentable: find_commentable, parent_id: nil)
                       .includes(user: { avatar_attachment: :blob })

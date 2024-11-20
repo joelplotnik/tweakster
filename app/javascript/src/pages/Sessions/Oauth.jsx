@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import Loading from '../../components/UI/Loading'
@@ -9,27 +8,22 @@ import { storeTokens } from '../../util/auth'
 
 const OauthCallback = () => {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
 
   useEffect(() => {
-    const hash = window.location.hash.substring(1)
+    const searchParams = new URLSearchParams(window.location.search)
+    const encodedData = searchParams.get('data')
 
-    if (hash) {
+    if (encodedData) {
       try {
-        const decodedData = atob(hash)
+        const decodedData = atob(encodedData)
         const userTokenData = JSON.parse(decodedData)
-        const {
-          access_token,
-          refresh_token,
-          expires_in,
-          id,
-          username,
-          avatar_url,
-          role,
-        } = userTokenData
 
-        storeTokens(access_token, refresh_token, expires_in)
+        const { token, refresh_token, expires_in, resource_owner } =
+          userTokenData
 
+        storeTokens(token, refresh_token, expires_in)
+
+        const { id, username, avatar_url, role } = resource_owner
         dispatch(userActions.setUser({ id, username, avatar_url, role }))
       } catch (error) {
         console.error('Error decoding data:', error)
@@ -39,9 +33,10 @@ const OauthCallback = () => {
       toast.error('No callback data found.')
     }
 
-    const previousPath = localStorage.getItem('previousPath') || '/'
+    const previousPath = localStorage.getItem('previous') || '/'
+    localStorage.removeItem('previous')
     window.location.href = previousPath
-  }, [dispatch, navigate])
+  }, [dispatch])
 
   return <Loading text={'Loading your Twitch vibes...'} />
 }

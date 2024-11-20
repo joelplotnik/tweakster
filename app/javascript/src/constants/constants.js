@@ -1,21 +1,17 @@
 export const API_URL =
   Tweakster.Config.env === 'development'
-    ? import.meta.env.VITE_APP_API_URL_DEV
-    : import.meta.env.VITE_APP_API_URL_PROD
+    ? 'http://localhost:5100/api/v1'
+    : 'http://tweakster/api/v1'
 
 export const WS_URL =
   Tweakster.Config.env === 'development'
-    ? import.meta.env.VITE_APP_WS_URL_DEV
-    : import.meta.env.VITE_APP_WS_URL_PROD
-
-export const CLIENT_ID = import.meta.env.VITE_APP_CLIENT_ID
-export const CLIENT_SECRET = import.meta.env.VITE_APP_CLIENT_SECRET
+    ? 'ws://localhost:5100/cable'
+    : 'ws://tweakster/cable'
 
 export const TWITCH_REDIRECT_URI =
   Tweakster.Config.env === 'development'
-    ? import.meta.env.VITE_APP_TWITCH_REDIRECT_URI_DEV
-    : import.meta.env.VITE_APP_TWITCH_REDIRECT_URI_PROD
-export const TWITCH_CLIENT_ID = import.meta.env.VITE_APP_TWITCH_CLIENT_ID
-export const TWITCH_SECRET = import.meta.env.VITE_APP_TWITCH_SECRET
+    ? 'http://localhost:5100/api/v1/users/auth/twitch/callback'
+    : 'http://tweakster/api/v1/users/auth/twitch/callback'
+export const TWITCH_CLIENT_ID = 'c85vwopyrn43u0oythkjgh6k1ta2h4'
 
-export const EXPIRED_TOKEN = import.meta.env.VITE_APP_EXPIRED_TOKEN
+export const EXPIRED_TOKEN = 'EXPIRED'

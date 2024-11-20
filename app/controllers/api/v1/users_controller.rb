@@ -1,18 +1,14 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :doorkeeper_authorize!, only: %i[me update destroy following check_ownership]
-  before_action :current_user
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: [:restricted]
 
-  def show_current_user
-    if current_user
-      render json: {
-        id: current_user.id,
-        email: current_user.email,
-        username: current_user.username,
-        avatar_url: current_user.avatar_url,
-        role: current_user.role
-      }
+  # This is for testing purposes
+  def restricted
+    devise_api_token = current_devise_api_token
+    if devise_api_token
+      render json: { message: "You are logged in as #{devise_api_token.resource_owner.username}" }, status: :ok
     else
-      render json: { error: 'User not found' }, status: :not_found
+      render json: { message: 'You are not logged in' }, status: :ok
     end
   end
 

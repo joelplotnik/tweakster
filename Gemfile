@@ -27,8 +27,8 @@ gem 'faker'
 # Flexible authentication solution for Rails
 gem 'devise'
 
-# OAuth 2.0 provider for user authentication and authorization.
-gem 'doorkeeper', '~> 5.7'
+# Provides token-based authentication
+gem 'devise-api', '~> 0.2.0'
 
 # An OmniAuth strategy for Twitch
 gem 'omniauth-twitch'
@@ -47,9 +47,6 @@ gem 'bugsnag'
 
 # Framework for serializing and deserializing JSON API data
 gem 'jsonapi-serializer', '~> 2.2'
-
-# Ruby HTML and CSS sanitizer
-gem 'sanitize'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
