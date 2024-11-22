@@ -10,6 +10,7 @@ import {
   RiMenuLine,
   RiNotification3Line,
   RiQuestionLine,
+  RiSearchLine,
   RiUserLine,
 } from 'react-icons/ri'
 import { useDispatch, useSelector } from 'react-redux'
@@ -39,6 +40,15 @@ const MainNavigation = () => {
   const submit = useSubmit()
   const user = useSelector(state => state.user.user)
   const dispatch = useDispatch()
+  const [isSearchBarVisible, setIsSearchBarVisible] = useState(false)
+
+  const handleSearchIconClick = () => {
+    setIsSearchBarVisible(prevState => !prevState)
+  }
+
+  const handleBackClick = () => {
+    setIsSearchBarVisible(false)
+  }
 
   // const hasNewNotifications = useSelector(
   //   state => state.notifications.hasNewNotifications
@@ -157,8 +167,19 @@ const MainNavigation = () => {
             </Link>
           </div>
         </div>
-        <SearchBar />
+        <SearchBar
+          mobile={isSearchBarVisible}
+          handleBackClick={handleBackClick}
+        />
         <nav className={classes['navbar-nav']}>
+          {!isSearchBarVisible && (
+            <div
+              className={classes['search-icon']}
+              onClick={handleSearchIconClick}
+            >
+              <RiSearchLine />
+            </div>
+          )}
           {token && (
             <NavLink to="new" className={classes['icon-button']}>
               <RiAddFill />
