@@ -139,6 +139,29 @@
   font-size: 20px;
 }
 
+.search-icon {
+  display: none;
+  position: relative;
+  align-items: center;
+  border: none;
+  border-radius: 20px;
+  padding: 0.4rem 0.4rem;
+  margin: 0.4rem 0.2rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background-color: #1a1a1b;
+  color: #eeeeee;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.search-icon:hover {
+  color: #e0e0e0;
+}
+
+.search-icon svg:first-child {
+  font-size: 20px;
+}
+
 .user-avatar {
   display: flex;
   align-items: center;
@@ -258,34 +281,8 @@
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .title {
-    justify-content: flex-start;
-  }
-
-  .hamburger-button {
-    display: block;
-    margin-left: auto;
-  }
-
-  .logo {
-    display: flex;
-    justify-content: center;
-    margin-left: 0.5rem;
-  }
-
-  .navbar-nav {
-    display: flex;
-    align-items: center;
-  }
-
-  .navbar-nav.show {
-    display: flex;
+  .company {
+    display: none;
   }
 
   .avatar-image {
@@ -296,23 +293,7 @@
     display: none;
   }
 
-  .dropdown-menu {
-    position: absolute;
-    right: 0;
-    width: 200px;
-    background-color: #1a1a1b;
-    color: #eeeeee;
-  }
-
-  .sidebar.active {
-    display: block;
-  }
-
-  .icon-button {
-    margin: 0rem;
-  }
-
-  .company {
-    display: none;
+  .search-icon {
+    display: flex;
   }
 }

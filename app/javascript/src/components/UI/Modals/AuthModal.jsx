@@ -30,6 +30,14 @@ export function AuthModal({ authType, onClick }) {
     emailInputRef.current?.focus()
   }, [modalType])
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [])
+
   const {
     value: enteredUsername,
     isValid: enteredUsernameIsValid,

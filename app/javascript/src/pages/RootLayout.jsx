@@ -39,7 +39,7 @@ const RootLayout = () => {
     setTimeout(async () => {
       dispatch(userActions.clearUser())
       submit(null, { action: '/logout', method: 'POST' })
-    }, tokenDuration) // set to 2 hours in AuthModal.js
+    }, tokenDuration)
   }, [token, submit, dispatch])
 
   useEffect(() => {

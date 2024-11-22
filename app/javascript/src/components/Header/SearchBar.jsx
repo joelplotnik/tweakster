@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { RiCloseLine, RiSearchLine } from 'react-icons/ri'
+import { RiArrowLeftLine, RiCloseLine, RiSearchLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
 import { API_URL } from '../../constants/constants'
 import classes from './SearchBar.module.css'
 
-function SearchBar() {
+function SearchBar({ mobile, handleBackClick }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [userResults, setUserResults] = useState([])
   const [gameResults, setGameResults] = useState([])
@@ -67,7 +67,15 @@ function SearchBar() {
   const hasResults = userResults.length !== 0 || gameResults.length !== 0
 
   return (
-    <div className={classes['search-bar']} ref={searchRef}>
+    <div
+      className={mobile ? classes['search-bar-mobile'] : classes['search-bar']}
+      ref={searchRef}
+    >
+      {mobile && (
+        <div className={classes['back-arrow']} onClick={handleBackClick}>
+          <RiArrowLeftLine className={classes.icon} />
+        </div>
+      )}
       <div className={classes['search']}>
         <div className={classes['search-icon']}>
           <RiSearchLine className={classes.icon} />

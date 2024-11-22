@@ -8,10 +8,7 @@
   align-items: center;
   z-index: 12;
   overflow: hidden;
-}
-
-.modal body {
-  overflow: hidden;
+  max-height: 100vh;
 }
 
 .header {
@@ -35,7 +32,8 @@
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
   width: 250px;
   position: relative;
-  overflow: auto;
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
 .modal label {
@@ -198,4 +196,11 @@
 .modal input:-webkit-autofill {
   -webkit-box-shadow: 0 1000px 0 1000px #1a1a1b inset;
   -webkit-text-fill-color: #eeeeee;
+}
+
+@media (max-width: 768px) {
+  .modal {
+    top: 5%;
+    transform: translateX(-50%);
+  }
 }
