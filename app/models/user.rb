@@ -30,13 +30,13 @@ class User < ApplicationRecord
          :omniauthable, omniauth_providers: [:twitch]
 
   validate :validate_username
-  validate :unique_uid_for_provider, if: :provider_present?
+  validate :unique_uid_for_provider, if: -> { provider.present? && uid.present? && new_record? }
 
   validates :email, format: URI::MailTo::EMAIL_REGEXP
   validates :username, presence: true,
                        uniqueness: { case_sensitive: false },
-                       length: { minimum: 2, maximum: 25 },
-                       format: { with: /^[a-zA-Z0-9_.]*$/, multiline: true }
+                       length: { minimum: 4, maximum: 25 },
+                       format: { with: /\A[a-zA-Z0-9_]*\z/, multiline: true }
   validates :url, allow_blank: true, length: { minimum: 7, maximum: 74 }
   validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
 
@@ -136,9 +136,5 @@ class User < ApplicationRecord
     return unless provider.present? && uid.present? && User.exists?(provider:, uid:)
 
     errors.add(:uid, 'has already been taken for this provider')
-  end
-
-  def provider_present?
-    provider.present?
   end
 end

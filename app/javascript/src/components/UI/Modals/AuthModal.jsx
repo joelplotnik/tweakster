@@ -190,7 +190,12 @@ export function AuthModal({ authType, onClick }) {
       }
     } catch (error) {
       console.error('Error: ', error.message)
-      toast.error('Error logging in user')
+
+      if (modalType === 'signup') {
+        toast.error('Error signing up user', error)
+      } else {
+        toast.error('Error logging in user')
+      }
     }
   }
 
