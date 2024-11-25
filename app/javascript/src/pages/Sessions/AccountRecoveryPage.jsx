@@ -9,26 +9,57 @@ const AccountRecoveryPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
 
-  const handleEmailChange = e => setEmail(e.target.value)
+  const handleEmailChange = event => setEmail(event.target.value)
 
-  const handleSubmit = async e => {
-    e.preventDefault()
+  const handleSubmit = async event => {
+    event.preventDefault()
     setIsLoading(true)
 
-    // Simulate sending the email
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/v1/users/password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user: { email } }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send recovery email.')
+      }
+
       toast.success('Recovery email sent! Please check your inbox.')
-      setIsLoading(false)
       setEmailSent(true)
-    }, 1000)
+    } catch (error) {
+      toast.error(error.message || 'Something went wrong.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleResendEmail = () => {
+  const handleResendEmail = async event => {
+    event.preventDefault()
     setIsLoading(true)
-    setTimeout(() => {
+
+    try {
+      const response = await fetch('/api/v1/users/password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user: { email } }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to resend recovery email.')
+      }
+
       toast.info('Recovery email resent! Check your inbox.')
+    } catch (error) {
+      toast.error(error.message || 'Something went wrong.')
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   return (

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Form, useParams } from 'react-router-dom'
+import { Form, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import useInput from '../../hooks/useInput'
@@ -7,6 +7,7 @@ import classes from './ResetPasswordPage.module.css'
 
 const ResetPasswordPage = () => {
   const { token } = useParams()
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -29,16 +30,37 @@ const ResetPasswordPage = () => {
     handleInputBlur: handleConfirmPasswordBlur,
   } = useInput(value => value === enteredPassword)
 
-  const handleSubmit = async e => {
-    e.preventDefault()
-
+  const handleSubmit = async event => {
+    event.preventDefault()
     setIsLoading(true)
     setErrorMessage('')
 
-    setTimeout(() => {
-      setIsLoading(false)
+    try {
+      const response = await fetch('/api/v1/users/password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: {
+            reset_password_token: token,
+            password: enteredPassword,
+          },
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to reset password.')
+      }
+
       toast.success('Password successfully reset! You can now log in.')
-    }, 1000)
+      navigate('/')
+    } catch (error) {
+      setErrorMessage(error.message || 'Something went wrong.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   let formIsValid = false
