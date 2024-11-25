@@ -333,8 +333,7 @@ export function AuthModal({ authType, onClick }) {
                 )}
                 {modalType === 'login' && (
                   <Link
-                    // to="/account-recovery"
-                    to="#"
+                    to="account-recovery"
                     className={classes['trouble-link']}
                     target="_blank"
                     rel="noopener noreferrer"

@@ -1,11 +1,10 @@
 import { Outlet } from 'react-router-dom'
 
-function UsersLayout() {
+const AccountRecoveryLayout = () => {
   return (
     <>
       <Outlet />
     </>
   )
 }
-
-export default UsersLayout
+export default AccountRecoveryLayout
