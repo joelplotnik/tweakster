@@ -114,9 +114,14 @@ PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
       description: Faker::Lorem.paragraph(sentence_count: 3)
     )
 
-    image_url = Faker::LoremFlickr.image(size: '300x300')
+    image_url = Faker::LoremFlickr.image(size: '300x400', search_terms: ['games'])
+
     if image_url.present?
-      game.image.attach(io: URI.open(image_url), filename: 'game_image.png')
+      begin
+        game.image.attach(io: URI.open(image_url), filename: "#{name.parameterize}_image.png")
+      rescue StandardError => e
+        puts "Error attaching image for #{game.name}: #{e.message}. Skipping image attachment."
+      end
     else
       puts "No image URL generated for #{game.name}. Skipping image attachment."
     end
