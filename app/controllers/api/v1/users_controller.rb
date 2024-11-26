@@ -1,6 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: [:restricted]
+  before_action :set_user, only: %i[show update destroy following check_ownership]
 
   # This is for testing purposes
   def restricted
@@ -44,48 +45,45 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
-    user = User.find(params[:id])
-    render json: format_user(user)
+    render json: format_user(@user)
   end
 
   def update
-    user = User.find(params[:id])
-
     if current_user.admin?
       if params[:user][:avatar].present?
-        user.avatar.attach(params[:user][:avatar])
+        @user.avatar.attach(params[:user][:avatar])
       elsif params[:user][:remove_avatar] == 'true'
-        user.reset_avatar_to_default
+        @user.reset_avatar_to_default
       end
 
       if params[:user][:new_password].present?
-        if user.update(password: params[:user][:new_password])
-          render_updated_user(user)
+        if @user.update(password: params[:user][:new_password])
+          render_updated_user(@user)
         else
-          render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
-      elsif user.update(user_params.except(:password, :new_password))
-        render_updated_user(user)
+      elsif @user.update(user_params.except(:password, :new_password))
+        render_updated_user(@user)
       else
-        render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
       end
-    elsif user.valid_password?(params[:user][:password])
+    elsif @user.valid_password?(params[:user][:password])
       if params[:user][:avatar].present?
-        user.avatar.attach(params[:user][:avatar])
+        @user.avatar.attach(params[:user][:avatar])
       elsif params[:user][:remove_avatar] == 'true'
-        user.reset_avatar_to_default
+        @user.reset_avatar_to_default
       end
 
       if params[:user][:new_password].present?
-        if user.update(password: params[:user][:new_password])
-          render_updated_user(user)
+        if @user.update(password: params[:user][:new_password])
+          render_updated_user(@user)
         else
-          render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
-      elsif user.update(user_params.except(:password, :new_password))
-        render_updated_user(user)
+      elsif @user.update(user_params.except(:password, :new_password))
+        render_updated_user(@user)
       else
-        render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
       end
     else
       render json: { error: 'Invalid password' }, status: :unauthorized
@@ -93,10 +91,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def destroy
-    user = User.find(params[:id])
-
-    if user.destroy
-      sign_out if !user.admin? || user == current_user
+    if @user.destroy
+      sign_out if !@user.admin? || @user == current_user
       render json: { message: 'User deleted successfully' }
     else
       render json: { error: 'Unauthorized' }, status: :unauthorized
@@ -122,9 +118,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def following
-    user = User.find(params[:id])
-
-    if !current_user.admin? && current_user != user
+    if !current_user.admin? && current_user != @user
       render json: { error: 'Unauthorized' }, status: :unauthorized
       return
     end
@@ -132,8 +126,8 @@ class Api::V1::UsersController < ApplicationController
     page = params[:page] || 1
     per_page = params[:per_page] || 10
 
-    followees = user.followees.order('relationships.created_at DESC')
-                    .paginate(page:, per_page:)
+    followees = @user.followees.order('relationships.created_at DESC')
+                     .paginate(page:, per_page:)
 
     followees_data = followees.map do |followee|
       {
@@ -147,12 +141,15 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def check_ownership
-    user = User.find(params[:id])
-    belongs_to_user = user == current_user || current_user.admin?
+    belongs_to_user = @user == current_user || current_user.admin?
     render json: { belongs_to_user: }
   end
 
   private
+
+  def set_user
+    @user = User.friendly.find(params[:id])
+  end
 
   def user_params
     params.require(:user).permit(:avatar, :username, :email, :url, :bio, :password, :new_password, :favorite_users)

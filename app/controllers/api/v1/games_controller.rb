@@ -1,4 +1,6 @@
 class Api::V1::GamesController < ApplicationController
+  before_action :set_game, only: %i[show update destroy]
+
   def index
     limit = params[:limit] || 5
     page = params[:page] || 1
@@ -72,7 +74,9 @@ class Api::V1::GamesController < ApplicationController
   end
 
   def set_game
-    @game = Game.find(params[:id])
+    @game = Game.friendly.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    render json: { error: 'Game not found' }, status: :not_found
   end
 
   def format_game(game)
