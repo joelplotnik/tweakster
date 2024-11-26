@@ -33,6 +33,9 @@ gem 'devise-api', '~> 0.2.0'
 # An OmniAuth strategy for Twitch
 gem 'omniauth-twitch'
 
+# Slugging and permalink plugins for Active Record
+gem 'friendly_id', '~> 5.5.0'
+
 # Integrates Vite.js for modern JavaScript asset management.
 gem 'vite_rails', '~> 3.0'
 

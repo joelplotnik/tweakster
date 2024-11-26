@@ -26,4 +26,6 @@ class Challenge < ApplicationRecord
   validates :title, presence: true
   validates :description, presence: true
   validates :category, inclusion: { in: CATEGORIES }
+
+  validates_uniqueness_of :title, scope: :game_id, message: 'Title must be unique within a game'
 end

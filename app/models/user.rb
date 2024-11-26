@@ -2,6 +2,9 @@ require 'open-uri'
 require 'mini_magick'
 
 class User < ApplicationRecord
+  extend FriendlyId
+  friendly_id :username, use: :slugged
+
   before_validation :strip_whitespace
 
   has_one_attached :avatar
