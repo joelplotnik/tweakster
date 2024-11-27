@@ -18,7 +18,7 @@ const usersRoutes = [
         element: <UsersPage />,
       },
       {
-        path: ':id',
+        path: ':username',
         id: 'user',
         loader: userLoader,
         children: [

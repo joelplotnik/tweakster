@@ -234,7 +234,7 @@ const MainNavigation = () => {
               <div className={classes['dropdown-menu']}>
                 {token && (
                   <NavLink
-                    to={`users/${user.id}`}
+                    to={`users/${user.username}`}
                     className={({ isActive }) =>
                       isActive ? classes.active : undefined
                     }

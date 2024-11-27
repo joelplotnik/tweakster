@@ -22,8 +22,6 @@ export const action = async () => {
       }
 
       toast.success('Successfully logged out')
-    } else {
-      toast.warn('No active session found')
     }
 
     clearLocalStorage()

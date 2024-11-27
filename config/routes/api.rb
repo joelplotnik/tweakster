@@ -20,7 +20,7 @@ end
 
 namespace :api do
   namespace :v1 do
-    get 'restricted', to: 'users#restricted'
+    get 'me', to: 'users#me'
     get 'popular_users', to: 'users#popular_users'
     get 'popular_games', to: 'games#popular_games'
     get 'popular_challenges', to: 'challenges#popular_challenges'

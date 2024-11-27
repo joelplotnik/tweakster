@@ -90,13 +90,9 @@ export function AuthModal({ authType, onClick }) {
   const storeUserData = async response => {
     const responseData = await response.json()
 
-    const { token, refresh_token, expires_in, resource_owner } = responseData
+    const { token, refresh_token, expires_in } = responseData
 
     storeTokens(token, refresh_token, expires_in)
-
-    const { id, username, avatar_url, role } = resource_owner
-
-    dispatch(userActions.setUser({ id, username, avatar_url, role }))
   }
 
   const handleSubmit = async event => {

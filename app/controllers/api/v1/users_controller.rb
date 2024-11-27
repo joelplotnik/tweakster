@@ -1,15 +1,14 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, only: [:restricted]
+  before_action :authenticate_devise_api_token!, only: %i[me]
   before_action :set_user, only: %i[show update destroy following check_ownership]
 
-  # This is for testing purposes
-  def restricted
+  def me
     devise_api_token = current_devise_api_token
-    if devise_api_token
-      render json: { message: "You are logged in as #{devise_api_token.resource_owner.username}" }, status: :ok
+    if devise_api_token && (user = devise_api_token.resource_owner)
+      render json: format_user(user), status: :ok
     else
-      render json: { message: 'You are not logged in' }, status: :ok
+      render json: { error: 'User not authenticated' }, status: :unauthorized
     end
   end
 

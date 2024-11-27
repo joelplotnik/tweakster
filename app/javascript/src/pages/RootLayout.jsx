@@ -14,37 +14,51 @@ import { EXPIRED_TOKEN } from '../constants/constants'
 import { CableProvider } from '../context/Cable'
 import RefreshContext from '../context/refresh'
 import { userActions } from '../store/user'
-import { getTokenDuration } from '../util/auth'
+import { fetchUserData } from '../store/user-actions'
+import { getTokenDuration, refreshAuthToken } from '../util/auth'
 
 const RootLayout = () => {
   const [refreshRoot, setRefreshRoot] = useState(false)
   const token = useLoaderData()
   const submit = useSubmit()
   const dispatch = useDispatch()
-  const isUserLocalStorageChange = key => key === 'user'
 
   useEffect(() => {
-    if (!token) {
-      return
+    let logoutTimeout
+
+    const handleTokenExpiration = async () => {
+      const refreshedToken = await refreshAuthToken()
+      if (!refreshedToken) {
+        handleLogout()
+      } else {
+        const newTokenDuration = getTokenDuration()
+        logoutTimeout = setTimeout(
+          handleTokenExpiration,
+          newTokenDuration - 5000
+        )
+      }
     }
 
-    if (token === EXPIRED_TOKEN) {
-      dispatch(userActions.clearUser())
-      submit(null, { action: '/logout', method: 'POST' })
-      return
+    if (token && token !== EXPIRED_TOKEN) {
+      dispatch(fetchUserData())
+      const tokenDuration = getTokenDuration()
+
+      logoutTimeout = setTimeout(handleTokenExpiration, tokenDuration - 5000)
+    } else if (token === EXPIRED_TOKEN) {
+      handleLogout()
     }
 
-    const tokenDuration = getTokenDuration()
+    return () => clearTimeout(logoutTimeout)
+  }, [token, dispatch, submit])
 
-    setTimeout(async () => {
-      dispatch(userActions.clearUser())
-      submit(null, { action: '/logout', method: 'POST' })
-    }, tokenDuration)
-  }, [token, submit, dispatch])
+  const handleLogout = () => {
+    dispatch(userActions.clearUser())
+    submit(null, { action: '/logout', method: 'POST' })
+  }
 
   useEffect(() => {
     const handleStorageChange = event => {
-      if (isUserLocalStorageChange(event.key)) {
+      if (event.key === 'token') {
         setRefreshRoot(true)
       }
     }

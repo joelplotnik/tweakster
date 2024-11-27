@@ -13,7 +13,7 @@ const gamesRoutes = [
         element: <GamesPage />,
       },
       {
-        path: ':id',
+        path: ':name',
         id: 'game',
         loader: gameLoader,
         children: [

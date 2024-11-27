@@ -1,6 +1,8 @@
 import { json, redirect } from 'react-router-dom'
 
 import { API_URL, EXPIRED_TOKEN } from '../constants/constants'
+import store from '../store'
+import { userActions } from '../store/user'
 
 export function storeTokens(token, refresh, expiration) {
   localStorage.setItem('token', token)
@@ -31,11 +33,7 @@ export async function getAuthToken() {
 
   if (tokenDuration < 0) {
     const refreshedToken = await refreshAuthToken()
-    if (refreshedToken) {
-      return refreshedToken
-    } else {
-      return EXPIRED_TOKEN
-    }
+    return refreshedToken || EXPIRED_TOKEN
   }
 
   return token
@@ -50,7 +48,7 @@ export function getTokenDuration() {
   return duration
 }
 
-async function refreshAuthToken() {
+export async function refreshAuthToken() {
   const refresh = localStorage.getItem('refresh')
 
   if (!refresh) {
