@@ -1,6 +1,11 @@
+import { RiGhostLine, RiSwordLine } from 'react-icons/ri'
 import { useSelector } from 'react-redux'
 import { json, useRouteLoaderData } from 'react-router-dom'
 
+import AttemptsList from '../../components/Content/Lists/AttemptsList'
+import ChallengesList from '../../components/Content/Lists/ChallengesList'
+import ProfileCard from '../../components/Content/Users/ProfileCard'
+import Tabs from '../../components/UI/Tabs'
 import { API_URL } from '../../constants/constants'
 import store from '../../store'
 import { userPageActions } from '../../store/userPage'
@@ -13,14 +18,28 @@ const UserPage = () => {
   const currentUser = useSelector(state => state.user.user)
   const isOwner = currentUser?.username === user.username
 
+  const attemptsCount = 34 // temporary
+  const challengesCount = 189 // temporary
+
+  const tabs = [
+    {
+      key: 'attempts',
+      label: `Attempts (${attemptsCount})`,
+      icon: <RiGhostLine />,
+      content: <AttemptsList entity={user} />,
+    },
+    {
+      key: 'challenges',
+      label: `Challenges (${challengesCount})`,
+      icon: <RiSwordLine />,
+      content: <ChallengesList entity={user} />,
+    },
+  ]
+
   return (
-    <div>
-      <h1>{user.username}'s Profile</h1>
-      {isOwner ? (
-        <button>Edit Profile</button>
-      ) : (
-        <p>You can only view this profile.</p>
-      )}
+    <div className={classes['user-page']}>
+      <ProfileCard user={user} isOwner={isOwner} />
+      <Tabs tabs={tabs} />
     </div>
   )
 }

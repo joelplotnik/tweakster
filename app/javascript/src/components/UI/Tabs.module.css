@@ -1,0 +1,39 @@
+.tabs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.tab-list {
+  display: flex;
+  justify-content: center;
+  border-top: 0.5px solid #555;
+  margin-bottom: 10px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-top: 1px solid transparent;
+  font-size: 0.9em;
+  color: #a9a9a9;
+  font-weight: bold;
+}
+
+.tab.active {
+  border-top: 1px solid #eeeeee;
+  color: #eeeeee;
+}
+
+.icon {
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+.tab-content {
+  padding: 20px 0;
+}

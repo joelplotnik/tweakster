@@ -1,0 +1,137 @@
+.profile-card {
+  justify-content: center;
+  align-items: center;
+  background-color: #1a1a1b;
+  display: flex;
+  width: 100%;
+  max-width: 700px;
+  min-width: 700px;
+  padding: 12px;
+  gap: 12px;
+}
+
+.avatar-wrapper {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.avatar {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-width: 50%;
+  word-wrap: break-word;
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.username {
+  font-size: 1.2em;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.follow-button,
+.edit-button {
+  background-color: #ff5e57;
+  color: #ffffff;
+  font-size: 0.8em;
+  font-weight: bold;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.follow-button:hover,
+.edit-button:hover {
+  background-color: #cc4b44;
+}
+
+.stats-section {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 12px;
+}
+
+.stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stats-number {
+  font-size: 1em;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.stats-label {
+  font-size: 0.8em;
+  color: #eeeeee;
+}
+
+.bio-section {
+  margin-top: 16px;
+}
+
+.bio,
+.currently-playing,
+.url a {
+  font-size: 0.9em;
+  color: #eeeeee;
+  word-wrap: break-word;
+}
+
+.url a {
+  color: #ff5e57;
+  text-decoration: none;
+}
+
+.url a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .profile-card {
+    flex-direction: column;
+    align-items: center;
+    min-width: 100%;
+  }
+
+  .avatar-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .user-info {
+    max-width: 90%;
+  }
+
+  .stats-section {
+    align-items: center;
+  }
+}
