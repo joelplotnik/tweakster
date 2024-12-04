@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
-import { useDispatch } from 'react-redux'
 import { Form, Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -12,13 +11,11 @@ import {
   TWITCH_REDIRECT_URI,
 } from '../../../constants/constants'
 import useInput from '../../../hooks/useInput'
-import { userActions } from '../../../store/user'
 import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
 import { Backdrop } from './Backdrop'
 
 export function AuthModal({ authType, onClick }) {
-  const dispatch = useDispatch()
   const [modalType, setModalType] = useState(authType)
   const [signupError, setSignupError] = useState(null)
   const [loginError, setLoginError] = useState(null)

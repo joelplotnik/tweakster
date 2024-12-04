@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { RiArrowLeftLine, RiCloseLine, RiSearchLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
@@ -11,6 +11,7 @@ function SearchBar({ mobile, handleBackClick }) {
   const [gameResults, setGameResults] = useState([])
   const [isFocused, setIsFocused] = useState(false)
   const searchRef = useRef(null)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     const handleClickOutside = event => {
@@ -52,6 +53,12 @@ function SearchBar({ mobile, handleBackClick }) {
     }
   }, [searchTerm, isFocused])
 
+  useEffect(() => {
+    if (mobile && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [mobile])
+
   const handleInputChange = event => {
     setSearchTerm(event.target.value)
   }
@@ -89,6 +96,7 @@ function SearchBar({ mobile, handleBackClick }) {
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           autoComplete="off"
+          ref={inputRef}
         />
         <div className={classes['clear-icon']} onClick={clearInput}>
           {searchTerm && <RiCloseLine className={classes.icon} />}

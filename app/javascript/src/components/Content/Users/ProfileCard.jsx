@@ -24,6 +24,10 @@ const ProfileCard = ({ user, isOwner }) => {
         </div>
         <div className={classes['stats-section']}>
           <div className={classes['stats-item']}>
+            <span className={classes['stats-number']}>120</span>
+            <span className={classes['stats-label']}>Points</span>
+          </div>
+          <div className={classes['stats-item']}>
             <span className={classes['stats-number']}>500</span>
             <span className={classes['stats-label']}>Followers</span>
           </div>
@@ -31,21 +35,21 @@ const ProfileCard = ({ user, isOwner }) => {
             <span className={classes['stats-number']}>180</span>
             <span className={classes['stats-label']}>Following</span>
           </div>
-          <div className={classes['stats-item']}>
-            <span className={classes['stats-number']}>120</span>
-            <span className={classes['stats-label']}>Points</span>
-          </div>
         </div>
         <div className={classes['bio-section']}>
-          <p className={classes['bio']}>{user.bio}</p>
-          <p className={classes['currently-playing']}>
-            Currently Playing: {user.currently_playing}
-          </p>
-          <p className={classes['url']}>
-            <a href={user.url} target="_blank" rel="noopener noreferrer">
-              Website
-            </a>
-          </p>
+          {user.bio && <p className={classes['bio']}>{user.bio}</p>}
+          {user.url && (
+            <p className={classes['url']}>
+              <a href={user.url} target="_blank" rel="noopener noreferrer">
+                Website
+              </a>
+            </p>
+          )}
+          {user.currently_playing && (
+            <p className={classes['currently-playing']}>
+              Currently Playing: {user.currently_playing}
+            </p>
+          )}
         </div>
       </div>
     </div>
