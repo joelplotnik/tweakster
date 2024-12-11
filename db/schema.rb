@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_25_232404) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_11_202804) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -175,6 +175,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_25_232404) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_games", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "game_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_id"], name: "index_user_games_on_game_id"
+    t.index ["user_id"], name: "index_user_games_on_user_id"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -186,8 +195,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_25_232404) do
     t.string "username"
     t.string "role", default: "user"
     t.string "bio", default: ""
-    t.string "url", default: ""
-    t.string "currently_playing", default: ""
     t.string "provider", default: ""
     t.string "uid", default: ""
     t.string "slug"
@@ -220,6 +227,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_25_232404) do
   add_foreign_key "difficulties", "users"
   add_foreign_key "likes", "comments"
   add_foreign_key "likes", "users"
+  add_foreign_key "user_games", "games"
+  add_foreign_key "user_games", "users"
   add_foreign_key "votes", "challenges"
   add_foreign_key "votes", "users"
 end

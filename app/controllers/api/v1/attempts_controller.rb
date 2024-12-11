@@ -110,14 +110,17 @@ class Api::V1::AttemptsController < ApplicationController
   end
 
   def format_attempt(attempt)
-    attempt.as_json(include: {
-                      challenge: {
-                        include: :game
-                      },
-                      user: {
-                        only: [:username],
-                        methods: [:avatar_url]
-                      }
-                    })
+    attempt.as_json(
+      include: {
+        challenge: {
+          include: :game
+        },
+        user: {
+          only: %i[username slug],
+          methods: [:avatar_url]
+        }
+      },
+      methods: [:comments_count]
+    )
   end
 end

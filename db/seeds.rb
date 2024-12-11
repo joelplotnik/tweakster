@@ -2,6 +2,7 @@
 User.delete_all
 Relationship.delete_all
 Game.delete_all
+UserGame.delete_all
 Challenge.delete_all
 Attempt.delete_all
 Comment.delete_all
@@ -24,9 +25,7 @@ users = []
     email:,
     password: 'Password11!!',
     username: Faker::Internet.username,
-    url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100),
-    currently_playing: Faker::Game.title
+    bio: Faker::Lorem.paragraph_by_chars(number: 150)
   )
 
   avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
@@ -57,9 +56,7 @@ unless User.exists?(email: admin_email)
     password: 'Password11!!',
     username: 'superadmin',
     role: 'admin',
-    url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100),
-    currently_playing: Faker::Game.title
+    bio: Faker::Lorem.paragraph_by_chars(number: 150)
   )
 
   avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
@@ -134,6 +131,22 @@ PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
   end
 end
 
+# Create UserGames
+if games.any?
+  User.all.each do |user|
+    game = games.sample
+    begin
+      UserGame.create!(user:, game:)
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error assigning game to user #{user.name}: #{e.message}. Skipping this user."
+    rescue StandardError => e
+      puts "Error assigning game to user #{user.name}: #{e.message}. Skipping this user."
+    end
+  end
+else
+  puts 'No games available to assign to users.'
+end
+
 # Create Challenges
 categories = [
   'Perfectionist',
@@ -156,7 +169,7 @@ challenges = []
   begin
     challenge = Challenge.create!(
       title:,
-      description: Faker::Lorem.paragraph(sentence_count: 5),
+      description: Faker::Lorem.paragraph(sentence_count: rand(5..15)),
       game: games.sample,
       user: users.sample,
       category: categories.sample

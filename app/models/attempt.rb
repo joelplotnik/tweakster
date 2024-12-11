@@ -11,6 +11,10 @@ class Attempt < ApplicationRecord
   after_create :increment_attempt_count
   after_destroy :decrement_attempt_count
 
+  def comments_count
+    comments.size
+  end
+
   private
 
   def increment_attempt_count

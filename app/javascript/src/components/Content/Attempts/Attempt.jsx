@@ -29,9 +29,6 @@ const Attempt = ({ attempt, isUserPage }) => {
     setIsExpanded(prev => !prev)
   }
 
-  challenge.description =
-    'Navigate the treacherous Labyrinth of Echoes, an ancient maze where the walls shift and time bends. Solve puzzles, avoid traps, and outsmart spectral guardians to reach the heart of the labyrinth. But beware: the maze itself plays tricks on your senses, and every choice could lead to your doom. Only the cleverest will uncover the labyrinths deepest secrets and escape with the legendary artifact before the magic consumes them.'
-
   const displayedDescription = isExpanded
     ? challenge.description
     : challenge.description.length > descriptionLimit
@@ -48,7 +45,9 @@ const Attempt = ({ attempt, isUserPage }) => {
               alt={`${user.username}'s avatar`}
               className={classes.avatar}
             />
-            <span className={classes.username}>{user.username}</span>
+            <Link to={`/users/${user.slug}`} className={classes.username}>
+              {user.username}
+            </Link>
           </div>
         )}
         <div
@@ -56,7 +55,12 @@ const Attempt = ({ attempt, isUserPage }) => {
             isUserPage ? classes['game-info-userpage'] : classes['game-info']
           }
         >
-          <p className={classes['game-name']}>{challenge.game.name}</p>
+          <Link
+            to={`/games/${challenge.game.slug}`}
+            className={classes['game-name']}
+          >
+            {challenge.game.name}
+          </Link>
           <p className={classes['game-platform']}>{challenge.game.platform}</p>
         </div>
       </div>
@@ -83,52 +87,56 @@ const Attempt = ({ attempt, isUserPage }) => {
           <span className={classes['challenge-description-content']}>
             {displayedDescription}
           </span>
-          {challenge.description.length > descriptionLimit && (
-            <button
-              onClick={toggleExpanded}
-              className={classes['show-more-button']}
+          <div className={classes['desription-actions']}>
+            {challenge.description.length > descriptionLimit && (
+              <button
+                onClick={toggleExpanded}
+                className={classes['show-more-button']}
+              >
+                {isExpanded ? 'Show Less' : 'Show More'}
+              </button>
+            )}
+            <Link
+              to={`/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`}
+              className={classes['view-full-link']}
             >
-              {isExpanded ? 'Show Less' : 'Show More'}
-            </button>
-          )}
-          <Link
-            to={`/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`}
-            className={classes['view-full-link']}
-          >
-            View Full Attempt
-          </Link>
+              View Full Attempt
+            </Link>
+          </div>
         </div>
         {status === 'Complete' && (
-          <div className={classes['completion-details']}>
-            <p className={classes['completion-date']}>
-              Completed {moment(completed_at).fromNow()}
-            </p>
-            <div className={classes['proof']}>
-              {proof_url ? (
-                proof_url.endsWith('.mp4') ? (
-                  <video className={classes['proof-video']} controls>
-                    <source src={proof_url} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+          <>
+            <div className={classes['completion-details']}>
+              <p className={classes['completion-date']}>
+                Completed {moment(completed_at).fromNow()}
+              </p>
+              <div className={classes['proof']}>
+                {proof_url ? (
+                  proof_url.endsWith('.mp4') ? (
+                    <video className={classes['proof-video']} controls>
+                      <source src={proof_url} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <img
+                      src={proof_url}
+                      alt="Proof of Completion"
+                      className={classes['proof-image']}
+                    />
+                  )
                 ) : (
-                  <img
-                    src={proof_url}
-                    alt="Proof of Completion"
-                    className={classes['proof-image']}
-                  />
-                )
-              ) : (
-                <p>No proof provided</p>
-              )}
+                  <p>No proof provided</p>
+                )}
+              </div>
             </div>
-          </div>
+            <div className={classes['bottom-bar']}>
+              <ApprovalButton approvalsCount={formatNumber(approvals_count)} />
+              <CommentButton commentsCount={formatNumber(comments_count)} />
+              <ShareButton />
+              <ReportButton />
+            </div>
+          </>
         )}
-        <div className={classes['bottom-bar']}>
-          <ApprovalButton approvalsCount={formatNumber(approvals_count)} />
-          <CommentButton commentsCount={formatNumber(53)} />
-          <ShareButton />
-          <ReportButton />
-        </div>
       </div>
     </div>
   )

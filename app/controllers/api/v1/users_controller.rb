@@ -44,7 +44,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
-    render json: format_user(@user)
+    render json: format_user(@user).merge({
+                                            currently_playing: @user.currently_playing_game
+                                          })
   end
 
   def update

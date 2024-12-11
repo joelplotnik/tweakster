@@ -8,6 +8,8 @@ class User < ApplicationRecord
   before_validation :strip_whitespace
 
   has_one_attached :avatar
+  has_one :user_game
+  has_one :game, through: :user_game
   has_many :challenges
   has_many :attempts, dependent: :destroy
   has_many :likes, dependent: :destroy
@@ -40,7 +42,6 @@ class User < ApplicationRecord
                        uniqueness: { case_sensitive: false },
                        length: { minimum: 4, maximum: 25 },
                        format: { with: /\A[a-zA-Z0-9_]*\z/, multiline: true }
-  validates :url, allow_blank: true, length: { minimum: 7, maximum: 74 }
   validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
 
   after_create :set_default_avatar, if: -> { !avatar.attached? }
@@ -116,6 +117,13 @@ class User < ApplicationRecord
     user
   end
 
+  def currently_playing_game
+    user_game = self.user_game
+    return nil unless user_game
+
+    user_game.game.slice(:name, :slug)
+  end
+
   private
 
   def validate_username
@@ -131,7 +139,6 @@ class User < ApplicationRecord
   end
 
   def strip_whitespace
-    url&.strip!
     bio&.strip!
   end
 

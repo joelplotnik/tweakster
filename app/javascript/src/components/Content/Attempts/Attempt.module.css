@@ -32,6 +32,10 @@
   color: #eeeeee;
 }
 
+.username:hover {
+  text-decoration: underline;
+}
+
 .game-info {
   text-align: right;
 }
@@ -47,6 +51,10 @@
   margin: 0;
   font-size: 0.85rem;
   color: #eeeeee;
+}
+
+.game-name:hover {
+  text-decoration: underline;
 }
 
 .challenge-header {
@@ -107,6 +115,10 @@
   display: inline-block;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.desription-actions {
+  margin-top: 5px;
 }
 
 .show-more-button {

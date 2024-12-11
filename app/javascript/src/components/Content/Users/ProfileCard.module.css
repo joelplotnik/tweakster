@@ -7,7 +7,7 @@
   width: 100%;
   max-width: 700px;
   min-width: 700px;
-  padding: 8px 12px 0 12px;
+  padding: 5px 12px 12px 12px;
   gap: 12px;
 }
 
@@ -92,10 +92,6 @@
 .stats-label {
   font-size: 0.8em;
   color: #eeeeee;
-}
-
-.bio-section {
-  margin-bottom: 12px;
 }
 
 .bio,
