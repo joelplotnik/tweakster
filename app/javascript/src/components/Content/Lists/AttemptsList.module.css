@@ -1,0 +1,22 @@
+.attempts-list {
+  padding: 0;
+}
+
+.header {
+  font-size: 1.5em;
+  margin-bottom: 16px;
+}
+
+.loading {
+  text-align: center;
+  padding: 16px;
+  font-size: 1.2em;
+  color: #666;
+}
+
+.end-message {
+  text-align: center;
+  padding: 16px;
+  font-size: 1em;
+  color: #999;
+}

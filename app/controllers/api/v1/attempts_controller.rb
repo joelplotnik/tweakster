@@ -1,20 +1,35 @@
-class Api::V1::AttempsController < ApplicationController
+class Api::V1::AttemptsController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, except: %i[index]
   before_action :set_user, only: [:index]
   before_action :set_challenge, only: [:index]
   before_action :set_attempt, only: %i[show update destroy]
 
   # GET /api/v1/users/:user_id/attempts
+  # GET /api/v1/users/:user_id/challenges/:challenge_id/attempts
   # GET /api/v1/games/:game_id/challenges/:challenge_id/attempts
   def index
+    limit = params[:limit] || 25
+    page = params[:page] || 1
+
     if @challenge
-      @attempts = @challenge.attempts.includes(:challenge, challenge: :game)
+      @attempts = @challenge.attempts
+                            .includes(:challenge, challenge: :game)
+                            .paginate(page:, per_page: limit)
     elsif @user
-      @attempts = @user.attempts.includes(:challenge, challenge: :game)
+      @attempts = @user.attempts
+                       .includes(:challenge, challenge: :game)
+                       .paginate(page:, per_page: limit)
     else
       render json: { error: 'User or challenge must be specified' }, status: :unprocessable_entity and return
     end
 
-    render json: @attempts.map { |attempt| format_attempt(attempt) }
+    render json: {
+      attempts: @attempts.map { |attempt| format_attempt(attempt) },
+      current_page: page.to_i,
+      total_pages: @attempts.total_pages,
+      total_attempts: @attempts.total_entries
+    }
   end
 
   # GET /api/v1/popular_attempts
@@ -83,21 +98,25 @@ class Api::V1::AttempsController < ApplicationController
   end
 
   def set_user
-    @user = User.find(params[:user_id]) if params[:user_id]
+    @user = User.friendly.find(params[:user_id]) if params[:user_id]
   end
 
   def set_challenge
-    @challenge = Challenge.find(params[:challenge_id]) if params[:challenge_id]
+    @challenge = Challenge.friendly.find(params[:challenge_id]) if params[:challenge_id]
   end
 
   def set_attempt
-    @attempt = Attempt.find(params[:id])
+    @attempt = Attempt.find(params[:attempt_id])
   end
 
   def format_attempt(attempt)
     attempt.as_json(include: {
                       challenge: {
                         include: :game
+                      },
+                      user: {
+                        only: [:username],
+                        methods: [:avatar_url]
                       }
                     })
   end

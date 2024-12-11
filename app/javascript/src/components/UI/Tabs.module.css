@@ -8,7 +8,6 @@
   display: flex;
   justify-content: center;
   border-top: 0.5px solid #555;
-  margin-bottom: 10px;
 }
 
 .tab {
@@ -35,5 +34,5 @@
 }
 
 .tab-content {
-  padding: 20px 0;
+  padding: 0;
 }

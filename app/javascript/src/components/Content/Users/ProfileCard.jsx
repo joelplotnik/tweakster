@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import classes from './ProfileCard.module.css'
 
 const ProfileCard = ({ user, isOwner }) => {
@@ -38,17 +40,22 @@ const ProfileCard = ({ user, isOwner }) => {
         </div>
         <div className={classes['bio-section']}>
           {user.bio && <p className={classes['bio']}>{user.bio}</p>}
-          {user.url && (
+          {/* {user.url && (
             <p className={classes['url']}>
               <a href={user.url} target="_blank" rel="noopener noreferrer">
                 Website
               </a>
             </p>
-          )}
+          )} */}
           {user.currently_playing && (
-            <p className={classes['currently-playing']}>
-              Currently Playing: {user.currently_playing}
-            </p>
+            <div className={classes['currently-playing-container']}>
+              <span className={classes['currently-playing-label']}>
+                Currently Playing
+              </span>
+              <Link className={classes['currently-playing']}>
+                {user.currently_playing}
+              </Link>
+            </div>
           )}
         </div>
       </div>

@@ -26,13 +26,13 @@ const UserPage = () => {
       key: 'attempts',
       label: `Attempts (${attemptsCount})`,
       icon: <RiGhostLine />,
-      content: <AttemptsList entity={user} />,
+      content: <AttemptsList />,
     },
     {
       key: 'challenges',
       label: `Challenges (${challengesCount})`,
       icon: <RiSwordLine />,
-      content: <ChallengesList entity={user} />,
+      content: <ChallengesList />,
     },
   ]
 

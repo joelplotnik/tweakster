@@ -2,12 +2,12 @@ export const formatNumber = number => {
   if (number < 10000) {
     return number.toLocaleString()
   } else if (number < 100000) {
-    return (number / 1000).toFixed(1) + 'k'
+    return Math.floor((number / 1000) * 10) / 10 + 'k'
   } else if (number < 1000000) {
-    return (number / 1000).toFixed(0) + 'k'
+    return Math.floor((number / 1000) * 10) / 10 + 'k'
   } else if (number < 1000000000) {
-    return (number / 1000000).toFixed(1) + 'm'
+    return Math.floor((number / 1000000) * 10) / 10 + 'm'
   } else {
-    return (number / 1000000000).toFixed(1) + 'b'
+    return Math.floor((number / 1000000000) * 10) / 10 + 'b'
   }
 }

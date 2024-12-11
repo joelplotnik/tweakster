@@ -1,0 +1,15 @@
+.comment-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.25em;
+}
+
+.icon {
+  color: #eeeeee;
+}
+
+.comment-count {
+  margin-left: 5px;
+  font-size: 12px;
+}

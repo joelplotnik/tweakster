@@ -21,7 +21,7 @@ const gamesRoutes = [
             index: true,
             element: <GamePage />,
           },
-          ...challengesRoutes,
+          ...challengesRoutes('name'),
           ,
         ],
       },

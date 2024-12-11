@@ -1,5 +1,5 @@
 concern :challengeable do
-  resources :challenges, only: %i[show index create update destroy] do
+  resources :challenges, param: :challenge_id, only: %i[show index create update destroy] do
     resources :votes, only: %i[create]
     resources :difficulty_ratings, only: [:create]
 
@@ -8,7 +8,7 @@ concern :challengeable do
       get 'replies', to: 'comments#replies', on: :member
     end
 
-    resources :attempts, only: %i[index create] do
+    resources :attempts, param: :attempts_id, only: %i[index create] do
       resources :approvals, only: [:create]
 
       resources :comments, only: %i[index create update destroy] do
@@ -26,12 +26,14 @@ namespace :api do
     get 'popular_challenges', to: 'challenges#popular_challenges'
     get 'popular_attempts', to: 'attempts#popular_attempts'
 
-    resources :users, only: %i[show index update destroy] do
+    resources :users, param: :user_id, only: %i[show index update destroy] do
       member do
         post 'follow', to: 'relationships#create'
         delete 'unfollow', to: 'relationships#destroy'
         get 'following'
         get 'check_ownership'
+
+        resources :attempts, param: :attempts_id, only: %i[index show]
       end
 
       collection do
@@ -41,7 +43,7 @@ namespace :api do
       concerns :challengeable
     end
 
-    resources :games, only: %i[show index create update destroy] do
+    resources :games, param: :game_id, only: %i[show index create update destroy] do
       collection do
         get 'search'
       end

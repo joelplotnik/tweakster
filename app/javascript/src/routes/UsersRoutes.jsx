@@ -37,7 +37,7 @@ const usersRoutes = [
             element: <FollowingPage />,
             loader: checkAuthLoader,
           },
-          ...challengesRoutes,
+          ...challengesRoutes('username'),
         ],
       },
     ],

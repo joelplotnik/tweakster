@@ -4,7 +4,7 @@ const GamePage = () => {
 export default GamePage
 
 export async function loader({ params }) {
-  const { id } = params
+  const { name } = params
 
   const token = 'placeholder_token'
 

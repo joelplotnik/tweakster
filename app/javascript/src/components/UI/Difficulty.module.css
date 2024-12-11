@@ -1,0 +1,14 @@
+.difficulty {
+  display: flex;
+  gap: 4px;
+}
+
+.filled {
+  color: #ffd447;
+  font-size: 1rem;
+}
+
+.unfilled {
+  color: #eeeeee;
+  font-size: 1rem;
+}

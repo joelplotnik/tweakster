@@ -147,7 +147,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def set_user
-    @user = User.friendly.find(params[:id])
+    @user = User.friendly.find(params[:user_id])
   end
 
   def user_params
