@@ -1,28 +1,20 @@
 class Api::V1::AttemptsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, except: %i[index]
-  before_action :set_user, only: [:index]
+  before_action :authenticate_devise_api_token!, only: %i[create update destroy]
   before_action :set_challenge, only: [:index]
   before_action :set_attempt, only: %i[show update destroy]
 
-  # GET /api/v1/users/:user_id/attempts
   # GET /api/v1/users/:user_id/challenges/:challenge_id/attempts
   # GET /api/v1/games/:game_id/challenges/:challenge_id/attempts
   def index
     limit = params[:limit] || 25
     page = params[:page] || 1
 
-    if @challenge
-      @attempts = @challenge.attempts
-                            .includes(:challenge, challenge: :game)
-                            .paginate(page:, per_page: limit)
-    elsif @user
-      @attempts = @user.attempts
-                       .includes(:challenge, challenge: :game)
-                       .paginate(page:, per_page: limit)
-    else
-      render json: { error: 'User or challenge must be specified' }, status: :unprocessable_entity and return
-    end
+    return render json: { error: 'Challenge must be specified' }, status: :unprocessable_entity unless @challenge
+
+    @attempts = @challenge.attempts
+                          .includes(:challenge, challenge: :game)
+                          .paginate(page:, per_page: limit)
 
     render json: {
       attempts: @attempts.map { |attempt| format_attempt(attempt) },
@@ -32,26 +24,10 @@ class Api::V1::AttemptsController < ApplicationController
     }
   end
 
-  # GET /api/v1/popular_attempts
-  def popular_attempts
-    limit = params[:limit] || 5
-    page = params[:page] || 1
-    point_in_time = params[:point_in_time] || Time.current
-
-    popular_attempts = Attempt
-                       .left_joins(:approvals)
-                       .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
-                       .group('attempts.id')
-                       .order('COUNT(approvals.id) DESC')
-                       .paginate(page:, per_page: limit)
-                       .includes(:challenge)
-                       .map { |attempt| format_attempt(attempt) }
-
-    render json: { attempts: popular_attempts, point_in_time: }, status: :ok
-  end
-
-  # GET /api/v1/users/:user_id/attempts/:id
+  # GET /api/v1/users/:user_id/challenges/:challenge_id/attempts/:id
+  # GET /api/v1/games/:game_id/challenges/:challenge_id/attempts/:id
   def show
+    puts 'Attempt: ', @attempt
     render json: format_attempt(@attempt)
   end
 
@@ -91,6 +67,24 @@ class Api::V1::AttemptsController < ApplicationController
     end
   end
 
+  # GET /api/v1/popular_attempts
+  def popular_attempts
+    limit = params[:limit] || 5
+    page = params[:page] || 1
+    point_in_time = params[:point_in_time] || Time.current
+
+    popular_attempts = Attempt
+                       .left_joins(:approvals)
+                       .where('approvals.created_at >= ? AND approvals.created_at <= ?', 7.days.ago, point_in_time)
+                       .group('attempts.id')
+                       .order('COUNT(approvals.id) DESC')
+                       .paginate(page:, per_page: limit)
+                       .includes(:challenge)
+                       .map { |attempt| format_attempt(attempt) }
+
+    render json: { attempts: popular_attempts, point_in_time: }, status: :ok
+  end
+
   private
 
   def attempt_params
@@ -102,11 +96,11 @@ class Api::V1::AttemptsController < ApplicationController
   end
 
   def set_challenge
-    @challenge = Challenge.friendly.find(params[:challenge_id]) if params[:challenge_id]
+    @challenge = Challenge.find(params[:challenge_id]) if params[:challenge_id]
   end
 
   def set_attempt
-    @attempt = Attempt.find(params[:attempt_id])
+    @attempt = Attempt.find(params[:id]) if params[:id]
   end
 
   def format_attempt(attempt)

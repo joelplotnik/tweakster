@@ -1,17 +1,32 @@
-require 'will_paginate/array'
-
 class Api::V1::ChallengesController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create update destroy]
+  before_action :set_user, only: [:index]
+  before_action :set_game, only: [:index]
   before_action :set_challenge, only: %i[show update destroy]
 
   def index
-    challenges = Challenge.all
+    limit = params[:limit] || 25
+    page = params[:page] || 1
 
-    challenges = challenges.where(user_id: params[:user_id]) if params[:user_id]
-    challenges = challenges.where(game_id: params[:game_id]) if params[:game_id]
+    if @user
+      challenges = @user.challenges
+                        .includes(:user, :game)
+                        .paginate(page:, per_page: limit)
+    elsif @game
+      challenges = @game.challenges
+                        .includes(:user, :game)
+                        .paginate(page:, per_page: limit)
+    else
+      render json: { error: 'User or game must be specified' }, status: :unprocessable_entity and return
+    end
 
-    challenges = challenges.paginate(page: params[:page], per_page: params[:per_page] || 10)
-
-    render json: challenges.map { |challenge| format_challenge(challenge) }, status: :ok
+    render json: {
+      challenges: challenges.map { |challenge| format_challenge(challenge) },
+      current_page: page.to_i,
+      total_pages: challenges.total_pages,
+      total_challenges: challenges.total_entries
+    }
   end
 
   def popular_challenges
@@ -31,13 +46,7 @@ class Api::V1::ChallengesController < ApplicationController
   end
 
   def show
-    @challenge = find_challenge
-
-    if @challenge
-      render json: format_challenge(@challenge)
-    else
-      render json: { error: 'Challenge not found' }, status: :not_found
-    end
+    render json: format_attempt(@challenge)
   end
 
   def create
@@ -78,19 +87,16 @@ class Api::V1::ChallengesController < ApplicationController
     params.require(:challenge).permit(:title, :description, :category)
   end
 
-  def set_challenge
-    @challenge = find_challenge
-    render json: { error: 'Challenge not found' }, status: :not_found unless @challenge
+  def set_user
+    @user = User.friendly.find(params[:user_id]) if params[:user_id]
   end
 
-  def find_challenge
-    if params[:user_id]
-      Challenge.find_by(id: params[:id], user_id: params[:user_id])
-    elsif params[:game_id]
-      Challenge.find_by(id: params[:id], game_id: params[:game_id])
-    else
-      Challenge.find_by(id: params[:id])
-    end
+  def set_game
+    @game = Game.friendly.find(params[:game_id]) if params[:game_id]
+  end
+
+  def set_challenge
+    @challenge = Challenge.find(params[:id]) if params[:id]
   end
 
   def format_challenge(challenge)

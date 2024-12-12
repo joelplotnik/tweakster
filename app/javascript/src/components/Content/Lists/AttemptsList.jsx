@@ -13,20 +13,22 @@ const AttemptsList = () => {
   const { username, name: gameName, id: challengeId } = useParams()
   const isUserPage = !!username && !challengeId && !gameName
 
+  const getEndpoint = page => {
+    if (username && !challengeId && !gameName) {
+      return `${API_URL}/users/${username}/attempts?page=${page}`
+    }
+    if (username && challengeId && !gameName) {
+      return `${API_URL}/users/${username}/challenges/${challengeId}/attempts?page=${page}`
+    }
+    if (gameName && challengeId && !username) {
+      return `${API_URL}/games/${gameName}/challenges/${challengeId}/attempts?page=${page}`
+    }
+    throw new Error('Invalid context for fetching attempts')
+  }
+
   const fetchAttempts = async page => {
     try {
-      let endpoint
-
-      if (username && !challengeId && !gameName) {
-        endpoint = `${API_URL}/users/${username}/attempts?page=${page}`
-      } else if (username && challengeId && !gameName) {
-        endpoint = `${API_URL}/users/${username}/challenges/${challengeId}/attempts?page=${page}`
-      } else if (gameName && challengeId && !username) {
-        endpoint = `${API_URL}/games/${gameName}/challenges/${challengeId}/attempts?page=${page}`
-      } else {
-        throw new Error('Invalid context for fetching attempts')
-      }
-
+      const endpoint = getEndpoint(page)
       const response = await fetch(endpoint)
 
       if (!response.ok) {
@@ -37,17 +39,15 @@ const AttemptsList = () => {
       setAttempts(prev => [...prev, ...data.attempts])
       setHasMore(data.hasMore)
     } catch (error) {
-      console.error('Error fetching attempts:', error)
+      console.error('Error fetching attempts:', error.message)
     }
   }
 
   useEffect(() => {
     fetchAttempts(currentPage)
-  }, [currentPage, username, gameName, challengeId])
+  }, [currentPage])
 
-  const loadMore = () => {
-    setCurrentPage(prev => prev + 1)
-  }
+  const loadMore = () => setCurrentPage(prev => prev + 1)
 
   return (
     <div className={classes['attempts-list']}>

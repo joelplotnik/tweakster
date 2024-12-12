@@ -1,4 +1,6 @@
 class Api::V1::GamesController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create update destroy]
   before_action :set_game, only: %i[show update destroy]
 
   def index
