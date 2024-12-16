@@ -93,7 +93,8 @@ class Api::V1::UsersController < ApplicationController
       {
         id: user.id,
         username: user.username,
-        avatar_url: user.avatar_url
+        avatar_url: user.avatar_url,
+        slug: user.slug
       }
     end
 

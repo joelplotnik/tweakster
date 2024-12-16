@@ -16,27 +16,6 @@ class Api::V1::GamesController < ApplicationController
     render json: games
   end
 
-  def popular_games
-    limit = params[:limit] || 5
-    page = params[:page] || 1
-    point_in_time = params[:point_in_time] || Time.current
-
-    popular_games = Game
-                    .with_attached_image
-                    .left_joins(challenges: :attempts)
-                    .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
-                    .group('games.id')
-                    .order('COUNT(attempts.id) DESC')
-                    .paginate(page:, per_page: limit)
-                    .map { |game| format_game(game) }
-
-    render json: { games: popular_games, point_in_time: }, status: :ok
-  end
-
-  def show
-    render json: format_game(@game)
-  end
-
   def create
     game = Game.new(game_params)
     if game.save
@@ -67,6 +46,27 @@ class Api::V1::GamesController < ApplicationController
                 .map { |game| format_game(game) }
 
     render json: games
+  end
+
+  def popular_games
+    limit = params[:limit] || 5
+    page = params[:page] || 1
+    point_in_time = params[:point_in_time] || Time.current
+
+    popular_games = Game
+                    .with_attached_image
+                    .left_joins(challenges: :attempts)
+                    .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
+                    .group('games.id')
+                    .order('COUNT(attempts.id) DESC')
+                    .paginate(page:, per_page: limit)
+                    .map { |game| format_game(game) }
+
+    render json: { games: popular_games, point_in_time: }, status: :ok
+  end
+
+  def show
+    render json: format_game(@game)
   end
 
   private

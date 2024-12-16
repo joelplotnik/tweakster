@@ -117,8 +117,8 @@ function SearchBar({ mobile, handleBackClick }) {
 
               {userResults.map(result => (
                 <Link
-                  to={`/users/${result.id}`}
-                  key={result.id}
+                  to={`/users/${result.slug}`}
+                  key={result.slug}
                   className={classes['user-result']}
                   onClick={clearInput}
                 >
@@ -143,8 +143,8 @@ function SearchBar({ mobile, handleBackClick }) {
 
               {gameResults.map(result => (
                 <Link
-                  to={`/games/${result.id}`}
-                  key={result.id}
+                  to={`/games/${result.slug}`}
+                  key={result.slug}
                   className={classes['game-result']}
                   onClick={clearInput}
                 >
