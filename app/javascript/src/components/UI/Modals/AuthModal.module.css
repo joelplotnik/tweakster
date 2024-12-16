@@ -13,7 +13,7 @@
 
 .header {
   position: relative;
-  color: #eeeeee;
+  color: var(--primary-text-color);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,7 +26,7 @@
 }
 
 .modal-content {
-  background-color: #1a1a1b;
+  background-color: var(--secondary-background-color);
   padding: 3rem;
   border-radius: 0.5rem;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
@@ -38,7 +38,7 @@
 
 .modal label {
   font-size: 14px;
-  color: #eeeeee;
+  color: var(--primary-text-color);
   display: block;
   margin-bottom: 1rem;
 }
@@ -51,11 +51,11 @@
 
 .modal input {
   display: block;
-  background-color: #1a1a1b;
-  color: #eeeeee;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
   margin-bottom: 1rem;
   padding: 0.5rem;
-  border: 1px solid #424242;
+  border: 1px solid var(--primary-border-color);
   border-radius: 5px;
   font-size: 14px;
   outline: none;
@@ -63,27 +63,27 @@
 }
 
 .modal input:focus {
-  border: 1px solid #ff5e57;
+  border: 1px solid var(--primary-red-color);
 }
 
 .invalid input {
   font-size: 14px;
-  border: 1px solid #ff5e57;
+  border: 1px solid var(--primary-red-color);
 }
 
 .invalid input:focus {
   font-size: 14px;
-  border-bottom-color: #ff5e57;
+  border-bottom-color: var(--primary-red-color);
 }
 
 .error-text {
   font-size: 14px;
-  color: #ff5e57;
+  color: var(--primary-red-color);
 }
 
 .question {
   font-size: 14px;
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .submit-btn {
@@ -93,23 +93,23 @@
   border-radius: 5px;
   font-size: 14px;
   font-weight: bold;
-  background-color: #ff5e57;
-  color: white;
+  background-color: var(--primary-red-color);
+  color: var(--primary-text-color);
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   width: 100%;
 }
 
 .submit-btn:hover {
-  background-color: #cc4b44;
+  background-color: var(--primary-red-color-hover);
 }
 
 .submit-btn:disabled,
 .submit-btn:disabled:hover,
 .submit-btn:disabled:active {
-  background-color: #424242;
-  color: #eeeeee;
-  border-color: #424242;
+  background-color: var(--primary-border-color);
+  color: var(--primary-text-color);
+  border-color: var(--primary-border-color);
   cursor: not-allowed;
 }
 
@@ -122,8 +122,8 @@
   border-radius: 5px;
   font-size: 14px;
   font-weight: bold;
-  background-color: #9146ff;
-  color: white;
+  background-color: var(--twitch-color);
+  color: var(--primary-text-color);
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   width: 100%;
@@ -141,7 +141,7 @@
 }
 
 .submit-btn-twitch:hover {
-  background-color: #7a3ea5;
+  background-color: var(--twitch-color-hover);
 }
 
 .close-icon {
@@ -153,7 +153,7 @@
   top: 0.75rem;
   right: 0.5rem;
   font-size: 1.5rem;
-  color: #eeeeee;
+  color: var(--primary-text-color);
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   z-index: 12;
@@ -163,14 +163,14 @@
 }
 
 .close-icon:hover {
-  background-color: #424242;
+  background-color: var(--primary-border-color);
 }
 
 .modal-content .switch-modal-btn {
   font-size: 14px;
   background-color: transparent;
   border: none;
-  color: #ff5e57;
+  color: var(--primary-red-color);
   cursor: pointer;
   font-weight: bold;
   text-decoration: none;
@@ -183,7 +183,7 @@
 
 .trouble-link {
   font-size: 14px;
-  color: #ff5e57;
+  color: var(--primary-red-color);
   text-decoration: none;
   display: block;
   margin-bottom: 1rem;
@@ -194,8 +194,8 @@
 }
 
 .modal input:-webkit-autofill {
-  -webkit-box-shadow: 0 1000px 0 1000px #1a1a1b inset;
-  -webkit-text-fill-color: #eeeeee;
+  -webkit-box-shadow: 0 1000px 0 1000px var(--secondary-background-color) inset;
+  -webkit-text-fill-color: var(--primary-text-color);
 }
 
 @media (max-width: 768px) {

@@ -1,16 +1,16 @@
 .user-container {
   width: 350px;
   height: 50px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
+  background-color: var(--secondary-background-color);
+  border: 1px solid var(--primary-border-color);
   border-radius: 5px;
   align-items: center;
   margin: 10px;
-  color: #333;
+  color: var(--primary-text-color);
 }
 
 .user-container:hover {
-  background-color: #eaeaea;
+  background-color: var(--primary-text-color-hover);
 }
 
 .user-info {
@@ -23,8 +23,8 @@
 .user-avatar-container {
   width: 30px;
   height: 30px;
-  background-color: white;
-  border: 1px solid #cccccc;
+  background-color: var(--primary-text-color);
+  border: 1px solid var(--primary-border-color);
   overflow: hidden;
   border-radius: 50%;
   margin-right: 10px;

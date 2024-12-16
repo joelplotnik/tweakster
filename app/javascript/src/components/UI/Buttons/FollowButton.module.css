@@ -4,8 +4,8 @@
   display: inline-block;
   width: 260px;
   padding: 10px 20px;
-  background-color: #1a1a1b;
-  color: #fff;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
   text-decoration: none;
   border-radius: 20px;
   border: none;
@@ -16,5 +16,5 @@
 
 .btn:hover {
   content: 'Unfollow';
-  background-color: #030303;
+  background-color: var(--primary-background-color);
 }

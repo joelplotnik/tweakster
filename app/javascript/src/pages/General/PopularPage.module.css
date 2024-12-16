@@ -1,14 +1,14 @@
 .popular-page {
   padding: 20px;
-  background-color: #141414;
-  color: #eeeeee;
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
   overflow: hidden;
 }
 
 .title {
   font-size: 24px;
   margin-bottom: 10px;
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .carousel {
@@ -26,7 +26,7 @@
 .item {
   min-width: 200px;
   height: 200px;
-  background-color: #333;
+  background-color: var(--secondary-background-color);
   margin-right: 15px;
   border-radius: 8px;
   position: relative;
@@ -63,5 +63,5 @@
   left: 10px;
   font-size: 18px;
   font-weight: bold;
-  color: #fff;
+  color: var(--primary-text-color);
 }

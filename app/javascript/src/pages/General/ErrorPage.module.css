@@ -11,12 +11,12 @@
   font-size: 5rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  color: #2b2d42;
+  color: var(--primary-text-color);
 }
 
 .message {
   font-size: 2rem;
   font-weight: 500;
   margin-bottom: 2rem;
-  color: #4f5d75;
+  color: var(--primary-text-color);
 }

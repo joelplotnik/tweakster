@@ -28,8 +28,8 @@
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background-color: white;
-  border: 1px solid #cccccc;
+  background-color: var(--primary-text-color);
+  border: 1px solid var(--primary-border-color);
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -42,7 +42,7 @@
 .upload-avatar-btn svg {
   width: 35px;
   height: 35px;
-  color: #d92563;
+  color: var(--primary-red-color);
 }
 
 .remove-avatar-button-container {
@@ -50,10 +50,10 @@
 }
 
 .remove-avatar-button {
-  color: #d92563;
+  color: var(--primary-red-color);
   border-radius: 50%;
-  background-color: white;
-  border: 1px solid #cccccc;
+  background-color: var(--primary-text-color);
+  border: 1px solid var(--primary-border-color);
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
@@ -61,7 +61,7 @@
 }
 
 .remove-avatar-button:hover {
-  color: #c3164b;
+  color: var(--primary-red-color-hover);
   border: 1px solid black;
 }
 
@@ -150,7 +150,7 @@
 
 .form-submit-button {
   background-color: rgb(51, 153, 255);
-  color: #fff;
+  color: var(--primary-text-color);
   border: none;
   border-radius: 5px;
   padding: 8px 16px;
@@ -197,8 +197,8 @@
 
 .delete-button {
   display: inline-block;
-  background-color: #d92563;
-  color: #fff;
+  background-color: var(--primary-red-color);
+  color: var(--primary-text-color);
   padding: 10px;
   text-decoration: none;
   border-radius: 5px;

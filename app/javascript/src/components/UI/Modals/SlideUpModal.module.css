@@ -3,7 +3,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  background: #1a1a1b;
+  background: var(--secondary-background-color);
   border-radius: 16px 16px 0 0;
   padding: 16px;
   max-height: 75%;

@@ -7,7 +7,7 @@
 .tab-list {
   display: flex;
   justify-content: center;
-  border-top: 0.5px solid #555;
+  border-top: 0.5px solid var(--primary-border-color);
 }
 
 .tab {
@@ -19,13 +19,13 @@
   border: none;
   border-top: 1px solid transparent;
   font-size: 0.9em;
-  color: #a9a9a9;
+  color: var(--primary-text-color-hover);
   font-weight: bold;
 }
 
 .tab.active {
-  border-top: 1px solid #eeeeee;
-  color: #eeeeee;
+  border-top: 1px solid var(--primary-text-color);
+  color: var(--primary-text-color);
 }
 
 .icon {

@@ -1,6 +1,6 @@
 .user-page {
-  background-color: #1a1a1b;
-  color: #eeeeee;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
   display: flex;
   justify-content: center;
   flex-direction: column;

@@ -138,7 +138,7 @@
   top: 100%;
   left: 0;
   z-index: 10;
-  background-color: #ffffff;
+  background-color: var(--primary-text-color) fff;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   padding: 5px;
@@ -155,7 +155,7 @@
 }
 
 .dropdown-menu button {
-  color: #333333;
+  color: var(--secondary-background-color) 333;
   text-decoration: none;
   padding: 0.5rem;
   font-size: 0.9rem;
@@ -171,7 +171,7 @@
 }
 
 .dropdown-menu button:hover {
-  background-color: #eeeeee;
+  background-color: var(--primary-text-color);
 }
 
 .report {

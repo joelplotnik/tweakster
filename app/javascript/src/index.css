@@ -1,20 +1,47 @@
-body {
-  margin: 0;
-  background-color: #141414;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+:root {
+  --primary-background-color: #141414;
+  --secondary-background-color: #1a1a1b;
+
+  --primary-border-color: #424242;
+  --primary-border-color-hover: #5a5a5a;
+
+  --primary-text-color: #eeeeee;
+  --primary-text-color-hover: #a9a9a9;
+
+  --primary-red-color: #ff5e57;
+  --primary-red-color-hover: #cc4b44;
+
+  --primary-yellow-color: #ffd447;
+  --primary-yellow-color-hover: #d8b13a;
+
+  --primary-green-color: #28c76f;
+  --primary-green-color-hover: #20a85a;
+
+  --primary-blue-color: #5a8dee;
+  --primary-blue-color-hover: #486cbe;
+
+  --twitch-color: #9146ff;
+  --twitch-color-hover: #7a3ea5;
+
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  --font-family-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+  --body-margin: 0;
+  --main-margin: 3rem;
+}
+
+body {
+  margin: var(--main-margin);
+  background-color: var(--primary-background-color);
+  font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
 main {
-  margin: 3rem auto;
+  margin: var(--main-margin) auto;
   display: flex;
   justify-content: center;
 }

@@ -6,11 +6,11 @@
 }
 
 .icon-selected {
-  color: #28a745;
+  color: var(--primary-green-color);
 }
 
 .icon-unselected {
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .approval-count {
@@ -19,9 +19,9 @@
 }
 
 .selected {
-  color: #28a745;
+  color: var(--primary-green-color);
 }
 
 .unselected {
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }

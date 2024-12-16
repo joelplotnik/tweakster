@@ -4,22 +4,22 @@
   margin: 50px auto;
   padding: 20px;
   border-radius: 8px;
-  background-color: #1a1a1b;
+  background-color: var(--secondary-background-color);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-align: center;
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .header {
   margin-bottom: 0;
   font-size: 24px;
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .divider {
   border: none;
   height: 1.5px;
-  background-color: #eeeeee;
+  background-color: var(--primary-text-color);
   margin-top: 10px;
   margin-bottom: 20px;
 }
@@ -42,7 +42,7 @@
 .input-group label {
   font-size: 14px;
   font-weight: bold;
-  color: #eeeeee;
+  color: var(--primary-text-color);
   margin-bottom: 5px;
   display: block;
 }
@@ -57,19 +57,19 @@
 }
 
 .input {
-  border: 1px solid #424242;
-  background-color: #1a1a1b;
-  color: #eeeeee;
+  border: 1px solid var(--primary-border-color);
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
   outline: none;
 }
 
 .input:focus {
-  border-color: #ff5e57;
+  border-color: var(--primary-red-color);
 }
 
 .button {
-  background-color: #ff5e57;
-  color: #eeeeee;
+  background-color: var(--primary-red-color);
+  color: var(--primary-text-color);
   border: none;
   font-weight: bold;
   transition: background-color 0.2s ease-in-out;
@@ -77,27 +77,27 @@
 }
 
 .button:hover {
-  background-color: #cc4b44;
+  background-color: var(--primary-red-color-hover);
 }
 
 .button:disabled {
-  background-color: #424242;
+  background-color: var(--primary-border-color);
   cursor: not-allowed;
 }
 
 .success-message {
-  color: #eeeeee;
+  color: var(--primary-text-color);
   font-size: 14px;
 }
 
 .error-message {
-  color: #ff5e57;
+  color: var(--primary-red-color);
   font-size: 14px;
 }
 
 .input:-webkit-autofill {
-  -webkit-box-shadow: 0 1000px 0 1000px #1a1a1b inset;
-  -webkit-text-fill-color: #eeeeee;
+  -webkit-box-shadow: 0 1000px 0 1000px var(--secondary-background-color) inset;
+  -webkit-text-fill-color: var(--primary-text-color);
 }
 
 @media (max-width: 480px) {

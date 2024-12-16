@@ -11,12 +11,12 @@
   text-align: center;
   padding: 16px;
   font-size: 1.2em;
-  color: #666;
+  color: var(--primary-text-color);
 }
 
 .end-message {
   text-align: center;
   padding: 16px;
   font-size: 1em;
-  color: #999;
+  color: var(--primary-text-color);
 }

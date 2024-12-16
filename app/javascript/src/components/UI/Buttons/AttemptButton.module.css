@@ -1,6 +1,6 @@
 .attemptButton {
-  background-color: #28a745;
-  color: #ffffff;
+  background-color: var(--primary-green-color);
+  color: var(--primary-text-color) fff;
   font-size: 0.8em;
   font-weight: bold;
   padding: 6px 12px;
@@ -10,5 +10,5 @@
 }
 
 .attemptButton:hover {
-  background-color: #218838;
+  background-color: var(--primary-green-color-hover);
 }

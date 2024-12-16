@@ -2,7 +2,7 @@
   padding: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   border-radius: 14px;
-  background-color: #1a1a1b;
-  color: #eeeeee;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
   max-width: 80%;
 }

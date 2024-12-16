@@ -2,7 +2,7 @@
   box-sizing: border-box;
   justify-content: center;
   align-items: center;
-  background-color: #1a1a1b;
+  background-color: var(--secondary-background-color);
   display: flex;
   width: 100%;
   max-width: 700px;
@@ -21,7 +21,7 @@
 }
 
 .avatar {
-  background-color: #eeeeee;
+  background-color: var(--primary-text-color);
   border-radius: 50%;
   width: 100%;
   height: 100%;
@@ -57,8 +57,8 @@
 
 .follow-button,
 .edit-button {
-  background-color: #ff5e57;
-  color: #ffffff;
+  background-color: var(--primary-red-color);
+  color: var(--primary-text-color);
   font-size: 0.8em;
   font-weight: bold;
   padding: 6px 12px;
@@ -69,7 +69,7 @@
 
 .follow-button:hover,
 .edit-button:hover {
-  background-color: #cc4b44;
+  background-color: var(--primary-red-color-hover);
 }
 
 .stats-section {
@@ -86,23 +86,23 @@
 .stats-number {
   font-size: 1em;
   font-weight: bold;
-  color: #ffffff;
+  color: var(--primary-text-color);
 }
 
 .stats-label {
   font-size: 0.8em;
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .bio,
 .url a {
   font-size: 0.9em;
-  color: #eeeeee;
+  color: var(--primary-text-color);
   word-wrap: break-word;
 }
 
 .url a {
-  color: #ff5e57;
+  color: var(--primary-red-color);
   text-decoration: none;
 }
 
@@ -119,13 +119,13 @@
 .currently-playing-label {
   font-size: 0.9em;
   font-weight: bold;
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .currently-playing {
   margin-top: 5px;
   font-size: 0.9em;
-  color: #ff5e57;
+  color: var(--primary-red-color);
   text-decoration: none;
   word-wrap: break-word;
 }
@@ -165,7 +165,7 @@
 
   .top-section {
     margin-bottom: 1.25rem;
-    color: #eeeeee;
+    color: var(--primary-text-color);
     font-size: 0.9em;
     word-wrap: break-word;
     margin-left: -69px;
@@ -179,7 +179,7 @@
 
   .bio-section {
     margin-top: 1.25rem;
-    color: #eeeeee;
+    color: var(--primary-text-color);
     font-size: 0.9em;
     word-wrap: break-word;
     margin-left: -69px;

@@ -6,7 +6,7 @@
 }
 
 .icon {
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .text {

@@ -39,7 +39,7 @@
   margin-top: 0;
   margin-bottom: 0;
   margin-left: 3rem;
-  color: #333;
+  color: var(--secondary-background-color);
 }
 
 .buttons-container {

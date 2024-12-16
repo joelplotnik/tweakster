@@ -12,31 +12,31 @@
 
 .vote-count {
   font-size: 12px;
-  color: #eeeeee;
+  color: var(--primary-text-color);
 }
 
 .upvote,
 .downvote {
-  color: #eeeeee;
+  color: var(--primary-text-color);
   font-size: 1.25rem;
 }
 
 .upvote-filled {
   font-size: 1.25rem;
-  color: #ff5e57;
+  color: var(--primary-red-color);
 }
 
 .downvote-filled {
   font-size: 1.25rem;
-  color: #1c9afc;
+  color: var(--primary-blue-color);
 }
 
 .vote-button:hover .upvote {
   font-size: 1.25rem;
-  color: #ff5e57;
+  color: var(--primary-red-color);
 }
 
 .vote-button:hover .downvote {
   font-size: 1.25rem;
-  color: #1c9afc;
+  color: var(--primary-blue-color);
 }
