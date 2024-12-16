@@ -82,12 +82,11 @@ const Attempt = ({ attempt, isUserPage }) => {
           <p className={classes.category}> {challenge.category}</p>
         </div>
         <hr className={classes.divider} />
-
         <div className={classes['challenge-description']}>
           <span className={classes['challenge-description-content']}>
             {displayedDescription}
           </span>
-          <div className={classes['desription-actions']}>
+          <div className={classes['description-actions']}>
             {challenge.description.length > descriptionLimit && (
               <button
                 onClick={toggleExpanded}

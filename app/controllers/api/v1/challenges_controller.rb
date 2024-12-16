@@ -29,24 +29,8 @@ class Api::V1::ChallengesController < ApplicationController
     }
   end
 
-  def popular_challenges
-    limit = params[:limit] || 5
-    page = params[:page] || 1
-    point_in_time = params[:point_in_time] || Time.current
-
-    popular_challenges = Challenge
-                         .left_joins(:attempts)
-                         .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
-                         .group('challenges.id')
-                         .order('COUNT(attempts.id) DESC')
-                         .paginate(page:, per_page: limit)
-                         .map { |challenge| format_challenge(challenge) }
-
-    render json: { challenges: popular_challenges, point_in_time: }, status: :ok
-  end
-
   def show
-    render json: format_attempt(@challenge)
+    render json: format_challenge(@challenge)
   end
 
   def create
@@ -81,6 +65,22 @@ class Api::V1::ChallengesController < ApplicationController
     end
   end
 
+  def popular_challenges
+    limit = params[:limit] || 5
+    page = params[:page] || 1
+    point_in_time = params[:point_in_time] || Time.current
+
+    popular_challenges = Challenge
+                         .left_joins(:attempts)
+                         .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
+                         .group('challenges.id')
+                         .order('COUNT(attempts.id) DESC')
+                         .paginate(page:, per_page: limit)
+                         .map { |challenge| format_challenge(challenge) }
+
+    render json: { challenges: popular_challenges, point_in_time: }, status: :ok
+  end
+
   private
 
   def challenge_params
@@ -103,6 +103,7 @@ class Api::V1::ChallengesController < ApplicationController
     challenge.as_json(include: {
                         game: {},
                         user: {}
-                      })
+                      },
+                      methods: %i[comments_count attempts_count difficulty_rating])
   end
 end

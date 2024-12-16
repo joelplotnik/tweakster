@@ -1,0 +1,53 @@
+.difficulty-form {
+  text-align: center;
+}
+
+.header {
+  margin: 0 0 16px 0;
+  color: #eeeeee;
+}
+
+.divider {
+  border: none;
+  height: 0.5px;
+  width: 97%;
+  background-color: #555;
+  margin-top: 5px;
+  margin-bottom: 16px;
+}
+
+.difficulty {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.icon {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
+.filled,
+.unfilled {
+  font-size: 3rem;
+  transition: color 0.3s ease;
+}
+
+.filled {
+  color: #ffd447;
+}
+
+.unfilled {
+  color: #eeeeee;
+}
+
+@media (max-width: 768px) {
+  .filled,
+  .unfilled {
+    font-size: 2.5rem;
+  }
+}

@@ -4,8 +4,6 @@ class Api::V1::AttemptsController < ApplicationController
   before_action :set_challenge, only: [:index]
   before_action :set_attempt, only: %i[show update destroy]
 
-  # GET /api/v1/users/:user_id/challenges/:challenge_id/attempts
-  # GET /api/v1/games/:game_id/challenges/:challenge_id/attempts
   def index
     limit = params[:limit] || 25
     page = params[:page] || 1
@@ -24,14 +22,10 @@ class Api::V1::AttemptsController < ApplicationController
     }
   end
 
-  # GET /api/v1/users/:user_id/challenges/:challenge_id/attempts/:id
-  # GET /api/v1/games/:game_id/challenges/:challenge_id/attempts/:id
   def show
-    puts 'Attempt: ', @attempt
     render json: format_attempt(@attempt)
   end
 
-  # POST /api/v1/games/:game_id/challenges/:challenge_id/attempts
   def create
     attempt = current_user.attempts.new(attempt_params.merge(challenge_id: @challenge.id))
 
@@ -43,7 +37,6 @@ class Api::V1::AttemptsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /api/v1/users/:user_id/attempts/:id
   def update
     if @attempt.user_id == current_user.id
       if @attempt.update(attempt_params)
@@ -57,7 +50,6 @@ class Api::V1::AttemptsController < ApplicationController
     end
   end
 
-  # DELETE /api/v1/users/:user_id/attempts/:id
   def destroy
     if @attempt.user_id == current_user.id
       @attempt.destroy
@@ -67,7 +59,6 @@ class Api::V1::AttemptsController < ApplicationController
     end
   end
 
-  # GET /api/v1/popular_attempts
   def popular_attempts
     limit = params[:limit] || 5
     page = params[:page] || 1
@@ -107,14 +98,15 @@ class Api::V1::AttemptsController < ApplicationController
     attempt.as_json(
       include: {
         challenge: {
-          include: :game
+          include: :game,
+          methods: [:difficulty_rating]
         },
         user: {
           only: %i[username slug],
           methods: [:avatar_url]
         }
       },
-      methods: [:comments_count]
+      methods: %i[comments_count approvals_count]
     )
   end
 end

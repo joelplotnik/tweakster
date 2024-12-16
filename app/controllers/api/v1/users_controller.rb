@@ -189,14 +189,15 @@ class Api::V1::UsersController < ApplicationController
     attempt.as_json(
       include: {
         challenge: {
-          include: :game
+          include: :game,
+          methods: [:difficulty_rating]
         },
         user: {
           only: %i[username slug],
           methods: [:avatar_url]
         }
       },
-      methods: [:comments_count]
+      methods: %i[comments_count approvals_count]
     )
   end
 end

@@ -8,20 +8,11 @@ class Attempt < ApplicationRecord
   validates :user_id, uniqueness: { scope: :challenge_id }
   validates :status, inclusion: { in: ['To Do', 'In Progress', 'Complete'] }
 
-  after_create :increment_attempt_count
-  after_destroy :decrement_attempt_count
-
   def comments_count
     comments.size
   end
 
-  private
-
-  def increment_attempt_count
-    challenge.increment!(:attempt_count)
-  end
-
-  def decrement_attempt_count
-    challenge.decrement!(:attempt_count)
+  def approvals_count
+    approvals.size
   end
 end
