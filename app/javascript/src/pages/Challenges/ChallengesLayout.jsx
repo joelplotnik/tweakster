@@ -1,4 +1,11 @@
+import { Outlet } from 'react-router-dom'
+
 const ChallengesLayout = () => {
-  return null
+  return (
+    <>
+      <Outlet />
+    </>
+  )
 }
+
 export default ChallengesLayout

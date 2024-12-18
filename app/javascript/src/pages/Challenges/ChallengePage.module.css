@@ -1,4 +1,4 @@
-.user-page {
+.challenge-page {
   background-color: var(--secondary-background-color);
   display: flex;
   justify-content: center;
@@ -8,7 +8,7 @@
 }
 
 @media (max-width: 768px) {
-  .user-page {
+  .challenge-page {
     min-width: 100%;
   }
 }

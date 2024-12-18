@@ -1,6 +1,6 @@
 import { RiGhostLine, RiSwordLine } from 'react-icons/ri'
 import { useSelector } from 'react-redux'
-import { json, useRouteLoaderData } from 'react-router-dom'
+import { json } from 'react-router-dom'
 
 import AttemptsList from '../../components/Content/Lists/AttemptsList'
 import ChallengesList from '../../components/Content/Lists/ChallengesList'
@@ -10,27 +10,22 @@ import { API_URL } from '../../constants/constants'
 import store from '../../store'
 import { userPageActions } from '../../store/userPage'
 import { getAuthToken } from '../../util/auth'
+import { formatNumber } from '../../util/format'
 import classes from './UserPage.module.css'
 
 const UserPage = () => {
-  const token = useRouteLoaderData('root')
   const user = useSelector(state => state.userPage.user)
-  const currentUser = useSelector(state => state.user.user)
-  const isOwner = currentUser?.username === user.username
-
-  const attemptsCount = 34 // temporary
-  const challengesCount = 189 // temporary
 
   const tabs = [
     {
       key: 'attempts',
-      label: `Attempts (${attemptsCount})`,
+      label: `Attempts (${formatNumber(user.attempts_count)})`,
       icon: <RiGhostLine />,
       content: <AttemptsList />,
     },
     {
       key: 'challenges',
-      label: `Challenges (${challengesCount})`,
+      label: `Challenges (${formatNumber(user.challenges_count)})`,
       icon: <RiSwordLine />,
       content: <ChallengesList />,
     },
@@ -38,7 +33,7 @@ const UserPage = () => {
 
   return (
     <div className={classes['user-page']}>
-      <ProfileCard user={user} isOwner={isOwner} />
+      <ProfileCard user={user} isOwner={user.is_owner} />
       <Tabs tabs={tabs} />
     </div>
   )
@@ -48,7 +43,7 @@ export default UserPage
 
 export async function loader({ params }) {
   const { username } = params
-  const token = getAuthToken()
+  const token = await getAuthToken()
 
   const response = await fetch(`${API_URL}/users/${username}`, {
     method: 'GET',

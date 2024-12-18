@@ -1,4 +1,10 @@
+import { Outlet } from 'react-router-dom'
+
 const GamesLayout = () => {
-  return null
+  return (
+    <>
+      <Outlet />
+    </>
+  )
 }
 export default GamesLayout

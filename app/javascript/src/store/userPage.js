@@ -17,12 +17,6 @@ const userPageSlice = createSlice({
     updateFollowerCount: (state, action) => {
       state.user.follower_count = action.payload
     },
-    updateFaveChannels: (state, action) => {
-      state.user.favorite_channels = action.payload
-    },
-    updateFaveUsers: (state, action) => {
-      state.user.favorite_users = action.payload
-    },
   },
 })
 

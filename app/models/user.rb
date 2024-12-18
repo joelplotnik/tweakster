@@ -124,6 +124,26 @@ class User < ApplicationRecord
     user_game.game.slice(:name, :slug)
   end
 
+  def challenges_count
+    challenges.size
+  end
+
+  def attempts_count
+    attempts.size
+  end
+
+  def points
+    attempts.joins(:approvals).count
+  end
+
+  def followers_count
+    followers.size
+  end
+
+  def followees_count
+    followees.size
+  end
+
   private
 
   def validate_username

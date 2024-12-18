@@ -40,8 +40,10 @@ const ChallengesList = () => {
   }
 
   useEffect(() => {
-    fetchChallenges(currentPage)
-  }, [currentPage])
+    setChallenges([])
+    setCurrentPage(1)
+    fetchChallenges(1)
+  }, [username, gameName])
 
   const loadMore = () => setCurrentPage(prev => prev + 1)
 

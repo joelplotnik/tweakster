@@ -1,8 +1,4 @@
-import { json, redirect } from 'react-router-dom'
-
 import { API_URL, EXPIRED_TOKEN } from '../constants/constants'
-import store from '../store'
-import { userActions } from '../store/user'
 
 export function storeTokens(token, refresh, expiration) {
   localStorage.setItem('token', token)
@@ -75,41 +71,4 @@ export async function refreshAuthToken() {
   storeTokens(token, refresh_token, expires_in)
 
   return token
-}
-
-export async function checkAuthLoader({ params }) {
-  const token = getAuthToken()
-
-  if (!token) {
-    return redirect('/')
-  }
-
-  const { id } = params
-  const parsedID = parseInt(id, 10)
-
-  // User attempting to edit their profile
-  if (parsedID) {
-    const response = await fetch(
-      `${API_URL}/users/${parsedID}/check_ownership`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      const data = await response.json()
-
-      if (response.status === 401 || !data.belongs_to_user) {
-        return redirect('/')
-      } else {
-        throw json({ message: 'Could not make request.' }, { status: 500 })
-      }
-    }
-  }
-
-  return null
 }

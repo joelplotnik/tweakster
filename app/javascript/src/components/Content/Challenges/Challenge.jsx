@@ -147,7 +147,11 @@ const Challenge = ({ challenge, isUserPage }) => {
                 </button>
               )}
               <Link
-                to={`/games/${game.slug}/challenges/${id}`}
+                to={
+                  isUserPage
+                    ? `/users/${user.slug}/challenges/${id}`
+                    : `/games/${game.slug}/challenges/${id}`
+                }
                 className={classes['view-full-link']}
               >
                 View Full Challenge

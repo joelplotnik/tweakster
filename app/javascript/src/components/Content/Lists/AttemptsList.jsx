@@ -44,8 +44,10 @@ const AttemptsList = () => {
   }
 
   useEffect(() => {
-    fetchAttempts(currentPage)
-  }, [currentPage])
+    setAttempts([])
+    setCurrentPage(1)
+    fetchAttempts(1)
+  }, [username, gameName])
 
   const loadMore = () => setCurrentPage(prev => prev + 1)
 

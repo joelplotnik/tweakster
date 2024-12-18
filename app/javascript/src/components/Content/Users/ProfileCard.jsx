@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 
+import { formatNumber } from '../../../util/format'
 import classes from './ProfileCard.module.css'
 
 const ProfileCard = ({ user, isOwner }) => {
@@ -26,15 +27,21 @@ const ProfileCard = ({ user, isOwner }) => {
         </div>
         <div className={classes['stats-section']}>
           <div className={classes['stats-item']}>
-            <span className={classes['stats-number']}>120</span>
+            <span className={classes['stats-number']}>
+              {formatNumber(user.points)}
+            </span>
             <span className={classes['stats-label']}>Points</span>
           </div>
           <div className={classes['stats-item']}>
-            <span className={classes['stats-number']}>500</span>
+            <span className={classes['stats-number']}>
+              {formatNumber(user.followers)}
+            </span>
             <span className={classes['stats-label']}>Followers</span>
           </div>
           <div className={classes['stats-item']}>
-            <span className={classes['stats-number']}>180</span>
+            <span className={classes['stats-number']}>
+              {formatNumber(user.following)}
+            </span>
             <span className={classes['stats-label']}>Following</span>
           </div>
         </div>

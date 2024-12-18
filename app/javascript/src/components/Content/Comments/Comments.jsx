@@ -1,364 +1,122 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { RiAddFill } from 'react-icons/ri'
-import { useDispatch } from 'react-redux'
-import { useParams, useRouteLoaderData } from 'react-router-dom'
-import { toast } from 'react-toastify'
+import { useCallback, useEffect, useState } from 'react'
 
 import { API_URL } from '../../../constants/constants'
-import { pieceActions } from '../../store/piece'
-import AuthModal from '../../UI/Modals/AuthModal'
-import CommentForm from '../Forms/CommentForm'
-import SortDropdown from '../UI/SortDropdown'
 import Comment from './Comment'
 import classes from './Comments.module.css'
 
-const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
-  const token = useRouteLoaderData('root')
+const Comments = () => {
   const [comments, setComments] = useState([])
-  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-  const [commentsLeft, setCommentsLeft] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
-  const [newCommentIds, setNewCommentIds] = useState([])
-  const [selectedSortOption, setSelectedSortOption] = useState('old')
-  const selectedSortOptionRef = useRef(selectedSortOption)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [showCommentForm, setShowCommentForm] = useState(false)
-  const [activeComment, setActiveComment] = useState(null)
-  const commentsTitle =
-    commentable.comments_count === 1 ? 'Comment' : 'Comments'
-  const dispatch = useDispatch()
-  const newCommentRef = useRef(null)
-  const params = useParams()
-  const wildcardParam = params['*']
+  const [page, setPage] = useState(1)
+  const [replies, setReplies] = useState({})
 
-  const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
+  const fetchComments = useCallback(async page => {
+    setLoading(true)
+    try {
+      const path = window.location.pathname
+      const response = await fetch(`${API_URL}${path}/comments?page=${page}`)
+      const data = await response.json()
 
-  const handleSortChange = useCallback(option => {
-    if (option === selectedSortOptionRef.current) {
-      return
+      if (Array.isArray(data)) {
+        setComments(prevComments => [...prevComments, ...data])
+        setHasMore(data.length === 10)
+      } else {
+        console.error('Unexpected response format:', data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch comments:', error)
+    } finally {
+      setLoading(false)
     }
-
-    setNewCommentIds([])
-    setComments([])
-    setSelectedSortOption(option)
-    setPage(1)
-    setHasMore(true)
   }, [])
 
-  const fetchComments = async (currentPage, loadAll = false) => {
+  const fetchReplies = async (parentId, page) => {
     try {
-      let url = ''
-
-      if (commentableType === 'Piece') {
-        url = `${API_URL}/${wildcardParam}/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
-          newCommentIds
-        )}${loadAll ? '&load_all=true' : ''}`
-      } else if (commentableType === 'Tweak') {
-        url = `${API_URL}/${wildcardParam}/tweaks/${
-          commentable.id
-        }/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
-          newCommentIds
-        )}${loadAll ? '&load_all=true' : ''}`
-      }
-
-      const response = await fetch(url)
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch comments')
-      }
-
+      const path = window.location.pathname
+      const response = await fetch(
+        `${API_URL}${path}/comments/${parentId}/replies?page=${page}`
+      )
       const data = await response.json()
       return data
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error fetching comments')
+      console.error('Failed to fetch replies:', error)
+      return null
     }
   }
 
-  const fetchData = async (loadAll = false) => {
-    if (!isLoading && hasMore) {
-      setIsLoading(true)
-
-      const commentsFromServer = await fetchComments(page, loadAll)
-
-      if (commentsFromServer) {
-        if (selectedSortOption !== selectedSortOptionRef.current) {
-          // If the selectedSortOption has changed, reset comments
-          selectedSortOptionRef.current = selectedSortOption
-          setComments(commentsFromServer.comments)
-        } else {
-          // If the sort option is the same, append fetched data
-          setComments(prevComments => [
-            ...prevComments,
-            ...commentsFromServer.comments,
-          ])
-        }
-
-        setHasMore(commentsFromServer.meta.has_more)
-        setCommentsLeft(commentsFromServer.meta.comments_left)
-        setPage(prevPage => prevPage + 1)
-      }
-
-      setIsLoading(false)
+  const handleLoadMoreReplies = async parentId => {
+    const currentReplies = replies[parentId] || {
+      data: [],
+      remaining: 0,
+      page: 1,
     }
-  }
+    const data = await fetchReplies(parentId, currentReplies.page)
 
-  useEffect(() => {
-    fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSortOption])
-
-  const updateCommentMessage = (commentsArray, targetCommentId, newMessage) => {
-    return commentsArray.map(comment => {
-      if (comment.id === targetCommentId) {
-        // If this is the edited comment, update its message
-        return {
-          ...comment,
-          message: newMessage,
-        }
-      } else {
-        return comment
-      }
-    })
-  }
-
-  const handleCommentSubmit = async (
-    message,
-    commentableId,
-    commentId = null
-  ) => {
-    try {
-      let url = ''
-      let method = commentId ? 'PUT' : 'POST'
-
-      if (commentableType === 'Piece') {
-        url = commentId
-          ? `${API_URL}/${wildcardParam}/comments/${commentId}`
-          : `${API_URL}/${wildcardParam}/comments`
-      } else if (commentableType === 'Tweak') {
-        url = commentId
-          ? `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments/${commentId}`
-          : `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments`
-      }
-
-      const commentData = {
-        message: message,
-        commentable_id: commentableId,
-        commentable_type: commentableType,
-      }
-
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+    if (data) {
+      setReplies(prevReplies => ({
+        ...prevReplies,
+        [parentId]: {
+          data: [...currentReplies.data, ...data.replies],
+          remaining: data.remaining_replies,
+          page: currentReplies.page + 1,
         },
-        body: JSON.stringify(commentData),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to submit comment')
-      }
-
-      const newComment = await response.json()
-      const newCommentId = newComment.id
-
-      // Handle the state update based on the comment action
-      if (commentId) {
-        // Edit comment
-        setComments(prevComments => {
-          return updateCommentMessage(prevComments, commentId, message)
-        })
-      } else {
-        // New comment
-        setNewCommentIds(prevIds => [...prevIds, newCommentId])
-        setComments(prevComments => [...prevComments, newComment])
-        newCommentRef.current = newCommentId
-        dispatch(pieceActions.increaseCommentCount())
-      }
-      setActiveComment(null)
-    } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error submitting comment')
-    }
-  }
-
-  const deleteComment = (commentsArray, targetCommentId) => {
-    return commentsArray.filter(comment => {
-      if (comment.id === targetCommentId) {
-        return false
-      } else {
-        return !comment.deleted // Filter out deleted comments
-      }
-    })
-  }
-
-  const markCommentAsDeleted = (commentsArray, targetCommentId) => {
-    return commentsArray.map(comment => {
-      if (comment.id === targetCommentId) {
-        // Mark the comment as deleted
-        return {
-          ...comment,
-          deleted: true,
-        }
-      } else {
-        return comment
-      }
-    })
-  }
-
-  const handleDeleteComment = async commentId => {
-    try {
-      const response = await fetch(
-        `${API_URL}/${wildcardParam}/comments/${commentId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to delete comment')
-      }
-
-      setActiveComment(null)
-
-      // Find the deleted comment in the state
-      const commentToDelete = comments.find(comment => comment.id === commentId)
-
-      if (!commentToDelete) {
-        return // Comment not found, nothing to delete
-      }
-
-      const decreaseCommentCountBy = 1
-      dispatch(pieceActions.decreaseCommentCount({ decreaseCommentCountBy }))
-
-      setComments(prevComments => {
-        return deleteComment(
-          markCommentAsDeleted(prevComments, commentId),
-          commentId
-        )
-      })
-
-      if (newCommentIds.includes(commentId)) {
-        setNewCommentIds(prevIds => prevIds.filter(id => id !== commentId))
-      }
-    } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error deleting comment')
+      }))
     }
   }
 
   useEffect(() => {
-    if (newCommentRef.current) {
-      const newCommentElement = document.getElementById(newCommentRef.current)
+    fetchComments(page)
+  }, [fetchComments, page])
 
-      if (newCommentElement) {
-        if (pieceClassModalRef === 'page') {
-          const topOffset = 48
-          const elementPosition = newCommentElement.getBoundingClientRect().top
-          const offsetPosition = elementPosition + window.scrollY - topOffset
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth',
-          })
-        } else {
-          newCommentElement.scrollIntoView({ behavior: 'smooth' })
-        }
-      }
-      newCommentRef.current = null
-    }
-  }, [comments, pieceClassModalRef])
-
-  const handleShowAllComments = () => {
-    fetchData(true)
+  const handleLoadMore = () => {
+    setPage(prevPage => prevPage + 1)
   }
 
   return (
-    <>
-      <div className={classes.comments}>
-        {commentableType === 'Piece' && (
-          <div className={classes['header-container']}>
-            <h2 className={classes.title}>
-              {commentable.comments_count} {commentsTitle}
-            </h2>
-            {comments.length > 0 && (
-              <SortDropdown onSortChange={handleSortChange} />
-            )}
-          </div>
-        )}
-        <div className={classes.commentList}>
-          {comments.map(comment => (
-            <div
-              key={comment.id}
-              id={
-                comment.id === newCommentRef.current
-                  ? newCommentRef.current
-                  : undefined
-              }
-            >
-              <Comment
-                comment={comment}
-                commentable={commentable}
-                commentableType={commentableType}
-                onEdit={(message, commentId) =>
-                  handleCommentSubmit(message, commentable.id, commentId)
-                }
-                onDelete={commentId => handleDeleteComment(commentId)}
-                activeComment={activeComment}
-                setActiveComment={setActiveComment}
-              />
-            </div>
-          ))}
-        </div>
-        <div className={classes['buttons-container']}>
-          {hasMore ? (
-            <button
-              className={classes['comments-button']}
-              onClick={handleShowAllComments}
-              disabled={isLoading}
-            >
-              {isLoading
-                ? 'Loading...'
-                : commentsLeft === 1
-                ? 'Show 1 more comment'
-                : `Show ${commentsLeft} more comments`}
-            </button>
-          ) : token ? (
-            <button
-              className={classes['comments-button']}
-              onClick={() => setShowCommentForm(true)}
-            >
-              Leave A Comment
-            </button>
-          ) : (
-            <button
-              className={classes['comments-button']}
-              onClick={handleAuthModalToggle}
-            >
-              Leave A Comment
-            </button>
-          )}
-        </div>
-        {showCommentForm && (
-          <CommentForm
-            onCancel={() => setShowCommentForm(false)}
-            onSubmit={message => handleCommentSubmit(message, commentable.id)}
-            showCancel={true}
+    <div className={classes.commentsSection}>
+      {comments.map(comment => (
+        <div key={comment.id}>
+          <Comment
+            user={comment.user}
+            message={comment.message}
+            reply={false}
           />
-        )}
-      </div>
-      {showAuthModal && (
-        <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+
+          {/* Render replies */}
+          {replies[comment.id]?.data.map(reply => (
+            <Comment
+              key={reply.id}
+              user={reply.user}
+              message={reply.message}
+              reply={true}
+            />
+          ))}
+
+          {/* View More Replies button */}
+          {comment.replies_count > 0 &&
+            (replies[comment.id]?.remaining > 0 || !replies[comment.id]) && (
+              <button
+                onClick={() => handleLoadMoreReplies(comment.id)}
+                className={classes.loadMoreReplies}
+              >
+                View{' '}
+                {Math.min(
+                  replies[comment.id]?.remaining || comment.replies_count,
+                  10
+                )}{' '}
+                more replies
+              </button>
+            )}
+        </div>
+      ))}
+      {hasMore && !loading && (
+        <button onClick={handleLoadMore} className={classes.loadMore}>
+          Load more comments
+        </button>
       )}
-    </>
+      {loading && <p>Loading...</p>}
+    </div>
   )
 }
 

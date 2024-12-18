@@ -1,11 +1,9 @@
-import { useState } from 'react'
 import { RiChat3Line } from 'react-icons/ri'
 
 import classes from './CommentButton.module.css'
 
 const CommentButton = ({ commentsCount }) => {
   const handleClick = () => {
-    // Placeholder for opening the comment popup (future implementation)
     console.log('Comment button clicked')
   }
 

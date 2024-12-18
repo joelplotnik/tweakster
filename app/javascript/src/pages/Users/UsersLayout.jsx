@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 
-function UsersLayout() {
+const UsersLayout = () => {
   return (
     <>
       <Outlet />

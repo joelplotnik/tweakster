@@ -27,10 +27,13 @@ class Api::V1::CommentsController < ApplicationController
     page = params[:page].to_i.positive? ? params[:page].to_i : 1
     paginated_replies = replies.offset((page - 1) * per_page).limit(per_page)
 
+    remaining_replies = replies.count - (page * per_page)
+
     replies_json = paginated_replies.map { |reply| format_comment(reply) }
 
     render json: {
-      replies: replies_json
+      replies: replies_json,
+      remaining_replies: [remaining_replies, 0].max
     }
   end
 

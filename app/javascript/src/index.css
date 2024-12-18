@@ -33,8 +33,9 @@
 }
 
 body {
-  margin: var(--main-margin);
+  margin: var(--body-margin);
   background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
   font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -1,6 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[me]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[show]
   before_action :set_user, only: %i[show update destroy attempts following popular_users check_ownership]
 
   def index
@@ -17,8 +18,11 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def show
+    is_owner = current_user.present? && current_user == @user
+
     render json: format_user(@user).merge({
-                                            currently_playing: @user.currently_playing_game
+                                            currently_playing: @user.currently_playing_game,
+                                            is_owner:
                                           })
   end
 
@@ -182,7 +186,12 @@ class Api::V1::UsersController < ApplicationController
 
   def format_user(user)
     user.as_json.merge({
-                         avatar_url: user.avatar_url
+                         avatar_url: user.avatar_url,
+                         points: user.points,
+                         attempts_count: user.attempts_count,
+                         challenges_count: user.challenges_count,
+                         following: user.followees_count,
+                         followers: user.followers_count
                        })
   end
 

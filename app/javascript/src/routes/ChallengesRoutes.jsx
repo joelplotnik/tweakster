@@ -5,7 +5,6 @@ import ChallengesLayout from '../pages/Challenges/ChallengesLayout'
 import ChallengesPage from '../pages/Challenges/ChallengesPage'
 import EditChallengePage from '../pages/Challenges/EditChallengePage'
 import NewChallengePage from '../pages/Challenges/NewChallengePage'
-import { checkAuthLoader } from '../util/auth'
 import attemptsRoutes from './AttemptsRoutes'
 
 const challengesRoutes = context => [
@@ -23,7 +22,6 @@ const challengesRoutes = context => [
         path: 'new',
         id: `${context}-challenges-new`,
         element: <NewChallengePage />,
-        loader: checkAuthLoader,
       },
       {
         path: ':id',
@@ -39,7 +37,6 @@ const challengesRoutes = context => [
             path: 'edit',
             id: `${context}-challenge-edit`,
             element: <EditChallengePage />,
-            loader: checkAuthLoader,
           },
           ...attemptsRoutes(`${context}-challenge`),
         ],

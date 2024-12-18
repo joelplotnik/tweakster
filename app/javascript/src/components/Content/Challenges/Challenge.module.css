@@ -176,7 +176,7 @@
 .attempt-button {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 5px;
+  margin-bottom: 12px;
   margin-right: 12px;
   gap: 12px;
 }
@@ -192,7 +192,6 @@
 
 .image-container {
   background-color: var(--primary-background-color);
-  padding-top: 5px;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -1,6 +1,7 @@
 class Api::V1::ChallengesController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[create update destroy]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[show]
   before_action :set_user, only: [:index]
   before_action :set_game, only: [:index]
   before_action :set_challenge, only: %i[show update destroy]
@@ -30,7 +31,11 @@ class Api::V1::ChallengesController < ApplicationController
   end
 
   def show
-    render json: format_challenge(@challenge)
+    is_owner = current_user.present? && current_user == @challenge.user
+
+    render json: format_challenge(@challenge).merge({
+                                                      is_owner:
+                                                    })
   end
 
   def create
