@@ -1,57 +1,57 @@
-.commentsSection {
-  padding: 16px;
-  border-radius: 8px;
-}
-
-.loadMore {
-  margin-top: 16px;
-  color: #007bff;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.loadMore:hover {
-  text-decoration: underline;
-}
-
 .comment,
 .reply {
-  margin-bottom: 16px;
-  padding: 12px;
-  border: 1px solid var(--primary-border-color);
+  padding: 10px;
   border-radius: 8px;
-}
-
-.commentHeader,
-.replyHeader {
+  background-color: var(--secondary-background-color);
   display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+  flex-direction: column;
 }
 
 .reply {
   margin-left: 24px;
-  border-left: 2px solid var(--primary-border-color);
+}
+
+.container {
+  display: flex;
+  align-items: flex-start;
+}
+
+.avatar-container {
+  margin-right: 12px;
 }
 
 .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 8px;
+  background-color: var(--primary-text-color);
 }
 
-.loadMoreReplies {
-  margin-top: 8px;
-  color: #007bff;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
+.text-container {
+  flex: 1;
 }
 
-.loadMoreReplies:hover {
+.username {
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--primary-link-color);
+  text-decoration: none;
+  margin-bottom: 4px;
+  display: inline-block;
+}
+
+.username:hover {
   text-decoration: underline;
+}
+
+.message {
+  font-size: 0.9rem;
+  color: var(--primary-text-color);
+  margin: 0;
+}
+
+.like-container {
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
 }

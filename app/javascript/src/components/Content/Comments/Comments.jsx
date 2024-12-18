@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { RiSubtractLine } from 'react-icons/ri'
 
 import { API_URL } from '../../../constants/constants'
 import Comment from './Comment'
@@ -10,6 +11,8 @@ const Comments = () => {
   const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
   const [replies, setReplies] = useState({})
+
+  console.log(comments)
 
   const fetchComments = useCallback(async page => {
     setLoading(true)
@@ -74,12 +77,13 @@ const Comments = () => {
   }
 
   return (
-    <div className={classes.commentsSection}>
+    <div className={classes['comments-section']}>
       {comments.map(comment => (
         <div key={comment.id}>
           <Comment
             user={comment.user}
             message={comment.message}
+            likesCount={comment.likes_count}
             reply={false}
           />
 
@@ -89,6 +93,7 @@ const Comments = () => {
               key={reply.id}
               user={reply.user}
               message={reply.message}
+              likesCount={reply.likes_count}
               reply={true}
             />
           ))}
@@ -98,8 +103,9 @@ const Comments = () => {
             (replies[comment.id]?.remaining > 0 || !replies[comment.id]) && (
               <button
                 onClick={() => handleLoadMoreReplies(comment.id)}
-                className={classes.loadMoreReplies}
+                className={classes['load-more-replies']}
               >
+                <RiSubtractLine className={classes['separator-icon']} />
                 View{' '}
                 {Math.min(
                   replies[comment.id]?.remaining || comment.replies_count,
@@ -111,7 +117,7 @@ const Comments = () => {
         </div>
       ))}
       {hasMore && !loading && (
-        <button onClick={handleLoadMore} className={classes.loadMore}>
+        <button onClick={handleLoadMore} className={classes['load-more']}>
           Load more comments
         </button>
       )}

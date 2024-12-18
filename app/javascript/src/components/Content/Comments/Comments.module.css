@@ -1,57 +1,37 @@
-.commentsSection {
+.comments-section {
   padding: 16px;
   border-radius: 8px;
 }
 
-.loadMore {
-  margin-top: 16px;
-  color: #007bff;
+.load-more {
+  color: var(--primary-red-color);
   background: none;
   border: none;
   cursor: pointer;
   font-size: 16px;
 }
 
-.loadMore:hover {
+.load-more:hover {
   text-decoration: underline;
 }
 
-.comment,
-.reply {
-  margin-bottom: 16px;
-  padding: 12px;
-  /* border: 1px solid var(--primary-border-color); */
-  border-radius: 8px;
-}
-
-.commentHeader,
-.replyHeader {
+.load-more-replies {
   display: flex;
+  color: var(--primary-red-color);
   align-items: center;
-  margin-bottom: 8px;
-}
-
-.reply {
-  margin-left: 24px;
-  /* border-left: 2px solid var(--primary-border-color); */
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.loadMoreReplies {
-  margin-top: 8px;
-  color: #007bff;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 14px;
+  margin-left: 24px;
+  margin-bottom: 8px;
 }
 
-.loadMoreReplies:hover {
+.load-more-replies:hover {
   text-decoration: underline;
+}
+
+.separator-icon {
+  margin-right: 5px;
+  font-size: 1.25em;
 }
