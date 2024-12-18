@@ -11,7 +11,7 @@ const AttemptsList = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const { username, name: gameName, id: challengeId } = useParams()
-  const isUserPage = !!username && !challengeId && !gameName
+  const isUserContext = !!username && !challengeId && !gameName
 
   const getEndpoint = page => {
     if (username && !challengeId && !gameName) {
@@ -63,7 +63,11 @@ const AttemptsList = () => {
         }
       >
         {attempts.map(attempt => (
-          <Attempt key={attempt.id} attempt={attempt} isUserPage={isUserPage} />
+          <Attempt
+            key={attempt.id}
+            attempt={attempt}
+            isUserContext={isUserContext}
+          />
         ))}
       </InfiniteScroll>
     </div>

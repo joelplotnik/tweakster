@@ -14,7 +14,7 @@ import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import DifficultyForm from '../Forms/DifficultyForm'
 import classes from './Challenge.module.css'
 
-const Challenge = ({ challenge, isUserPage }) => {
+const Challenge = ({ challenge, isUserContext }) => {
   const {
     id,
     title,
@@ -61,7 +61,7 @@ const Challenge = ({ challenge, isUserPage }) => {
     <>
       <div className={classes.challenge}>
         <div className={classes['user-game-details']}>
-          {!isUserPage && (
+          {!isUserContext && (
             <div className={classes['user-info']}>
               <img
                 src={user.avatar_url}
@@ -75,7 +75,9 @@ const Challenge = ({ challenge, isUserPage }) => {
           )}
           <div
             className={
-              isUserPage ? classes['game-info-userpage'] : classes['game-info']
+              isUserContext
+                ? classes['game-info-userpage']
+                : classes['game-info']
             }
           >
             <Link to={`/games/${game.slug}`} className={classes['game-name']}>
@@ -148,7 +150,7 @@ const Challenge = ({ challenge, isUserPage }) => {
               )}
               <Link
                 to={
-                  isUserPage
+                  isUserContext
                     ? `/users/${user.slug}/challenges/${id}`
                     : `/games/${game.slug}/challenges/${id}`
                 }

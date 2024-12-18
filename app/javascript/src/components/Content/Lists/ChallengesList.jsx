@@ -11,7 +11,7 @@ const ChallengesList = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const { username, name: gameName } = useParams()
-  const isUserPage = !!username && !gameName
+  const isUserContext = !!username && !gameName
 
   const getEndpoint = page => {
     if (username && !gameName) {
@@ -62,7 +62,7 @@ const ChallengesList = () => {
           <Challenge
             key={challenge.id}
             challenge={challenge}
-            isUserPage={isUserPage}
+            isUserContext={isUserContext}
           />
         ))}
       </InfiniteScroll>

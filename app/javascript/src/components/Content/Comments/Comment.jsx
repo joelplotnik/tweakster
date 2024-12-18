@@ -1,12 +1,12 @@
+import moment from 'moment'
 import { Link } from 'react-router-dom'
 
 import LikeButton from '../../UI/Buttons/LikeButton'
 import classes from './Comment.module.css'
 
-const Comment = ({ user, message, likesCount, reply }) => (
+const Comment = ({ user, created_at, message, likesCount, reply }) => (
   <div className={reply ? classes.reply : classes.comment}>
     <div className={classes.container}>
-      {/* Avatar */}
       <div className={classes['avatar-container']}>
         <img
           src={user.avatar_url}
@@ -14,16 +14,17 @@ const Comment = ({ user, message, likesCount, reply }) => (
           className={classes.avatar}
         />
       </div>
-
-      {/* Username and Message */}
       <div className={classes['text-container']}>
-        <Link to={`/profile/${user.id}`} className={classes.username}>
-          {user.username}
-        </Link>
+        <div className={classes['user-info']}>
+          <Link to={`/profile/${user.id}`} className={classes.username}>
+            {user.username}
+          </Link>
+          <span className={classes['created-at']}>
+            {moment(created_at).fromNow()}
+          </span>
+        </div>
         <p className={classes.message}>{message}</p>
       </div>
-
-      {/* Like Button */}
       <div className={classes['like-container']}>
         <LikeButton likesCount={likesCount} />
       </div>

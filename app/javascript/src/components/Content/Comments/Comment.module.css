@@ -31,12 +31,23 @@
   flex: 1;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.created-at {
+  font-size: 0.8rem;
+  color: var(--primary-text-color-hover);
+}
+
 .username {
   font-weight: bold;
   font-size: 1rem;
   color: var(--primary-link-color);
   text-decoration: none;
-  margin-bottom: 4px;
   display: inline-block;
 }
 

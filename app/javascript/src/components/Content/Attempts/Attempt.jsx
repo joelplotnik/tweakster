@@ -11,7 +11,7 @@ import ShareButton from '../../UI/Buttons/ShareButton'
 import Difficulty from '../../UI/Difficulty'
 import classes from './Attempt.module.css'
 
-const Attempt = ({ attempt, isUserPage }) => {
+const Attempt = ({ attempt, isUserContext }) => {
   const {
     id,
     status,
@@ -38,7 +38,7 @@ const Attempt = ({ attempt, isUserPage }) => {
   return (
     <div className={classes.attempt}>
       <div className={classes['user-game-details']}>
-        {!isUserPage && (
+        {!isUserContext && (
           <div className={classes['user-info']}>
             <img
               src={user.avatar_url}
@@ -52,7 +52,7 @@ const Attempt = ({ attempt, isUserPage }) => {
         )}
         <div
           className={
-            isUserPage ? classes['game-info-userpage'] : classes['game-info']
+            isUserContext ? classes['game-info-userpage'] : classes['game-info']
           }
         >
           <Link

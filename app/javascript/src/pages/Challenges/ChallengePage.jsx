@@ -1,6 +1,6 @@
 import { RiChat3Line, RiGhostLine } from 'react-icons/ri'
 import { useSelector } from 'react-redux'
-import { json } from 'react-router-dom'
+import { json, useParams } from 'react-router-dom'
 
 import Comments from '../../components/Content/Comments/Comments'
 import AttemptsList from '../../components/Content/Lists/AttemptsList'
@@ -14,6 +14,8 @@ import classes from './ChallengePage.module.css'
 
 const ChallengePage = () => {
   const challenge = useSelector(state => state.challengePage.challenge)
+  const { username, name: gameName } = useParams()
+  const basePath = username ? `/users/${username}` : `/games/${gameName}`
 
   const tabs = [
     {
@@ -26,7 +28,7 @@ const ChallengePage = () => {
       key: 'comments',
       label: `Comments (${formatNumber(challenge.comments_count)})`,
       icon: <RiChat3Line />,
-      content: <Comments />,
+      content: <Comments basePath={basePath} challengeId={challenge.id} />,
     },
   ]
 
