@@ -8,9 +8,10 @@ const CommentForm = ({ onSubmit, replyingTo, onTextChange }) => {
 
   useEffect(() => {
     if (replyingTo) {
-      setCommentText(`@${replyingTo.user.username} `)
-    } else {
-      setCommentText('')
+      const usernamePrefix = `@${replyingTo.user.username} `
+      if (!commentText.startsWith(usernamePrefix)) {
+        setCommentText(usernamePrefix)
+      }
     }
   }, [replyingTo])
 
