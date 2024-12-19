@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { RiArrowUpLine } from 'react-icons/ri'
 
 import classes from './CommentForm.module.css'
 
 const CommentForm = ({ onSubmit, replyingTo }) => {
-  const [commentText, setCommentText] = useState(
-    replyingTo ? `@${replyingTo.username} ` : ''
-  )
+  const [commentText, setCommentText] = useState('')
+
+  useEffect(() => {
+    if (replyingTo) {
+      setCommentText(`@${replyingTo.user.username} `)
+    } else {
+      setCommentText('')
+    }
+  }, [replyingTo])
 
   const handleChange = event => {
     setCommentText(event.target.value)

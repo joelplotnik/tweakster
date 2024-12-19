@@ -19,18 +19,16 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       setLoading(true)
       try {
         let path = `${basePath}/challenges/${challengeId}`
-
-        if (attemptId) {
-          path += `/attempts/${attemptId}`
-        }
+        if (attemptId) path += `/attempts/${attemptId}`
         path += `/comments?page=${page}`
 
         const response = await fetch(`${API_URL}${path}`)
-        const data = await response.json()
+        if (!response.ok) throw new Error('Failed to fetch comments')
 
+        const data = await response.json()
         if (Array.isArray(data)) {
           setComments(prevComments => [...prevComments, ...data])
-          setHasMore(data.length === 10)
+          setHasMore(data.length === 10) // Assume pagination with 10 items per page
         } else {
           console.error('Unexpected response format:', data)
         }
@@ -43,22 +41,25 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
     [basePath, challengeId, attemptId]
   )
 
-  const fetchReplies = async (parentId, page) => {
-    try {
-      let path = `${basePath}/challenges/${challengeId}`
-      if (attemptId) {
-        path += `/attempts/${attemptId}`
-      }
-      path += `/comments/${parentId}/replies?page=${page}`
+  const fetchReplies = useCallback(
+    async (parentId, page) => {
+      try {
+        let path = `${basePath}/challenges/${challengeId}`
+        if (attemptId) path += `/attempts/${attemptId}`
+        path += `/comments/${parentId}/replies?page=${page}`
 
-      const response = await fetch(`${API_URL}${path}`)
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error('Failed to fetch replies:', error)
-      return null
-    }
-  }
+        const response = await fetch(`${API_URL}${path}`)
+        if (!response.ok) throw new Error('Failed to fetch replies')
+
+        const data = await response.json()
+        return data
+      } catch (error) {
+        console.error('Failed to fetch replies:', error)
+        return null
+      }
+    },
+    [basePath, challengeId, attemptId]
+  )
 
   const handleLoadMoreReplies = async parentId => {
     const currentReplies = replies[parentId] || {
@@ -67,8 +68,8 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       page: 1,
       allRepliesLoaded: false,
     }
-    const data = await fetchReplies(parentId, currentReplies.page)
 
+    const data = await fetchReplies(parentId, currentReplies.page)
     if (data) {
       const allRepliesLoaded = data.remaining_replies === 0
       setReplies(prevReplies => ({
@@ -84,29 +85,23 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
   }
 
   const handleHideReplies = parentId => {
-    // Reset replies for the comment to start over
     setReplies(prevReplies => ({
       ...prevReplies,
       [parentId]: undefined,
     }))
   }
 
+  const handleReplyClick = comment => {
+    setReplyingTo(comment)
+  }
+
   const handleSubmitComment = async commentText => {
     try {
       let path = `${basePath}/challenges/${challengeId}`
-
-      if (attemptId) {
-        path += `/attempts/${attemptId}`
-      }
-
+      if (attemptId) path += `/attempts/${attemptId}`
       path += '/comments'
 
-      const parentId =
-        replyingTo && replyingTo.parent_id
-          ? replyingTo.parent_id
-          : replyingTo
-          ? replyingTo.id
-          : null
+      const parentId = replyingTo?.id || null
 
       const response = await fetch(path, {
         method: 'POST',
@@ -117,13 +112,20 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to post comment')
-      }
+      if (!response.ok) throw new Error('Failed to post comment')
 
       const newComment = await response.json()
-
-      setComments(prevComments => [newComment, ...prevComments])
+      if (parentId) {
+        setReplies(prevReplies => ({
+          ...prevReplies,
+          [parentId]: {
+            ...(prevReplies[parentId] || {}),
+            data: [newComment, ...(prevReplies[parentId]?.data || [])],
+          },
+        }))
+      } else {
+        setComments(prevComments => [newComment, ...prevComments])
+      }
       setReplyingTo(null)
     } catch (error) {
       console.error('Failed to post comment:', error)
@@ -143,22 +145,18 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       {comments.map(comment => (
         <div key={comment.id}>
           <Comment
-            user={comment.user}
-            message={comment.message}
-            created_at={comment.created_at}
-            likesCount={comment.likes_count}
+            comment={comment}
             reply={false}
+            onReplyClick={handleReplyClick}
           />
 
           {/* Render replies */}
           {replies[comment.id]?.data.map(reply => (
             <Comment
               key={reply.id}
-              user={reply.user}
-              message={reply.message}
-              created_at={reply.created_at}
-              likesCount={reply.likes_count}
+              comment={reply}
               reply={true}
+              onReplyClick={handleReplyClick}
             />
           ))}
 
