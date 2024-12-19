@@ -3,7 +3,7 @@ import { RiArrowUpLine } from 'react-icons/ri'
 
 import classes from './CommentForm.module.css'
 
-const CommentForm = ({ onSubmit, replyingTo }) => {
+const CommentForm = ({ onSubmit, replyingTo, onTextChange }) => {
   const [commentText, setCommentText] = useState('')
 
   useEffect(() => {
@@ -15,7 +15,11 @@ const CommentForm = ({ onSubmit, replyingTo }) => {
   }, [replyingTo])
 
   const handleChange = event => {
-    setCommentText(event.target.value)
+    const value = event.target.value
+    setCommentText(value)
+    if (onTextChange) {
+      onTextChange(value)
+    }
   }
 
   const handleSubmit = event => {

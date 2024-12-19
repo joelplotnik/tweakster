@@ -95,6 +95,12 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
     setReplyingTo(comment)
   }
 
+  const handleInputChange = text => {
+    if (replyingTo && !text.startsWith(`@${replyingTo.user.username} `)) {
+      setReplyingTo(null)
+    }
+  }
+
   const handleSubmitComment = async commentText => {
     try {
       let path = `${basePath}/challenges/${challengeId}`
@@ -192,7 +198,11 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         </button>
       )}
       <div className={classes['comment-form-container']}>
-        <CommentForm onSubmit={handleSubmitComment} replyingTo={replyingTo} />
+        <CommentForm
+          onSubmit={handleSubmitComment}
+          replyingTo={replyingTo}
+          onTextChange={handleInputChange}
+        />
       </div>
     </div>
   )
