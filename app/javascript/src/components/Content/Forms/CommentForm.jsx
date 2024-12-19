@@ -1,50 +1,39 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { RiArrowUpLine } from 'react-icons/ri'
 
 import classes from './CommentForm.module.css'
 
-const PieceCommentForm = ({ comment, onCancel, onSubmit, showCancel }) => {
-  const [message, setMessage] = useState('')
+const CommentForm = ({ onSubmit, replyingTo }) => {
+  const [commentText, setCommentText] = useState(
+    replyingTo ? `@${replyingTo.username} ` : ''
+  )
 
-  useEffect(() => {
-    if (comment) {
-      setMessage(comment.message)
-    }
-  }, [comment])
+  const handleChange = event => {
+    setCommentText(event.target.value)
+  }
 
   const handleSubmit = event => {
     event.preventDefault()
-
-    const commentId = comment ? comment.id : null
-
-    onSubmit(message, commentId)
-    setMessage('')
-    showCancel && onCancel()
+    if (commentText.trim()) {
+      onSubmit(commentText)
+      setCommentText('')
+    }
   }
 
   return (
-    <form className={classes['comment-form']} onSubmit={handleSubmit}>
-      <textarea
-        className={classes['comment-text-area']}
-        value={message}
-        onChange={event => setMessage(event.target.value)}
+    <form onSubmit={handleSubmit} className={classes['comment-form']}>
+      <input
+        type="text"
         placeholder="Add a comment..."
+        value={commentText}
+        onChange={handleChange}
+        className={classes['comment-input']}
       />
-      <div className={classes['button-container']}>
-        <button className={classes['comment-submit-button']} type="submit">
-          {comment ? 'Update Comment' : 'Comment'}
-        </button>
-        {showCancel && (
-          <button
-            className={classes['cancel-button']}
-            type="button"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-        )}
-      </div>
+      <button type="submit" className={classes['submit-button']}>
+        <RiArrowUpLine className={classes['submit-icon']} />
+      </button>
     </form>
   )
 }
 
-export default PieceCommentForm
+export default CommentForm

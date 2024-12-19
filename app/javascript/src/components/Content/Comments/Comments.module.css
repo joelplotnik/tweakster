@@ -1,6 +1,18 @@
 .comments-section {
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.comment-form-container {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--secondary-background-color);
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 800px;
 }
 
 .load-more {

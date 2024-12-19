@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { RiSubtractLine } from 'react-icons/ri'
 
 import { API_URL } from '../../../constants/constants'
+import CommentForm from '../Forms/CommentForm'
 import Comment from './Comment'
 import classes from './Comments.module.css'
 
@@ -11,6 +12,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
   const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
   const [replies, setReplies] = useState({})
+  const [replyingTo, setReplyingTo] = useState(null)
 
   const fetchComments = useCallback(
     async page => {
@@ -89,6 +91,45 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
     }))
   }
 
+  const handleSubmitComment = async commentText => {
+    try {
+      let path = `${basePath}/challenges/${challengeId}`
+
+      if (attemptId) {
+        path += `/attempts/${attemptId}`
+      }
+
+      path += '/comments'
+
+      const parentId =
+        replyingTo && replyingTo.parent_id
+          ? replyingTo.parent_id
+          : replyingTo
+          ? replyingTo.id
+          : null
+
+      const response = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: commentText,
+          parent_id: parentId,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to post comment')
+      }
+
+      const newComment = await response.json()
+
+      setComments(prevComments => [newComment, ...prevComments])
+      setReplyingTo(null)
+    } catch (error) {
+      console.error('Failed to post comment:', error)
+    }
+  }
+
   useEffect(() => {
     fetchComments(page)
   }, [fetchComments, page])
@@ -152,7 +193,9 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
           Load more comments
         </button>
       )}
-      {loading && <p>Loading...</p>}
+      <div className={classes['comment-form-container']}>
+        <CommentForm onSubmit={handleSubmitComment} replyingTo={replyingTo} />
+      </div>
     </div>
   )
 }
