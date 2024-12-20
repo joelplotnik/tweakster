@@ -1,6 +1,9 @@
 require 'will_paginate/array'
 
 class Api::V1::CommentsController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create update destroy]
+
   def index
     comments = Comment.where(commentable: find_commentable, parent_id: nil)
                       .includes(user: { avatar_attachment: :blob })
@@ -48,8 +51,7 @@ class Api::V1::CommentsController < ApplicationController
       CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == commentable.user
 
       render json: comment, include: {
-        user: { only: [:username], methods: [:avatar_url] },
-        likes: { only: [:user_id] }
+        user: { only: %i[username slug], methods: [:avatar_url] }
       }, status: :created
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
@@ -61,8 +63,7 @@ class Api::V1::CommentsController < ApplicationController
 
     if comment.update(comment_params.except(:parent_id))
       render json: comment, include: {
-        user: { only: [:username], methods: [:avatar_url] },
-        likes: { only: [:user_id] }
+        user: { only: [:username], methods: [:avatar_url] }
       }, status: :ok
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
@@ -71,19 +72,18 @@ class Api::V1::CommentsController < ApplicationController
 
   def destroy
     comment = Comment.find(params[:id])
-    comment.destroy
 
-    if comment.destroyed?
-      render json: { message: 'Comment successfully deleted' }, status: :ok
+    if comment.user == current_user || comment.commentable.user == current_user
+      comment.destroy
+
+      if comment.destroyed?
+        render json: { message: 'Comment successfully deleted' }, status: :ok
+      else
+        render json: { error: 'Failed to delete comment' }, status: :unprocessable_entity
+      end
     else
-      render json: { error: 'Failed to delete comment' }, status: :unprocessable_entity
+      render json: { error: 'Unauthorized to delete this comment' }, status: :unauthorized
     end
-  end
-
-  def check_ownership
-    comment = Comment.find(params[:id])
-    belongs_to_user = comment.user == current_user || current_user.admin?
-    render json: { belongs_to_user: }
   end
 
   private
@@ -106,6 +106,7 @@ class Api::V1::CommentsController < ApplicationController
     comment.as_json.merge({
                             user: {
                               username: comment.user.username,
+                              slug: comment.user.slug,
                               avatar_url: comment.user.avatar.attached? ? url_for(comment.user.avatar) : nil
                             }
                           })

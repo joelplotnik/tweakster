@@ -394,6 +394,20 @@ users.each do |user|
     puts "Validation error for Report on Challenge: #{e.message}. Skipping this report."
   end
 
+  # Attempts
+  attempts_to_report = Attempt.where.not(user_id: user.id)
+  sampled_attempts = attempts_to_report.sample(rand(1..[10, attempts_to_report.count].min))
+  sampled_attempts.each do |attempt|
+    Report.create!(
+      content_type: 'attempt',
+      content_id: attempt.id,
+      reporter_id: user.id,
+      reason: report_reasons.sample
+    )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Report on Attempt: #{e.message}. Skipping this report."
+  end
+
   # Comments
   comments_to_report = Comment.where.not(user_id: user.id)
   sampled_comments = comments_to_report.sample(rand(1..[10, comments_to_report.count].min))

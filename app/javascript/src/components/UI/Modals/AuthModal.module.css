@@ -198,9 +198,9 @@
   -webkit-text-fill-color: var(--primary-text-color);
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .modal {
     top: 5%;
     transform: translateX(-50%);
   }
-}
+} */

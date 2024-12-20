@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { RiSubtractLine } from 'react-icons/ri'
+import { useRouteLoaderData } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
 import CommentForm from '../Forms/CommentForm'
@@ -7,6 +8,8 @@ import Comment from './Comment'
 import classes from './Comments.module.css'
 
 const Comments = ({ basePath, challengeId, attemptId }) => {
+  const token = useRouteLoaderData('root')
+  const isLoggedIn = !!token
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
@@ -28,7 +31,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         const data = await response.json()
         if (Array.isArray(data)) {
           setComments(prevComments => [...prevComments, ...data])
-          setHasMore(data.length === 10) // Assume pagination with 10 items per page
+          setHasMore(data.length === 10)
         } else {
           console.error('Unexpected response format:', data)
         }
@@ -111,7 +114,10 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
       const response = await fetch(path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           message: commentText,
           parent_id: parentId,
@@ -138,6 +144,39 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
     }
   }
 
+  const handleDeleteComment = async commentId => {
+    try {
+      let path = `${basePath}/challenges/${challengeId}`
+      if (attemptId) path += `/attempts/${attemptId}`
+      path += `/comments/${commentId}`
+
+      const response = await fetch(`${API_URL}${path}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) throw new Error('Failed to delete comment')
+
+      setComments(prevComments =>
+        prevComments.filter(comment => comment.id !== commentId)
+      )
+
+      setReplies(prevReplies => {
+        const newReplies = { ...prevReplies }
+        Object.keys(newReplies).forEach(parentId => {
+          newReplies[parentId].data = newReplies[parentId].data.filter(
+            reply => reply.id !== commentId
+          )
+        })
+        return newReplies
+      })
+    } catch (error) {
+      console.error('Failed to delete comment:', error)
+    }
+  }
+
   useEffect(() => {
     fetchComments(page)
   }, [fetchComments, page])
@@ -154,6 +193,8 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
             comment={comment}
             reply={false}
             onReplyClick={handleReplyClick}
+            onDeleteClick={handleDeleteComment}
+            isLoggedIn={isLoggedIn}
           />
 
           {/* Render replies */}
@@ -163,6 +204,8 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
               comment={reply}
               reply={true}
               onReplyClick={handleReplyClick}
+              onDeleteClick={handleDeleteComment}
+              isLoggedIn={isLoggedIn}
             />
           ))}
 

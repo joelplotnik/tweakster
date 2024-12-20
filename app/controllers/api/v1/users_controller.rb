@@ -2,7 +2,7 @@ class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[me]
   before_action :authenticate_devise_api_token_if_present!, only: %i[show]
-  before_action :set_user, only: %i[show update destroy attempts following popular_users check_ownership]
+  before_action :set_user, only: %i[show update destroy attempts following popular_users]
 
   def index
     limit = params[:limit] || 25
@@ -162,11 +162,6 @@ class Api::V1::UsersController < ApplicationController
     end
 
     render json: followees_data
-  end
-
-  def check_ownership
-    belongs_to_user = @user == current_user || current_user.admin?
-    render json: { belongs_to_user: }
   end
 
   private
