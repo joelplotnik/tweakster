@@ -17,7 +17,7 @@ ActiveRecord::Base.connection.execute('DELETE FROM noticed_events')
 
 # Create Users
 users = []
-20.times do
+while users.size < 20
   email = Faker::Internet.email
   next if User.exists?(email:)
 
@@ -35,6 +35,7 @@ users = []
       user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
     rescue StandardError => e
       puts "Error attaching avatar for #{user.username}: #{e.message}. Skipping this user."
+      next
     end
   else
     puts "No avatar URL generated for #{user.username}. Skipping avatar attachment."
@@ -73,6 +74,7 @@ unless User.exists?(email: admin_email)
 
   begin
     admin_user.save!
+    users << admin_user
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Admin User: #{e.message}. Skipping this user."
   end
@@ -223,21 +225,23 @@ end
 attempts = []
 statuses = ['To Do', 'In Progress', 'Complete']
 
-60.times do
-  next if Attempt.exists?(challenge: challenges.sample)
+users.each do |user|
+  challenges.each do |challenge|
+    next if Attempt.exists?(user_id: user.id, challenge_id: challenge.id)
 
-  status = statuses.sample # Sample status
+    status = statuses.sample
 
-  begin
-    attempt = Attempt.create!(
-      challenge: challenges.sample,
-      user: users.sample,
-      status:,
-      completed_at: status == 'Complete' ? Faker::Date.between(from: '2023-01-01', to: '2024-01-01') : nil
-    )
-    attempts << attempt
-  rescue ActiveRecord::RecordInvalid => e
-    puts "Validation error for Attempt: #{e.message}. Skipping this attempt."
+    begin
+      attempt = Attempt.create!(
+        challenge:,
+        user:,
+        status:,
+        completed_at: status == 'Complete' ? Faker::Date.between(from: '2023-01-01', to: '2024-01-01') : nil
+      )
+      attempts << attempt
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Attempt: #{e.message}. Skipping this attempt."
+    end
   end
 end
 
@@ -245,7 +249,7 @@ end
 attempts.each do |attempt|
   next unless attempt.status == 'Complete'
 
-  num_approvals = rand(0..10)
+  num_approvals = rand(0..5)
   approvers = users.sample(num_approvals).uniq
 
   approvers.each do |approver|
@@ -358,7 +362,7 @@ end
 # Create Likes on Comments
 comments = Comment.all
 comments.each do |comment|
-  num_likes = rand(0..20)
+  num_likes = rand(0..10)
   likers = users.sample(num_likes).uniq
   likers.each do |liker|
     next if Like.exists?(user: liker, comment_id: comment.id)

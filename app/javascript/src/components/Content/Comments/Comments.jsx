@@ -110,17 +110,22 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       if (attemptId) path += `/attempts/${attemptId}`
       path += '/comments'
 
-      const parentId = replyingTo?.id || null
+      const commentableType = attemptId ? 'Attempt' : 'Challenge'
+      const parentId = replyingTo?.parent_id || replyingTo?.id || null
 
-      const response = await fetch(path, {
+      const response = await fetch(`${API_URL}${path}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          message: commentText,
-          parent_id: parentId,
+          comment: {
+            message: commentText,
+            commentable_type: commentableType,
+            commentable_id: attemptId || challengeId,
+            parent_id: parentId,
+          },
         }),
       })
 
@@ -132,11 +137,11 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
           ...prevReplies,
           [parentId]: {
             ...(prevReplies[parentId] || {}),
-            data: [newComment, ...(prevReplies[parentId]?.data || [])],
+            data: [...(prevReplies[parentId]?.data || []), newComment],
           },
         }))
       } else {
-        setComments(prevComments => [newComment, ...prevComments])
+        setComments(prevComments => [...prevComments, newComment])
       }
       setReplyingTo(null)
     } catch (error) {

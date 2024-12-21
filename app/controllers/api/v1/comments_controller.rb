@@ -45,10 +45,13 @@ class Api::V1::CommentsController < ApplicationController
     comment = commentable.comments.new(comment_params)
     comment.user = current_user
 
-    comment.parent_id = params[:id] if params[:id].present?
-
     if comment.save
-      CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == commentable.user
+      if comment.parent_id.present?
+        parent_comment = Comment.find(comment.parent_id)
+        CommentNotifier.with(record: comment).deliver(parent_comment.user) unless parent_comment.user == current_user
+      else
+        CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == commentable.user
+      end
 
       render json: comment, include: {
         user: { only: %i[username slug], methods: [:avatar_url] }
@@ -89,7 +92,7 @@ class Api::V1::CommentsController < ApplicationController
   private
 
   def comment_params
-    params.require(:comment).permit(:message, :commentable_id, :commentable_type)
+    params.require(:comment).permit(:message, :commentable_id, :commentable_type, :parent_id)
   end
 
   def find_commentable
