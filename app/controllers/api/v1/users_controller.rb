@@ -5,16 +5,21 @@ class Api::V1::UsersController < ApplicationController
   before_action :set_user, only: %i[show update destroy attempts following popular_users]
 
   def index
-    limit = params[:limit] || 25
-    page = params[:page] || 1
-
     users = User
             .with_attached_avatar
             .paginate(page:, per_page: limit)
             .order(created_at: :asc)
             .map { |user| format_user(user) }
 
-    render json: users
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_users = users.offset((page - 1) * per_page).limit(per_page)
+
+    users_with_metadata = paginated_users.map do |user|
+      format_user(user)
+    end
+
+    render json: users_with_metadata
   end
 
   def show
@@ -106,21 +111,20 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def attempts
-    limit = params[:limit] || 25
-    page = params[:page] || 1
-
-    return render json: { error: 'User must be specified' }, status: :unprocessable_entity unless @user
-
     attempts = @user.attempts
                     .includes(:challenge, challenge: :game)
-                    .paginate(page:, per_page: limit)
+                    .order(created_at: :desc)
 
-    render json: {
-      attempts: attempts.map { |attempt| format_attempt(attempt) },
-      current_page: page.to_i,
-      total_pages: attempts.total_pages,
-      total_attempts: attempts.total_entries
-    }
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
+
+    attempts_with_metadata = paginated_attempts.map do |attempt|
+      format_attempt(attempt)
+    end
+
+    # Return the formatted attempts
+    render json: attempts_with_metadata
   end
 
   def popular_users

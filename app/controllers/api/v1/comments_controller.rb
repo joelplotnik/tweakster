@@ -9,6 +9,9 @@ class Api::V1::CommentsController < ApplicationController
                       .includes(user: { avatar_attachment: :blob })
                       .order(likes_count: :desc)
 
+    excluded_comment_ids = JSON.parse(params[:exclude] || '[]')
+    comments = comments.where.not(id: excluded_comment_ids)
+
     per_page = 10
     page = params[:page].to_i.positive? ? params[:page].to_i : 1
     paginated_comments = comments.offset((page - 1) * per_page).limit(per_page)
@@ -24,7 +27,12 @@ class Api::V1::CommentsController < ApplicationController
   def replies
     parent_comment = Comment.find(params[:id])
 
-    replies = parent_comment.children.includes(user: { avatar_attachment: :blob }).order(likes_count: :desc)
+    excluded_reply_ids = JSON.parse(params[:exclude] || '[]')
+
+    replies = parent_comment.children
+                            .where.not(id: excluded_reply_ids)
+                            .includes(user: { avatar_attachment: :blob })
+                            .order(likes_count: :desc)
 
     per_page = 10
     page = params[:page].to_i.positive? ? params[:page].to_i : 1

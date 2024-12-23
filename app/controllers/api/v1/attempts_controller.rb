@@ -5,21 +5,19 @@ class Api::V1::AttemptsController < ApplicationController
   before_action :set_attempt, only: %i[show update destroy]
 
   def index
-    limit = params[:limit] || 25
-    page = params[:page] || 1
+    attempts = @challenge.attempts
+                         .includes(:challenge, challenge: :game)
+                         .order(created_at: :desc)
 
-    return render json: { error: 'Challenge must be specified' }, status: :unprocessable_entity unless @challenge
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
 
-    @attempts = @challenge.attempts
-                          .includes(:challenge, challenge: :game)
-                          .paginate(page:, per_page: limit)
+    attempts_with_metadata = paginated_attempts.map do |attempt|
+      format_attempt(attempt)
+    end
 
-    render json: {
-      attempts: @attempts.map { |attempt| format_attempt(attempt) },
-      current_page: page.to_i,
-      total_pages: @attempts.total_pages,
-      total_attempts: @attempts.total_entries
-    }
+    render json: attempts_with_metadata
   end
 
   def show

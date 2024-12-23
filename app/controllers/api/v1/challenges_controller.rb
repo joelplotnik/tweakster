@@ -7,27 +7,23 @@ class Api::V1::ChallengesController < ApplicationController
   before_action :set_challenge, only: %i[show update destroy]
 
   def index
-    limit = params[:limit] || 25
-    page = params[:page] || 1
-
     if @user
-      challenges = @user.challenges
-                        .includes(:user, :game)
-                        .paginate(page:, per_page: limit)
+      challenges = @user.challenges.includes(:user, :game)
     elsif @game
-      challenges = @game.challenges
-                        .includes(:user, :game)
-                        .paginate(page:, per_page: limit)
+      challenges = @game.challenges.includes(:user, :game)
     else
       render json: { error: 'User or game must be specified' }, status: :unprocessable_entity and return
     end
 
-    render json: {
-      challenges: challenges.map { |challenge| format_challenge(challenge) },
-      current_page: page.to_i,
-      total_pages: challenges.total_pages,
-      total_challenges: challenges.total_entries
-    }
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_challenges = challenges.offset((page - 1) * per_page).limit(per_page)
+
+    challenges_with_metadata = paginated_challenges.map do |challenge|
+      format_challenge(challenge)
+    end
+
+    render json: challenges_with_metadata
   end
 
   def show

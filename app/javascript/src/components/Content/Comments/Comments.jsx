@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { RiSubtractLine } from 'react-icons/ri'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import { useRouteLoaderData } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
@@ -16,53 +17,50 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
   const [page, setPage] = useState(1)
   const [replies, setReplies] = useState({})
   const [replyingTo, setReplyingTo] = useState(null)
+  const [newCommentIds, setNewCommentIds] = useState([])
+  const [newReplyIds, setNewReplyIds] = useState([])
 
-  const fetchComments = useCallback(
-    async page => {
-      setLoading(true)
-      try {
-        let path = `${basePath}/challenges/${challengeId}`
-        if (attemptId) path += `/attempts/${attemptId}`
-        path += `/comments?page=${page}`
+  const fetchComments = async page => {
+    setLoading(true)
+    try {
+      let path = `${basePath}/challenges/${challengeId}`
+      if (attemptId) path += `/attempts/${attemptId}`
+      path += `/comments?page=${page}&exclude=${JSON.stringify(newCommentIds)}`
 
-        const response = await fetch(`${API_URL}${path}`)
-        if (!response.ok) throw new Error('Failed to fetch comments')
+      const response = await fetch(`${API_URL}${path}`)
+      if (!response.ok) throw new Error('Failed to fetch comments')
 
-        const data = await response.json()
-        if (Array.isArray(data)) {
-          setComments(prevComments => [...prevComments, ...data])
-          setHasMore(data.length === 10)
-        } else {
-          console.error('Unexpected response format:', data)
-        }
-      } catch (error) {
-        console.error('Failed to fetch comments:', error)
-      } finally {
-        setLoading(false)
+      const data = await response.json()
+      if (Array.isArray(data)) {
+        setComments(prevComments => [...prevComments, ...data])
+        setHasMore(data.length === 10)
+      } else {
+        console.error('Unexpected response format:', data)
       }
-    },
-    [basePath, challengeId, attemptId]
-  )
+    } catch (error) {
+      console.error('Failed to fetch comments:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
-  const fetchReplies = useCallback(
-    async (parentId, page) => {
-      try {
-        let path = `${basePath}/challenges/${challengeId}`
-        if (attemptId) path += `/attempts/${attemptId}`
-        path += `/comments/${parentId}/replies?page=${page}`
+  const fetchReplies = async (parentId, page) => {
+    try {
+      let path = `${basePath}/challenges/${challengeId}`
+      if (attemptId) path += `/attempts/${attemptId}`
+      path += `/comments/${parentId}/replies?page=${page}&exclude=${JSON.stringify(
+        newReplyIds
+      )}`
 
-        const response = await fetch(`${API_URL}${path}`)
-        if (!response.ok) throw new Error('Failed to fetch replies')
+      const response = await fetch(`${API_URL}${path}`)
+      if (!response.ok) throw new Error('Failed to fetch replies')
 
-        const data = await response.json()
-        return data
-      } catch (error) {
-        console.error('Failed to fetch replies:', error)
-        return null
-      }
-    },
-    [basePath, challengeId, attemptId]
-  )
+      return await response.json()
+    } catch (error) {
+      console.error('Failed to fetch replies:', error)
+      return null
+    }
+  }
 
   const handleLoadMoreReplies = async parentId => {
     const currentReplies = replies[parentId] || {
@@ -133,6 +131,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
       const newComment = await response.json()
       if (parentId) {
+        setNewReplyIds(prevIds => [...prevIds, newComment.id])
         setReplies(prevReplies => ({
           ...prevReplies,
           [parentId]: {
@@ -141,6 +140,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
           },
         }))
       } else {
+        setNewCommentIds(prevIds => [...prevIds, newComment.id])
         setComments(prevComments => [...prevComments, newComment])
       }
       setReplyingTo(null)
@@ -184,67 +184,63 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
   useEffect(() => {
     fetchComments(page)
-  }, [fetchComments, page])
-
-  const handleLoadMore = () => {
-    setPage(prevPage => prevPage + 1)
-  }
+  }, [page])
 
   return (
     <div className={classes['comments-section']}>
-      {comments.map(comment => (
-        <div key={comment.id}>
-          <Comment
-            comment={comment}
-            reply={false}
-            onReplyClick={handleReplyClick}
-            onDeleteClick={handleDeleteComment}
-            isLoggedIn={isLoggedIn}
-          />
-
-          {/* Render replies */}
-          {replies[comment.id]?.data.map(reply => (
+      <InfiniteScroll
+        dataLength={comments.length}
+        next={() => setPage(prevPage => prevPage + 1)}
+        hasMore={hasMore}
+        loader={<p>Loading...</p>}
+      >
+        {comments.map(comment => (
+          <div key={comment.id}>
             <Comment
-              key={reply.id}
-              comment={reply}
-              reply={true}
+              comment={comment}
+              reply={false}
               onReplyClick={handleReplyClick}
               onDeleteClick={handleDeleteComment}
               isLoggedIn={isLoggedIn}
             />
-          ))}
 
-          {/* View More Replies / Hide Replies button */}
-          {comment.replies_count > 0 &&
-            (replies[comment.id]?.allRepliesLoaded ? (
-              <button
-                onClick={() => handleHideReplies(comment.id)}
-                className={classes['load-more-replies']}
-              >
-                <RiSubtractLine className={classes['separator-icon']} />
-                Hide replies
-              </button>
-            ) : (
-              <button
-                onClick={() => handleLoadMoreReplies(comment.id)}
-                className={classes['load-more-replies']}
-              >
-                <RiSubtractLine className={classes['separator-icon']} />
-                View{' '}
-                {Math.min(
-                  replies[comment.id]?.remaining || comment.replies_count,
-                  10
-                )}{' '}
-                more replies
-              </button>
+            {replies[comment.id]?.data.map(reply => (
+              <Comment
+                key={reply.id}
+                comment={reply}
+                reply={true}
+                onReplyClick={handleReplyClick}
+                onDeleteClick={handleDeleteComment}
+                isLoggedIn={isLoggedIn}
+              />
             ))}
-        </div>
-      ))}
-      {hasMore && !loading && (
-        <button onClick={handleLoadMore} className={classes['load-more']}>
-          Load more comments
-        </button>
-      )}
+
+            {comment.replies_count > 0 &&
+              (replies[comment.id]?.allRepliesLoaded ? (
+                <button
+                  onClick={() => handleHideReplies(comment.id)}
+                  className={classes['load-more-replies']}
+                >
+                  <RiSubtractLine className={classes['separator-icon']} />
+                  Hide replies
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleLoadMoreReplies(comment.id)}
+                  className={classes['load-more-replies']}
+                >
+                  <RiSubtractLine className={classes['separator-icon']} />
+                  View{' '}
+                  {Math.min(
+                    replies[comment.id]?.remaining || comment.replies_count,
+                    10
+                  )}{' '}
+                  more replies
+                </button>
+              ))}
+          </div>
+        ))}
+      </InfiniteScroll>
       <div className={classes['comment-form-container']}>
         <CommentForm
           onSubmit={handleSubmitComment}

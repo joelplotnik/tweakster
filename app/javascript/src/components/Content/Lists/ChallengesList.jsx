@@ -8,7 +8,8 @@ import classes from './ChallengesList.module.css'
 
 const ChallengesList = () => {
   const [challenges, setChallenges] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const { username, name: gameName } = useParams()
   const isUserContext = !!username && !gameName
@@ -23,6 +24,7 @@ const ChallengesList = () => {
   }
 
   const fetchChallenges = async page => {
+    setLoading(true)
     try {
       const endpoint = getEndpoint(page)
       const response = await fetch(endpoint)
@@ -32,20 +34,25 @@ const ChallengesList = () => {
       }
 
       const data = await response.json()
-      setChallenges(prev => [...prev, ...data.challenges])
-      setHasMore(data.hasMore)
+
+      if (Array.isArray(data)) {
+        setChallenges(prevChallenges => [...prevChallenges, ...data])
+        setHasMore(data.length === 10)
+      } else {
+        console.error('Unexpected response format:', data)
+      }
     } catch (error) {
       console.error('Error fetching challenges:', error.message)
     }
   }
 
   useEffect(() => {
-    setChallenges([])
-    setCurrentPage(1)
-    fetchChallenges(1)
-  }, [username, gameName])
+    fetchChallenges(page)
+  }, [page])
 
-  const loadMore = () => setCurrentPage(prev => prev + 1)
+  const loadMore = () => {
+    setPage(prev => prev + 1)
+  }
 
   return (
     <div className={classes['challenges-list']}>

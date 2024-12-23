@@ -8,11 +8,11 @@ import classes from './AttemptsList.module.css'
 
 const AttemptsList = () => {
   const [attempts, setAttempts] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
   const { username, name: gameName, id: challengeId } = useParams()
   const isUserContext = !!username && !challengeId && !gameName
-
   const getEndpoint = page => {
     if (username && !challengeId && !gameName) {
       return `${API_URL}/users/${username}/attempts?page=${page}`
@@ -27,6 +27,7 @@ const AttemptsList = () => {
   }
 
   const fetchAttempts = async page => {
+    setLoading(true)
     try {
       const endpoint = getEndpoint(page)
       const response = await fetch(endpoint)
@@ -36,20 +37,27 @@ const AttemptsList = () => {
       }
 
       const data = await response.json()
-      setAttempts(prev => [...prev, ...data.attempts])
-      setHasMore(data.hasMore)
+
+      if (Array.isArray(data)) {
+        setAttempts(prevAttempts => [...prevAttempts, ...data])
+        setHasMore(data.length === 10)
+      } else {
+        console.error('Unexpected response format:', data)
+      }
     } catch (error) {
-      console.error('Error fetching attempts:', error.message)
+      console.error('Failed to fetch attempts:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    setAttempts([])
-    setCurrentPage(1)
-    fetchAttempts(1)
-  }, [username, gameName])
+    fetchAttempts(page)
+  }, [page])
 
-  const loadMore = () => setCurrentPage(prev => prev + 1)
+  const loadMore = () => {
+    setPage(prev => prev + 1)
+  }
 
   return (
     <div className={classes['attempts-list']}>
@@ -58,9 +66,7 @@ const AttemptsList = () => {
         next={loadMore}
         hasMore={hasMore}
         loader={<div className={classes.loading}>Loading more...</div>}
-        endMessage={
-          <p className={classes['end-message']}>No more attempts to show</p>
-        }
+        endMessage={<p>No more attempts to show</p>}
       >
         {attempts.map(attempt => (
           <Attempt
