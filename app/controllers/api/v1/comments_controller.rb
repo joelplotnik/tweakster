@@ -61,9 +61,10 @@ class Api::V1::CommentsController < ApplicationController
         CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == commentable.user
       end
 
-      render json: comment, include: {
-        user: { only: %i[username slug], methods: [:avatar_url] }
-      }, status: :created
+      formatted_comment = format_comment(comment)
+      formatted_comment['replies_count'] = comment.children.count
+
+      render json: formatted_comment, status: :created
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
     end

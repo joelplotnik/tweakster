@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { RiSubtractLine } from 'react-icons/ri'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useDispatch } from 'react-redux'
 import { useRouteLoaderData } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
+import { challengePageActions } from '../../../store/challengePage'
 import CommentForm from '../Forms/CommentForm'
 import Comment from './Comment'
 import classes from './Comments.module.css'
@@ -19,6 +21,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
   const [replyingTo, setReplyingTo] = useState(null)
   const [newCommentIds, setNewCommentIds] = useState([])
   const [newReplyIds, setNewReplyIds] = useState([])
+  const dispatch = useDispatch()
 
   const fetchComments = async page => {
     setLoading(true)
@@ -143,6 +146,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         setNewCommentIds(prevIds => [...prevIds, newComment.id])
         setComments(prevComments => [...prevComments, newComment])
       }
+      dispatch(challengePageActions.incrementCommentsCount(1))
       setReplyingTo(null)
     } catch (error) {
       console.error('Failed to post comment:', error)
@@ -164,6 +168,13 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
       if (!response.ok) throw new Error('Failed to delete comment')
 
+      // Calculate replies dynamically for totalCountToRemove
+      const deletedComment = comments.find(comment => comment.id === commentId)
+      const associatedReplies = replies[commentId]?.data || []
+      const dynamicRepliesCount = associatedReplies.length
+      const totalCountToRemove =
+        deletedComment?.replies_count || dynamicRepliesCount + 1
+
       setComments(prevComments =>
         prevComments.filter(comment => comment.id !== commentId)
       )
@@ -177,6 +188,8 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         })
         return newReplies
       })
+
+      dispatch(challengePageActions.decrementCommentsCount(totalCountToRemove))
     } catch (error) {
       console.error('Failed to delete comment:', error)
     }

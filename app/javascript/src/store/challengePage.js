@@ -11,6 +11,16 @@ const challengePageSlice = createSlice({
     setChallenge: (state, action) => {
       state.challenge = action.payload
     },
+    incrementCommentsCount: (state, action) => {
+      if (state.challenge) {
+        state.challenge.comments_count += action.payload
+      }
+    },
+    decrementCommentsCount: (state, action) => {
+      if (state.challenge) {
+        state.challenge.comments_count -= action.payload
+      }
+    },
   },
 })
 
