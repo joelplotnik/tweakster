@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { RiArrowUpLine } from 'react-icons/ri'
 import { useSelector } from 'react-redux'
 
@@ -9,12 +9,24 @@ const CommentForm = ({ onSubmit, replyingTo, onTextChange }) => {
   const token = useSelector(state => state.token.token)
   const [commentText, setCommentText] = useState('')
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     if (replyingTo) {
       const usernamePrefix = `@${replyingTo.user.username} `
       if (!commentText.startsWith(usernamePrefix)) {
         setCommentText(usernamePrefix)
+
+        // Set focus at the end of the pre-filled text
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus()
+            inputRef.current.setSelectionRange(
+              usernamePrefix.length,
+              usernamePrefix.length
+            )
+          }
+        }, 0)
       }
     }
   }, [replyingTo])
@@ -48,6 +60,7 @@ const CommentForm = ({ onSubmit, replyingTo, onTextChange }) => {
       <form onSubmit={handleSubmit} className={classes['comment-form']}>
         <input
           type="text"
+          ref={inputRef}
           placeholder={
             token ? 'Add a comment...' : 'Log in to leave a comment...'
           }

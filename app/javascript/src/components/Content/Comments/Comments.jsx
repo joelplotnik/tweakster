@@ -20,6 +20,8 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
   const [replyingTo, setReplyingTo] = useState(null)
   const [newCommentIds, setNewCommentIds] = useState([])
   const [newReplyIds, setNewReplyIds] = useState([])
+  const [highlightedCommentId, setHighlightedCommentId] = useState(null)
+  const [highlightedReplyId, setHighlightedReplyId] = useState(null)
   const dispatch = useDispatch()
 
   const fetchComments = async page => {
@@ -178,9 +180,12 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
             },
           }
         })
+
+        setHighlightedReplyId(newComment.id)
       } else {
         setNewCommentIds(prevIds => [...prevIds, newComment.id])
         setComments(prevComments => [newComment, ...prevComments])
+        setHighlightedCommentId(newComment.id)
       }
 
       dispatch(challengePageActions.incrementCommentsCount(1))
@@ -189,6 +194,34 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       console.error('Failed to post comment:', error)
     }
   }
+
+  useEffect(() => {
+    if (highlightedCommentId) {
+      const newCommentElement = document.getElementById(
+        `comment-${highlightedCommentId}`
+      )
+      if (newCommentElement) {
+        newCommentElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }
+    }
+  }, [highlightedCommentId])
+
+  useEffect(() => {
+    if (highlightedReplyId) {
+      const newReplyElement = document.getElementById(
+        `reply-${highlightedReplyId}`
+      )
+      if (newReplyElement) {
+        newReplyElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }
+    }
+  }, [highlightedReplyId])
 
   const handleDeleteComment = async commentId => {
     try {
@@ -275,7 +308,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         loader={<p>Loading...</p>}
       >
         {comments.map(comment => (
-          <div key={comment.id}>
+          <div key={comment.id} id={`comment-${comment.id}`}>
             <Comment
               comment={comment}
               reply={false}
@@ -285,14 +318,15 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
             />
 
             {replies[comment.id]?.data.map(reply => (
-              <Comment
-                key={reply.id}
-                comment={reply}
-                reply={true}
-                onReplyClick={handleReplyClick}
-                onDeleteClick={handleDeleteComment}
-                isLoggedIn={isLoggedIn}
-              />
+              <div key={reply.id} id={`reply-${reply.id}`}>
+                <Comment
+                  comment={reply}
+                  reply={true}
+                  onReplyClick={handleReplyClick}
+                  onDeleteClick={handleDeleteComment}
+                  isLoggedIn={isLoggedIn}
+                />
+              </div>
             ))}
 
             {comment.replies_count > 0 &&

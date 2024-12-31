@@ -120,7 +120,10 @@ function SearchBar({ mobile, handleBackClick }) {
                   to={`/users/${result.slug}`}
                   key={result.slug}
                   className={classes['user-result']}
-                  onClick={clearInput}
+                  onClick={() => {
+                    clearInput()
+                    handleBackClick()
+                  }}
                 >
                   <div className={classes['user-avatar-container']}>
                     <img
