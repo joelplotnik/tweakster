@@ -93,18 +93,34 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
   }
 
   const handleHideReplies = parentId => {
+    const currentReplies = replies[parentId]?.data || []
+
+    // Count how many replies in `newReplyIds` belong to this parent comment
+    const newRepliesCount = currentReplies.filter(reply =>
+      newReplyIds.includes(reply.id)
+    ).length
+
+    // Update the replies_count of the parent comment
+    setComments(prevComments =>
+      prevComments.map(comment =>
+        comment.id === parentId
+          ? {
+              ...comment,
+              replies_count: comment.replies_count + newRepliesCount,
+            }
+          : comment
+      )
+    )
+
+    // Remove replies from the state and update `newReplyIds`
     setReplies(prevReplies => ({
       ...prevReplies,
-      [parentId]: undefined,
+      [parentId]: undefined, // Remove replies for this parent comment
     }))
 
     setNewReplyIds(prevIds =>
-      prevIds.filter(id => !isNewCommentForParent(id, parentId))
+      prevIds.filter(id => !currentReplies.some(reply => reply.id === id))
     )
-  }
-
-  const isNewCommentForParent = (commentId, parentId) => {
-    return replies[parentId]?.data.some(reply => reply.id === commentId)
   }
 
   const handleReplyClick = comment => {
