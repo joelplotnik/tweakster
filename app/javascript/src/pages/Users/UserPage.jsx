@@ -32,7 +32,7 @@ const UserPage = () => {
   ]
 
   return (
-    <div className={classes['user-page']}>
+    <div className={classes['user-page']} key={user.id}>
       <ProfileCard user={user} isOwner={user.is_owner} />
       <Tabs tabs={tabs} />
     </div>
