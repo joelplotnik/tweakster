@@ -189,13 +189,40 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
       if (!response.ok) throw new Error('Failed to delete comment')
 
-      // Calculate replies dynamically for totalCountToRemove
-      const deletedComment = comments.find(comment => comment.id === commentId)
-      const associatedReplies = replies[commentId]?.data || []
-      const dynamicRepliesCount = associatedReplies.length
-      const totalCountToRemove =
-        deletedComment?.replies_count || dynamicRepliesCount + 1
+      // Find the comment to delete, either in top-level comments or in replies
+      const deletedComment =
+        comments.find(comment => comment.id === commentId) ||
+        Object.values(replies)
+          .flatMap(replyGroup => replyGroup.data)
+          .find(reply => reply.id === commentId)
 
+      if (!deletedComment) {
+        console.error('Comment not found for deletion.')
+        return
+      }
+
+      let totalCountToRemove = 1 // Start with 1 for the comment itself
+
+      // If it's a top-level comment, account for its replies
+      if (deletedComment.replies_count) {
+        totalCountToRemove += deletedComment.replies_count
+        setReplies(prevReplies => {
+          const newReplies = { ...prevReplies }
+          delete newReplies[commentId] // Remove all replies of the top-level comment
+          return newReplies
+        })
+      } else if (deletedComment.parent_id) {
+        // If it's a reply, decrement the replies_count for the parent
+        setComments(prevComments =>
+          prevComments.map(comment =>
+            comment.id === deletedComment.parent_id
+              ? { ...comment, replies_count: comment.replies_count - 1 }
+              : comment
+          )
+        )
+      }
+
+      // Update comments and replies state
       setComments(prevComments =>
         prevComments.filter(comment => comment.id !== commentId)
       )
@@ -209,10 +236,10 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
             )
           }
         })
-
         return newReplies
       })
 
+      // Decrement comments count in challengePage state
       dispatch(challengePageActions.decrementCommentsCount(totalCountToRemove))
     } catch (error) {
       console.error('Failed to delete comment:', error)
