@@ -5,19 +5,12 @@ class Api::V1::UsersController < ApplicationController
   before_action :set_user, only: %i[show update destroy attempts following popular_users]
 
   def index
-    users = User
-            .with_attached_avatar
-            .paginate(page:, per_page: limit)
-            .order(created_at: :asc)
-            .map { |user| format_user(user) }
+    users = User.with_attached_avatar
+                .order(created_at: :asc)
 
-    per_page = 10
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-    paginated_users = users.offset((page - 1) * per_page).limit(per_page)
+    paginated_users = users.paginate(page: params[:page], per_page: 10)
 
-    users_with_metadata = paginated_users.map do |user|
-      format_user(user)
-    end
+    users_with_metadata = paginated_users.map { |user| format_user(user) }
 
     render json: users_with_metadata
   end

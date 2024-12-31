@@ -15,9 +15,7 @@ class Api::V1::ChallengesController < ApplicationController
       render json: { error: 'User or game must be specified' }, status: :unprocessable_entity and return
     end
 
-    per_page = 10
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-    paginated_challenges = challenges.offset((page - 1) * per_page).limit(per_page)
+    paginated_challenges = challenges.paginate(page: params[:page], per_page: 10)
 
     challenges_with_metadata = paginated_challenges.map do |challenge|
       format_challenge(challenge)

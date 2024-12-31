@@ -1,5 +1,3 @@
-require 'will_paginate/array'
-
 class Api::V1::CommentsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[create update destroy]
@@ -12,9 +10,7 @@ class Api::V1::CommentsController < ApplicationController
     excluded_comment_ids = JSON.parse(params[:exclude] || '[]')
     comments = comments.where.not(id: excluded_comment_ids)
 
-    per_page = 10
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-    paginated_comments = comments.offset((page - 1) * per_page).limit(per_page)
+    paginated_comments = comments.paginate(page: params[:page], per_page: 10)
 
     comments_with_replies_count = paginated_comments.map do |comment|
       formatted_comment = format_comment(comment)
@@ -34,17 +30,17 @@ class Api::V1::CommentsController < ApplicationController
                             .includes(user: { avatar_attachment: :blob })
                             .order(likes_count: :desc)
 
-    per_page = 10
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-    paginated_replies = replies.offset((page - 1) * per_page).limit(per_page)
-
-    remaining_replies = replies.count - (page * per_page)
+    paginated_replies = replies.paginate(page: params[:page], per_page: 10)
 
     replies_json = paginated_replies.map { |reply| format_comment(reply) }
 
+    total_replies = replies.count
+    replies_shown = paginated_replies.current_page * paginated_replies.per_page
+    remaining_replies = [total_replies - replies_shown, 0].max
+
     render json: {
       replies: replies_json,
-      remaining_replies: [remaining_replies, 0].max
+      remaining_replies:
     }
   end
 

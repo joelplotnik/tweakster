@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { RiSubtractLine } from 'react-icons/ri'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useDispatch } from 'react-redux'
-import { useRouteLoaderData } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { API_URL } from '../../../constants/constants'
 import { challengePageActions } from '../../../store/challengePage'
@@ -11,7 +10,7 @@ import Comment from './Comment'
 import classes from './Comments.module.css'
 
 const Comments = ({ basePath, challengeId, attemptId }) => {
-  const token = useRouteLoaderData('root')
+  const token = useSelector(state => state.token.token)
   const isLoggedIn = !!token
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(false)
@@ -35,7 +34,12 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
       const data = await response.json()
       if (Array.isArray(data)) {
-        setComments(prevComments => [...prevComments, ...data])
+        const filteredComments = data.filter(
+          comment =>
+            !comments.some(existingComment => existingComment.id === comment.id)
+        )
+
+        setComments(prevComments => [...prevComments, ...filteredComments])
         setHasMore(data.length === 10)
       } else {
         console.error('Unexpected response format:', data)
@@ -93,6 +97,14 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       ...prevReplies,
       [parentId]: undefined,
     }))
+
+    setNewReplyIds(prevIds =>
+      prevIds.filter(id => !isNewCommentForParent(id, parentId))
+    )
+  }
+
+  const isNewCommentForParent = (commentId, parentId) => {
+    return replies[parentId]?.data.some(reply => reply.id === commentId)
   }
 
   const handleReplyClick = comment => {
@@ -135,17 +147,26 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       const newComment = await response.json()
       if (parentId) {
         setNewReplyIds(prevIds => [...prevIds, newComment.id])
-        setReplies(prevReplies => ({
-          ...prevReplies,
-          [parentId]: {
-            ...(prevReplies[parentId] || {}),
-            data: [...(prevReplies[parentId]?.data || []), newComment],
-          },
-        }))
+        setReplies(prevReplies => {
+          const currentReplies = prevReplies[parentId] || {
+            data: [],
+            remaining: 0,
+            page: 1,
+            allRepliesLoaded: false,
+          }
+          return {
+            ...prevReplies,
+            [parentId]: {
+              ...currentReplies,
+              data: [...currentReplies.data, newComment],
+            },
+          }
+        })
       } else {
         setNewCommentIds(prevIds => [...prevIds, newComment.id])
-        setComments(prevComments => [...prevComments, newComment])
+        setComments(prevComments => [newComment, ...prevComments])
       }
+
       dispatch(challengePageActions.incrementCommentsCount(1))
       setReplyingTo(null)
     } catch (error) {
@@ -182,10 +203,13 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       setReplies(prevReplies => {
         const newReplies = { ...prevReplies }
         Object.keys(newReplies).forEach(parentId => {
-          newReplies[parentId].data = newReplies[parentId].data.filter(
-            reply => reply.id !== commentId
-          )
+          if (newReplies[parentId]?.data) {
+            newReplies[parentId].data = newReplies[parentId].data.filter(
+              reply => reply.id !== commentId
+            )
+          }
         })
+
         return newReplies
       })
 

@@ -1,4 +1,6 @@
 import { API_URL, EXPIRED_TOKEN } from '../constants/constants'
+import store from '../store'
+import { tokenActions } from '../store/session'
 
 export function storeTokens(token, refresh, expiration) {
   localStorage.setItem('token', token)
@@ -7,12 +9,14 @@ export function storeTokens(token, refresh, expiration) {
   const expirationDate = new Date()
   expirationDate.setSeconds(expirationDate.getSeconds() + expiration)
   localStorage.setItem('expiration', expirationDate.toISOString())
+  store.dispatch(tokenActions.setToken(token))
 }
 
-export function clearLocalStorage() {
+export function clearTokens() {
   localStorage.removeItem('token')
   localStorage.removeItem('refresh')
   localStorage.removeItem('expiration')
+  store.dispatch(tokenActions.clearToken())
 }
 
 export function tokenLoader() {
@@ -61,7 +65,7 @@ export async function refreshAuthToken() {
 
   if (!response.ok) {
     console.error('Failed to refresh token')
-    clearLocalStorage()
+    clearTokens()
     return null
   }
 

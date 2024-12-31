@@ -9,9 +9,7 @@ class Api::V1::AttemptsController < ApplicationController
                          .includes(:challenge, challenge: :game)
                          .order(created_at: :desc)
 
-    per_page = 10
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-    paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
+    paginated_attempts = attempts.paginate(page: params[:page], per_page: 10)
 
     attempts_with_metadata = paginated_attempts.map do |attempt|
       format_attempt(attempt)
