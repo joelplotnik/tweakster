@@ -2,6 +2,8 @@ class Challenge < ApplicationRecord
   belongs_to :user
   belongs_to :game
 
+  has_one_attached :image
+
   has_many :attempts, dependent: :restrict_with_error
   has_many :comments, as: :commentable, dependent: :destroy
   has_many :votes, dependent: :destroy
@@ -28,6 +30,10 @@ class Challenge < ApplicationRecord
   validates :category, inclusion: { in: CATEGORIES }
 
   validates_uniqueness_of :title, scope: :game_id, message: 'Title must be unique within a game'
+
+  def image_url
+    Rails.application.routes.url_helpers.url_for(image) if image.attached?
+  end
 
   def comments_count
     comments.size

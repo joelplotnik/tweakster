@@ -111,4 +111,8 @@
 .name {
   font-size: 12px;
   margin-left: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
 }

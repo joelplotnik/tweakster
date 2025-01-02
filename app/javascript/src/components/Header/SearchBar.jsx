@@ -153,7 +153,7 @@ function SearchBar({ mobile, handleBackClick }) {
                 >
                   <div className={classes['game-image-container']}>
                     <img
-                      src={result.image_url}
+                      src={result.cover}
                       alt="Game"
                       className={classes['game-visual']}
                     />

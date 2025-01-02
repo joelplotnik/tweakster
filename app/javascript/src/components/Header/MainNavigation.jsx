@@ -181,7 +181,10 @@ const MainNavigation = () => {
             </div>
           )}
           {token && (
-            <NavLink to="new" className={classes['icon-button']}>
+            <NavLink
+              to={`users/${user?.username}/challenges/new`}
+              className={classes['icon-button']}
+            >
               <RiAddFill />
             </NavLink>
           )}

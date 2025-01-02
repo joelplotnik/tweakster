@@ -103,6 +103,6 @@ class Api::V1::ChallengesController < ApplicationController
                         game: {},
                         user: {}
                       },
-                      methods: %i[comments_count attempts_count difficulty_rating])
+                      methods: %i[comments_count attempts_count difficulty_rating image_url])
   end
 end

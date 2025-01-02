@@ -166,10 +166,7 @@ const Challenge = ({ challenge, isUserContext }) => {
           {/* {image_url && ( */}
           <div className={classes['image-container']}>
             <img
-              src={
-                image_url ||
-                'https://platform.polygon.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/21902058/EidIZw3XYAEj5V4.png?quality=90&strip=all&crop=0,16.666666666667,100,66.666666666667'
-              }
+              src={challenge.image_url}
               alt="Challenge related"
               className={classes.image}
             />

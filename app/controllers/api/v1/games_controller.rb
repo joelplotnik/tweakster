@@ -8,7 +8,6 @@ class Api::V1::GamesController < ApplicationController
     page = params[:page] || 1
 
     games = Game
-            .with_attached_image
             .paginate(page:, per_page: limit)
             .order(name: :asc)
             .map { |game| format_game(game) }
@@ -54,7 +53,6 @@ class Api::V1::GamesController < ApplicationController
     point_in_time = params[:point_in_time] || Time.current
 
     popular_games = Game
-                    .with_attached_image
                     .left_joins(challenges: :attempts)
                     .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
                     .group('games.id')
@@ -82,8 +80,6 @@ class Api::V1::GamesController < ApplicationController
   end
 
   def format_game(game)
-    game.as_json.merge({
-                         image_url: game.image_url
-                       })
+    game.as_json
   end
 end

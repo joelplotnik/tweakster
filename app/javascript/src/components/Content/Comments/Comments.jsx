@@ -315,6 +315,9 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
               onReplyClick={handleReplyClick}
               onDeleteClick={handleDeleteComment}
               isLoggedIn={isLoggedIn}
+              basePath={basePath}
+              challengeId={challengeId}
+              attemptId={attemptId}
             />
 
             {replies[comment.id]?.data.map(reply => (
@@ -325,6 +328,9 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
                   onReplyClick={handleReplyClick}
                   onDeleteClick={handleDeleteComment}
                   isLoggedIn={isLoggedIn}
+                  basePath={basePath}
+                  challengeId={challengeId}
+                  attemptId={attemptId}
                 />
               </div>
             ))}

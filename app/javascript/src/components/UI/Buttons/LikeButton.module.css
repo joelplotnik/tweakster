@@ -14,6 +14,10 @@
   color: var(--primary-text-color);
 }
 
+.like-button:hover .icon-unselected {
+  color: var(--primary-red-color);
+}
+
 .like-count {
   margin-top: 5px;
   font-size: 12px;

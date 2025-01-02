@@ -15,6 +15,9 @@ const Comment = ({
   onReplyClick,
   onDeleteClick,
   isLoggedIn,
+  basePath,
+  challengeId,
+  attemptId,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef(null)
@@ -135,7 +138,13 @@ const Comment = ({
             </div>
           </div>
           <div className={classes['like-container']}>
-            <LikeButton likesCount={comment.likes_count} />
+            <LikeButton
+              likesCount={comment.likes_count}
+              basePath={basePath}
+              challengeId={challengeId}
+              attemptId={attemptId}
+              commentId={comment.id}
+            />
           </div>
         </div>
       </div>
