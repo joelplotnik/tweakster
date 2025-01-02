@@ -7,25 +7,11 @@ import { formatNumber } from '../../../util/format'
 import AuthModal from '../Modals/AuthModal'
 import classes from './LikeButton.module.css'
 
-const LikeButton = ({
-  likesCount,
-  basePath,
-  challengeId,
-  attemptId,
-  commentId,
-}) => {
+const LikeButton = ({ userLiked, likesCount, basePathWithId, commentId }) => {
   const token = useSelector(state => state.token.token)
-  const [isSelected, setIsSelected] = useState(false)
+  const [isSelected, setIsSelected] = useState(userLiked)
   const [currentLikesCount, setCurrentLikesCount] = useState(likesCount)
   const [showAuthModal, setShowAuthModal] = useState(false)
-
-  console.log(
-    'basePath/challengeId/attemptId/commentId: ',
-    basePath,
-    challengeId,
-    attemptId,
-    commentId
-  )
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(prev => !prev)
@@ -38,9 +24,7 @@ const LikeButton = ({
     }
 
     try {
-      let path = `${basePath}/challenges/${challengeId}`
-      if (attemptId) path += `/attempts/${attemptId}`
-      path += `/comments/${commentId}/likes`
+      const path = `${basePathWithId}/comments/${commentId}/likes`
 
       const response = await fetch(`${API_URL}${path}`, {
         method: 'POST',

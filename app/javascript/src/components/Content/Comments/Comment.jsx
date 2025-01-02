@@ -11,13 +11,12 @@ import classes from './Comment.module.css'
 
 const Comment = ({
   comment,
+  userLiked,
   reply,
   onReplyClick,
   onDeleteClick,
   isLoggedIn,
-  basePath,
-  challengeId,
-  attemptId,
+  basePathWithId,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef(null)
@@ -139,10 +138,9 @@ const Comment = ({
           </div>
           <div className={classes['like-container']}>
             <LikeButton
+              userLiked={userLiked}
               likesCount={comment.likes_count}
-              basePath={basePath}
-              challengeId={challengeId}
-              attemptId={attemptId}
+              basePathWithId={basePathWithId}
               commentId={comment.id}
             />
           </div>

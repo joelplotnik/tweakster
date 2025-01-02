@@ -1,6 +1,7 @@
 class Api::V1::CommentsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[create update destroy]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[index replies]
 
   def index
     comments = Comment.where(commentable: find_commentable, parent_id: nil)
@@ -12,9 +13,19 @@ class Api::V1::CommentsController < ApplicationController
 
     paginated_comments = comments.paginate(page: params[:page], per_page: 10)
 
+    user_likes = if current_user
+                   Like.where(user: current_user, comment_id: paginated_comments.pluck(:id)).pluck(:comment_id)
+                 else
+                   []
+                 end
+    user_likes_set = user_likes.to_set
+
     comments_with_replies_count = paginated_comments.map do |comment|
       formatted_comment = format_comment(comment)
-      formatted_comment.merge('replies_count' => comment.children.count)
+      formatted_comment.merge(
+        'replies_count' => comment.children.count,
+        'user_liked' => user_likes_set.include?(comment.id)
+      )
     end
 
     render json: comments_with_replies_count
@@ -32,7 +43,16 @@ class Api::V1::CommentsController < ApplicationController
 
     paginated_replies = replies.paginate(page: params[:page], per_page: 10)
 
-    replies_json = paginated_replies.map { |reply| format_comment(reply) }
+    user_likes = if current_user
+                   Like.where(user: current_user, comment_id: paginated_replies.pluck(:id)).pluck(:comment_id)
+                 else
+                   []
+                 end
+    user_likes_set = user_likes.to_set
+
+    replies_json = paginated_replies.map do |reply|
+      format_comment(reply).merge('user_liked' => user_likes_set.include?(reply.id))
+    end
 
     total_replies = replies.count
     replies_shown = paginated_replies.current_page * paginated_replies.per_page
@@ -59,6 +79,7 @@ class Api::V1::CommentsController < ApplicationController
 
       formatted_comment = format_comment(comment)
       formatted_comment['replies_count'] = comment.children.count
+      formatted_comment['user_liked'] = false
 
       render json: formatted_comment, status: :created
     else

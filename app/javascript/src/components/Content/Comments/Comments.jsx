@@ -23,15 +23,24 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
   const [highlightedCommentId, setHighlightedCommentId] = useState(null)
   const [highlightedReplyId, setHighlightedReplyId] = useState(null)
   const dispatch = useDispatch()
+  const basePathWithId = `${basePath}/challenges/${challengeId}${
+    attemptId ? `/attempts/${attemptId}` : ''
+  }`
 
   const fetchComments = async page => {
     setLoading(true)
     try {
-      let path = `${basePath}/challenges/${challengeId}`
-      if (attemptId) path += `/attempts/${attemptId}`
-      path += `/comments?page=${page}&exclude=${JSON.stringify(newCommentIds)}`
+      const path = `${basePathWithId}/comments?page=${page}&exclude=${JSON.stringify(
+        newCommentIds
+      )}`
 
-      const response = await fetch(`${API_URL}${path}`)
+      const response = await fetch(`${API_URL}${path}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
       if (!response.ok) throw new Error('Failed to fetch comments')
 
       const data = await response.json()
@@ -55,13 +64,16 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
   const fetchReplies = async (parentId, page) => {
     try {
-      let path = `${basePath}/challenges/${challengeId}`
-      if (attemptId) path += `/attempts/${attemptId}`
-      path += `/comments/${parentId}/replies?page=${page}&exclude=${JSON.stringify(
+      const path = `${basePathWithId}/comments/${parentId}/replies?page=${page}&exclude=${JSON.stringify(
         newReplyIds
       )}`
 
-      const response = await fetch(`${API_URL}${path}`)
+      const response = await fetch(`${API_URL}${path}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
       if (!response.ok) throw new Error('Failed to fetch replies')
 
       return await response.json()
@@ -137,10 +149,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
   const handleSubmitComment = async commentText => {
     try {
-      let path = `${basePath}/challenges/${challengeId}`
-      if (attemptId) path += `/attempts/${attemptId}`
-      path += '/comments'
-
+      const path = `${basePathWithId}/comments`
       const commentableType = attemptId ? 'Attempt' : 'Challenge'
       const parentId = replyingTo?.parent_id || replyingTo?.id || null
 
@@ -225,9 +234,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
   const handleDeleteComment = async commentId => {
     try {
-      let path = `${basePath}/challenges/${challengeId}`
-      if (attemptId) path += `/attempts/${attemptId}`
-      path += `/comments/${commentId}`
+      const path = `${basePathWithId}/comments/${commentId}`
 
       const response = await fetch(`${API_URL}${path}`, {
         method: 'DELETE',
@@ -311,26 +318,24 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
           <div key={comment.id} id={`comment-${comment.id}`}>
             <Comment
               comment={comment}
+              userLiked={comment.user_liked}
               reply={false}
               onReplyClick={handleReplyClick}
               onDeleteClick={handleDeleteComment}
               isLoggedIn={isLoggedIn}
-              basePath={basePath}
-              challengeId={challengeId}
-              attemptId={attemptId}
+              basePathWithId={basePathWithId}
             />
 
             {replies[comment.id]?.data.map(reply => (
               <div key={reply.id} id={`reply-${reply.id}`}>
                 <Comment
                   comment={reply}
+                  userLiked={reply.user_liked}
                   reply={true}
                   onReplyClick={handleReplyClick}
                   onDeleteClick={handleDeleteComment}
                   isLoggedIn={isLoggedIn}
-                  basePath={basePath}
-                  challengeId={challengeId}
-                  attemptId={attemptId}
+                  basePathWithId={basePathWithId}
                 />
               </div>
             ))}
