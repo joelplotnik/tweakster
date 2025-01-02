@@ -3,7 +3,7 @@ concern :challengeable do
     resources :votes, only: %i[create]
     resources :difficulty_ratings, only: [:create]
 
-    resources :comments, only: %i[index create update destroy] do
+    resources :comments, only: %i[index create destroy] do
       resources :likes, only: [:create]
       get 'replies', to: 'comments#replies', on: :member
     end
@@ -11,7 +11,7 @@ concern :challengeable do
     resources :attempts, only: %i[index show create] do
       resources :approvals, only: [:create]
 
-      resources :comments, only: %i[index create update destroy] do
+      resources :comments, only: %i[index create destroy] do
         resources :likes, only: [:create]
       end
     end

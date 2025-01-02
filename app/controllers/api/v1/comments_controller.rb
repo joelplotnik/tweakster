@@ -1,6 +1,6 @@
 class Api::V1::CommentsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, only: %i[create update destroy]
+  before_action :authenticate_devise_api_token!, only: %i[create destroy]
   before_action :authenticate_devise_api_token_if_present!, only: %i[index replies]
 
   def index
@@ -82,18 +82,6 @@ class Api::V1::CommentsController < ApplicationController
       formatted_comment['user_liked'] = false
 
       render json: formatted_comment, status: :created
-    else
-      render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
-  def update
-    comment = Comment.find(params[:id])
-
-    if comment.update(comment_params.except(:parent_id))
-      render json: comment, include: {
-        user: { only: [:username], methods: [:avatar_url] }
-      }, status: :ok
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
     end
