@@ -163,15 +163,15 @@ const Challenge = ({ challenge, isUserContext }) => {
           <div className={classes['attempt-button']}>
             <AttemptButton />
           </div>
-          {/* {image_url && ( */}
-          <div className={classes['image-container']}>
-            <img
-              src={challenge.image_url}
-              alt="Challenge related"
-              className={classes.image}
-            />
-          </div>
-          {/* )} */}
+          {image_url && (
+            <div className={classes['image-container']}>
+              <img
+                src={image_url}
+                alt="Challenge related"
+                className={classes.image}
+              />
+            </div>
+          )}
           <div className={classes['bottom-bar']}>
             <VoteButton upvotes={upvotes} downvotes={downvotes} />
             <CommentButton

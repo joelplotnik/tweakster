@@ -101,7 +101,9 @@ class Api::V1::ChallengesController < ApplicationController
   def format_challenge(challenge)
     challenge.as_json(include: {
                         game: {},
-                        user: {}
+                        user: {
+                          methods: [:avatar_url]
+                        }
                       },
                       methods: %i[comments_count attempts_count difficulty_rating image_url])
   end

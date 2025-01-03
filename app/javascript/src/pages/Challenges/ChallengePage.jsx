@@ -2,6 +2,7 @@ import { RiChat3Line, RiGhostLine } from 'react-icons/ri'
 import { useSelector } from 'react-redux'
 import { json, useParams } from 'react-router-dom'
 
+import ChallengeCard from '../../components/Content/Challenges/ChallengeCard'
 import Comments from '../../components/Content/Comments/Comments'
 import AttemptsList from '../../components/Content/Lists/AttemptsList'
 import Tabs from '../../components/UI/Tabs'
@@ -34,7 +35,7 @@ const ChallengePage = () => {
 
   return (
     <div className={classes['challenge-page']} key={challenge.id}>
-      {/* <ChallengeCard challenge={challenge} isOwner={challenge.is_owner} /> */}
+      <ChallengeCard challenge={challenge} isOwner={challenge.is_owner} />
       <Tabs tabs={tabs} />
     </div>
   )
