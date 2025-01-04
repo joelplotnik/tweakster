@@ -1,7 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[me]
-  before_action :authenticate_devise_api_token_if_present!, only: %i[show]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
   before_action :set_user, only: %i[show update destroy attempts following popular_users]
 
   def index
@@ -104,19 +104,32 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def attempts
-    attempts = @user.attempts
-                    .includes(:challenge, challenge: :game)
-                    .order(created_at: :desc)
+    is_owner = current_user.present? && current_user == @user
+
+    attempts = if is_owner
+                 @user.attempts.includes(:challenge, challenge: :game)
+               else
+                 @user.attempts
+                      .includes(:challenge, challenge: :game)
+                      .where.not(status: 'To Do')
+               end
+
+    attempts = attempts.order(
+      Arel.sql(<<~SQL)
+        CASE status
+          WHEN 'In Progress' THEN 0
+          WHEN 'Complete' THEN 1
+          ELSE 2
+        END,
+        completed_at DESC
+      SQL
+    )
 
     per_page = 10
     page = params[:page].to_i.positive? ? params[:page].to_i : 1
     paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
 
-    attempts_with_metadata = paginated_attempts.map do |attempt|
-      format_attempt(attempt)
-    end
-
-    # Return the formatted attempts
+    attempts_with_metadata = paginated_attempts.map { |attempt| format_attempt(attempt) }
     render json: attempts_with_metadata
   end
 

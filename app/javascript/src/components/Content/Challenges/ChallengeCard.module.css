@@ -93,7 +93,7 @@
 
 .difficulty-category {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
   font-size: 14px;
   gap: 12px;
@@ -101,7 +101,6 @@
 
 .category {
   margin: 0;
-  margin-right: 5px;
   font-size: 0.9rem;
   color: var(--primary-text-color);
   line-height: 1.4;

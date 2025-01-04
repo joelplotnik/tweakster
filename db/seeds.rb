@@ -225,17 +225,24 @@ end
 
 # Create Attempts
 attempts = []
-statuses = ['To Do', 'In Progress', 'Complete']
+statuses = ['To Do', 'Complete']
 
 users.each do |attempt_user|
   num_attempts = rand(20..40)
 
   sampled_challenges = challenges.sample(num_attempts)
 
+  first_attempt = true
+
   sampled_challenges.each do |challenge|
     next if Attempt.exists?(user_id: attempt_user.id, challenge_id: challenge.id)
 
-    status = statuses.sample
+    status = if first_attempt
+               first_attempt = false
+               'In Progress'
+             else
+               statuses.sample
+             end
 
     begin
       attempt = Attempt.create!(

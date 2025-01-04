@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
@@ -7,6 +8,7 @@ import Attempt from '../Attempts/Attempt'
 import classes from './AttemptsList.module.css'
 
 const AttemptsList = () => {
+  const token = useSelector(state => state.token.token)
   const [attempts, setAttempts] = useState([])
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
@@ -30,7 +32,12 @@ const AttemptsList = () => {
     setLoading(true)
     try {
       const endpoint = getEndpoint(page)
-      const response = await fetch(endpoint)
+      const response = await fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (!response.ok) {
         throw new Error('Failed to fetch attempts')
