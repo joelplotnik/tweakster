@@ -15,6 +15,10 @@ class Api::V1::GamesController < ApplicationController
     render json: games
   end
 
+  def show
+    render json: format_game(@game)
+  end
+
   def create
     game = Game.new(game_params)
     if game.save
@@ -61,10 +65,6 @@ class Api::V1::GamesController < ApplicationController
                     .map { |game| format_game(game) }
 
     render json: { games: popular_games, point_in_time: }, status: :ok
-  end
-
-  def show
-    render json: format_game(@game)
   end
 
   private

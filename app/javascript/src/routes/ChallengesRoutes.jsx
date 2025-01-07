@@ -24,7 +24,7 @@ const challengesRoutes = context => [
         element: <NewChallengePage />,
       },
       {
-        path: ':id',
+        path: ':challengeId',
         id: `${context}-challenge`,
         loader: challengeLoader,
         children: [

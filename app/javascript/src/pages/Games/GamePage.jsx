@@ -1,12 +1,43 @@
+import { useSelector } from 'react-redux'
+
+import { API_URL } from '../../constants/constants'
+import store from '../../store'
+import { gamePageActions } from '../../store/gamePage'
+import { getAuthToken } from '../../util/auth'
+import classes from './GamePage.module.css'
+
 const GamePage = () => {
-  return null
+  const game = useSelector(state => state.gamePage.game)
+
+  return (
+    <div className={classes['game-page']} key={game.id}>
+      {/* <GameCard game={game} /> */}
+      <h1>YOU MADE IT TO THE GAME PAGE</h1>
+    </div>
+  )
 }
+
 export default GamePage
 
 export async function loader({ params }) {
   const { name } = params
+  const token = await getAuthToken()
 
-  const token = 'placeholder_token'
+  const response = await fetch(`${API_URL}/games/${name}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  })
 
-  return null
+  if (!response.ok) {
+    throw json({ message: 'Could not find user' }, { status: 500 })
+  }
+
+  const data = await response.json()
+
+  store.dispatch(gamePageActions.setGame(data))
+
+  return data
 }

@@ -48,14 +48,14 @@ const ChallengePage = () => {
 export default ChallengePage
 
 export async function loader({ params }) {
-  const { id, username, name } = params
+  const { username, name, challengeId } = params
   const token = await getAuthToken()
 
   let url = ''
   if (username) {
-    url = `${API_URL}/users/${username}/challenges/${id}`
+    url = `${API_URL}/users/${username}/challenges/${challengeId}`
   } else if (name) {
-    url = `${API_URL}/games/${name}/challenges/${id}`
+    url = `${API_URL}/games/${name}/challenges/${challengeId}`
   } else {
     throw json({ message: 'Invalid route context' }, { status: 400 })
   }
