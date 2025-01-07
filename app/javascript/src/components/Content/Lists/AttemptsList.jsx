@@ -14,7 +14,8 @@ const AttemptsList = () => {
   const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
   const { username, name: gameName, id: challengeId } = useParams()
-  const isUserContext = !!username && !challengeId && !gameName
+  const isUserContext = !challengeId
+
   const getEndpoint = page => {
     if (username && !challengeId && !gameName) {
       return `${API_URL}/users/${username}/attempts?page=${page}`
@@ -32,6 +33,8 @@ const AttemptsList = () => {
     setLoading(true)
     try {
       const endpoint = getEndpoint(page)
+      console.log(endpoint)
+
       const response = await fetch(endpoint, {
         headers: {
           'Content-Type': 'application/json',

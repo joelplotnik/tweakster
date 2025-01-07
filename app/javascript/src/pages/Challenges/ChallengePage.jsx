@@ -21,7 +21,7 @@ const ChallengePage = () => {
   const tabs = [
     {
       key: 'attempts',
-      label: `Attempts (${formatNumber(challenge.attempts_count)})`,
+      label: `Attempts (${formatNumber(challenge.active_attempts_count)})`,
       icon: <RiGhostLine />,
       content: <AttemptsList />,
     },

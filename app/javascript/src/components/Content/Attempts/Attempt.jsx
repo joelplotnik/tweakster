@@ -39,76 +39,95 @@ const Attempt = ({ attempt, isUserContext }) => {
     <div className={classes.attempt}>
       <div className={classes['user-game-details']}>
         {!isUserContext && (
-          <div className={classes['user-info']}>
-            <img
-              src={user.avatar_url}
-              alt={`${user.username}'s avatar`}
-              className={classes.avatar}
-            />
-            <Link to={`/users/${user.slug}`} className={classes.username}>
-              {user.username}
+          <>
+            <div className={classes['user-info']}>
+              <img
+                src={user.avatar_url}
+                alt={`${user.username}'s avatar`}
+                className={classes.avatar}
+              />
+              <Link to={`/users/${user.slug}`} className={classes.username}>
+                {user.username}
+              </Link>
+            </div>
+            <div className={classes.status}>
+              <AttemptStatus status={status} />
+            </div>
+          </>
+        )}
+        {isUserContext && (
+          <div className={classes['game-info']}>
+            <Link
+              to={`/games/${challenge.game.slug}`}
+              className={classes['game-name']}
+            >
+              {challenge.game.name}
             </Link>
+            <p className={classes['game-platform']}>
+              {challenge.game.platform}
+            </p>
           </div>
         )}
-        <div
-          className={
-            isUserContext ? classes['game-info-userpage'] : classes['game-info']
-          }
-        >
-          <Link
-            to={`/games/${challenge.game.slug}`}
-            className={classes['game-name']}
-          >
-            {challenge.game.name}
-          </Link>
-          <p className={classes['game-platform']}>{challenge.game.platform}</p>
-        </div>
       </div>
       <div className={classes['challenge-details']}>
-        <div className={classes['challenge-header']}>
-          <h3 className={classes['challenge-title']}>
-            <Link
-              to={`/games/${challenge.game.slug}/challenges/${challenge.id}`}
-              className={classes.link}
-            >
-              {challenge.title}
-            </Link>
-          </h3>
-          <AttemptStatus status={status} />
-        </div>
-        <hr className={classes.divider} />
-        <div className={classes['category-difficulty']}>
-          <Difficulty rating={challenge.difficulty_rating} />
-          <p className={classes.category}> {challenge.category}</p>
-        </div>
-        <hr className={classes.divider} />
-        <div className={classes['challenge-description']}>
-          <span className={classes['challenge-description-content']}>
-            {displayedDescription}
-          </span>
-          <div className={classes['description-actions']}>
-            {challenge.description.length > descriptionLimit && (
-              <button
-                onClick={toggleExpanded}
-                className={classes['show-more-button']}
-              >
-                {isExpanded ? 'Show Less' : 'Show More'}
-              </button>
-            )}
-            <Link
-              to={`/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`}
-              className={classes['view-full-link']}
-            >
-              View Full Attempt
-            </Link>
-          </div>
-        </div>
-        {status === 'Complete' && (
+        {isUserContext && (
+          <>
+            <div className={classes['challenge-header']}>
+              <h3 className={classes['challenge-title']}>
+                <Link
+                  to={`/games/${challenge.game.slug}/challenges/${challenge.id}`}
+                  className={classes.link}
+                >
+                  {challenge.title}
+                </Link>
+              </h3>
+
+              <div className={classes.status}>
+                <AttemptStatus status={status} />
+              </div>
+            </div>
+          </>
+        )}
+        {isUserContext && (
+          <>
+            <hr className={classes.divider} />
+            <div className={classes['category-difficulty']}>
+              <Difficulty rating={challenge.difficulty_rating} />
+              <p className={classes.category}> {challenge.category}</p>
+            </div>
+            <hr className={classes.divider} />
+            <div className={classes['challenge-description']}>
+              <span className={classes['challenge-description-content']}>
+                {displayedDescription}
+              </span>
+              <div className={classes['description-actions']}>
+                {challenge.description.length > descriptionLimit && (
+                  <button
+                    onClick={toggleExpanded}
+                    className={classes['show-more-button']}
+                  >
+                    {isExpanded ? 'Show Less' : 'Show More'}
+                  </button>
+                )}
+                <Link
+                  to={`/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`}
+                  className={classes['view-full-link']}
+                >
+                  View Full Attempt
+                </Link>
+              </div>
+            </div>
+          </>
+        )}
+
+        {(status === 'Complete' || status === 'In Progress') && (
           <>
             <div className={classes['completion-details']}>
-              <p className={classes['completion-date']}>
-                Completed {moment(completed_at).fromNow()}
-              </p>
+              {status === 'Complete' && (
+                <p className={classes['completion-date']}>
+                  Completed {moment(completed_at).fromNow()}
+                </p>
+              )}
               <div className={classes['proof']}>
                 {proof_url ? (
                   proof_url.endsWith('.mp4') ? (
@@ -129,7 +148,11 @@ const Attempt = ({ attempt, isUserContext }) => {
               </div>
             </div>
             <div className={classes['bottom-bar']}>
-              <ApprovalButton approvalsCount={formatNumber(approvals_count)} />
+              {status === 'Complete' && (
+                <ApprovalButton
+                  approvalsCount={formatNumber(approvals_count)}
+                />
+              )}
               <CommentButton commentsCount={formatNumber(comments_count)} />
               <ShareButton />
               <ReportButton />

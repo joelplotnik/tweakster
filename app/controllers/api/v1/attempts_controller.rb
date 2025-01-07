@@ -1,18 +1,24 @@
 class Api::V1::AttemptsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[create update destroy]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
   before_action :set_challenge, only: [:index]
   before_action :set_attempt, only: %i[show update destroy]
 
   def index
     attempts = @challenge.attempts
                          .includes(:challenge, challenge: :game)
+                         .where.not(status: 'To Do')
                          .order(created_at: :desc)
 
     paginated_attempts = attempts.paginate(page: params[:page], per_page: 10)
 
     attempts_with_metadata = paginated_attempts.map do |attempt|
-      format_attempt(attempt)
+      attempt_data = format_attempt(attempt)
+
+      attempt_data[:is_owner] = (current_user == attempt.user)
+
+      attempt_data
     end
 
     render json: attempts_with_metadata
@@ -34,7 +40,7 @@ class Api::V1::AttemptsController < ApplicationController
   end
 
   def update
-    if @attempt.user_id == current_user.id
+    if @attempt.present? && current_user == @attempt.user
       if @attempt.update(attempt_params)
         render json: { message: 'Attempt updated successfully',
                        attempt: format_attempt(@attempt) }
@@ -47,11 +53,13 @@ class Api::V1::AttemptsController < ApplicationController
   end
 
   def destroy
-    if @attempt.user_id == current_user.id
+    if @attempt.present? && current_user == @attempt.user
       @attempt.destroy
       render json: { message: 'Attempt deleted successfully' }, status: :no_content
+    elsif !@attempt
+      render json: { error: 'Attempt not found' }, status: :not_found
     else
-      render json: { error: 'You are not authorized to delete this challenge' }, status: :forbidden
+      render json: { error: 'You are not authorized to delete this attempt' }, status: :forbidden
     end
   end
 

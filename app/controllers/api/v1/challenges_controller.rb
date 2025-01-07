@@ -105,6 +105,6 @@ class Api::V1::ChallengesController < ApplicationController
                           methods: [:avatar_url]
                         }
                       },
-                      methods: %i[comments_count attempts_count difficulty_rating image_url])
+                      methods: %i[comments_count active_attempts_count difficulty_rating image_url])
   end
 end

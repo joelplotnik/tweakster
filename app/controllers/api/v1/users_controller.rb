@@ -104,16 +104,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def attempts
-    is_owner = current_user.present? && current_user == @user
+    attempts = @user.attempts.includes(:challenge, challenge: :game)
 
-    attempts = if is_owner
-                 @user.attempts.includes(:challenge, challenge: :game)
-               else
-                 @user.attempts
-                      .includes(:challenge, challenge: :game)
-                      .where.not(status: 'To Do')
-               end
-
+    # Order attempts based on status and timestamps
     attempts = attempts.order(
       Arel.sql(<<~SQL)
         CASE status
@@ -121,7 +114,7 @@ class Api::V1::UsersController < ApplicationController
           WHEN 'Complete' THEN 1
           ELSE 2
         END,
-        completed_at DESC
+        COALESCE(completed_at, created_at) DESC
       SQL
     )
 
@@ -129,7 +122,10 @@ class Api::V1::UsersController < ApplicationController
     page = params[:page].to_i.positive? ? params[:page].to_i : 1
     paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
 
-    attempts_with_metadata = paginated_attempts.map { |attempt| format_attempt(attempt) }
+    attempts_with_metadata = paginated_attempts.map do |attempt|
+      format_attempt(attempt).merge(is_owner: current_user == attempt.user)
+    end
+
     render json: attempts_with_metadata
   end
 

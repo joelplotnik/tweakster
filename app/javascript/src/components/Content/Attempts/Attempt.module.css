@@ -37,10 +37,6 @@
 }
 
 .game-info {
-  text-align: right;
-}
-
-.game-info-userpage {
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -73,6 +69,10 @@
   color: var(--primary-text-color);
   max-width: 85%;
   word-wrap: break-word;
+}
+
+.status {
+  margin-left: auto;
 }
 
 .link {

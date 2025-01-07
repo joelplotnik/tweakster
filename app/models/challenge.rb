@@ -43,6 +43,10 @@ class Challenge < ApplicationRecord
     attempts.size
   end
 
+  def active_attempts_count
+    attempts.where.not(status: 'To Do').size
+  end
+
   def difficulty_rating
     difficulties.average(:rating).to_f.round
   end
