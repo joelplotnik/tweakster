@@ -33,7 +33,6 @@ const AttemptsList = () => {
     setLoading(true)
     try {
       const endpoint = getEndpoint(page)
-      console.log(endpoint)
 
       const response = await fetch(endpoint, {
         headers: {

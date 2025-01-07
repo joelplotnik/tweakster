@@ -35,7 +35,11 @@ const ChallengePage = () => {
 
   return (
     <div className={classes['challenge-page']} key={challenge.id}>
-      <ChallengeCard challenge={challenge} isOwner={challenge.is_owner} />
+      <ChallengeCard
+        challenge={challenge}
+        isOwner={challenge.is_owner}
+        basePath={basePath}
+      />
       <Tabs tabs={tabs} />
     </div>
   )

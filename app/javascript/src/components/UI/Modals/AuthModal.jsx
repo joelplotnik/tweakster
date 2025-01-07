@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
-import { Form, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Form, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import Logo from '../../../assets/logo_color.svg'
@@ -10,17 +10,17 @@ import {
   TWITCH_CLIENT_ID,
   TWITCH_REDIRECT_URI,
 } from '../../../constants/constants'
+import RefreshContext from '../../../context/refresh'
 import useInput from '../../../hooks/useInput'
 import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
 import { Backdrop } from './Backdrop'
 
 export function AuthModal({ authType, onClick }) {
+  const setRefreshRoot = useContext(RefreshContext)
   const [modalType, setModalType] = useState(authType)
   const [signupError, setSignupError] = useState(null)
   const [loginError, setLoginError] = useState(null)
-  const navigate = useNavigate()
-  const location = useLocation()
   const emailInputRef = useRef(null)
 
   useEffect(() => {
@@ -145,7 +145,7 @@ export function AuthModal({ authType, onClick }) {
         resetPasswordInput()
         resetConfirmPasswordInput()
         onClick()
-        navigate(location.pathname)
+        setRefreshRoot(true)
       } else {
         if (!enteredEmailIsValid || !enteredPasswordIsValid) {
           return
@@ -179,7 +179,7 @@ export function AuthModal({ authType, onClick }) {
         resetUsernameInput()
         resetPasswordInput()
         onClick()
-        navigate(location.pathname)
+        setRefreshRoot(true)
       }
     } catch (error) {
       console.error('Error: ', error.message)

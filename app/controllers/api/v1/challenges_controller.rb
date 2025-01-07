@@ -1,7 +1,7 @@
 class Api::V1::ChallengesController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[create update destroy]
-  before_action :authenticate_devise_api_token_if_present!, only: %i[show]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[index show]
   before_action :set_user, only: [:index]
   before_action :set_game, only: [:index]
   before_action :set_challenge, only: %i[show update destroy]
@@ -17,8 +17,18 @@ class Api::V1::ChallengesController < ApplicationController
 
     paginated_challenges = challenges.paginate(page: params[:page], per_page: 10)
 
+    user_votes = if current_user
+                   Vote.where(user: current_user)
+                       .where(challenge_id: paginated_challenges.pluck(:id))
+                       .pluck(:challenge_id, :vote_type)
+                       .to_h
+                 else
+                   {}
+                 end
+
     challenges_with_metadata = paginated_challenges.map do |challenge|
-      format_challenge(challenge)
+      formatted_challenge = format_challenge(challenge)
+      formatted_challenge.merge('user_vote' => user_votes[challenge.id])
     end
 
     render json: challenges_with_metadata
@@ -26,9 +36,11 @@ class Api::V1::ChallengesController < ApplicationController
 
   def show
     is_owner = current_user.present? && current_user == @challenge.user
+    user_vote = current_user ? Vote.find_by(user: current_user, challenge: @challenge)&.vote_type : nil
 
     render json: format_challenge(@challenge).merge({
-                                                      is_owner:
+                                                      is_owner:,
+                                                      user_vote:
                                                     })
   end
 

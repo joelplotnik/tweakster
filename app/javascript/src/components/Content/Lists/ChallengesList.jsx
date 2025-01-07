@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
@@ -7,6 +8,7 @@ import Challenge from '../Challenges/Challenge'
 import classes from './ChallengesList.module.css'
 
 const ChallengesList = () => {
+  const token = useSelector(state => state.token.token)
   const [challenges, setChallenges] = useState([])
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
@@ -27,7 +29,14 @@ const ChallengesList = () => {
     setLoading(true)
     try {
       const endpoint = getEndpoint(page)
-      const response = await fetch(endpoint)
+
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
       if (!response.ok) {
         throw new Error('Failed to fetch challenges')

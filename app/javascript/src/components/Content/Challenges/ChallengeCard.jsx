@@ -1,13 +1,12 @@
 import moment from 'moment'
 import { Link } from 'react-router-dom'
 
-import { formatNumber } from '../../../util/format'
 import AttemptButton from '../../UI/Buttons/AttemptButton'
 import VoteButton from '../../UI/Buttons/VoteButton'
 import Difficulty from '../../UI/Difficulty'
 import classes from './ChallengeCard.module.css'
 
-const ChallengeCard = ({ challenge, isOwner }) => {
+const ChallengeCard = ({ challenge, isOwner, basePath }) => {
   return (
     <div className={classes['challenge-card']}>
       <div className={classes['challenge-card-main']}>
@@ -52,11 +51,6 @@ const ChallengeCard = ({ challenge, isOwner }) => {
             to={`/users/${challenge.user.slug}`}
             className={classes['user-link']}
           >
-            {/* <img
-            src={challenge.user.avatar_url}
-            alt={challenge.user.username}
-            className={classes['avatar']}
-          /> */}
             <span>{challenge.user.username}</span>
           </Link>
         </div>
@@ -67,8 +61,11 @@ const ChallengeCard = ({ challenge, isOwner }) => {
       <hr className={classes.divider} />
       <div className={classes['votes']}>
         <VoteButton
+          userVote={challenge.user_vote}
           upvotes={challenge.upvotes}
           downvotes={challenge.downvotes}
+          basePath={basePath}
+          challengeId={challenge.id}
         />
       </div>
     </div>

@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import { formatNumber } from '../../../util/format'
 import AttemptButton from '../../UI/Buttons/AttemptButton'
@@ -22,6 +22,7 @@ const Challenge = ({ challenge, isUserContext }) => {
     description,
     image_url,
     created_at,
+    user_vote,
     upvotes,
     downvotes,
     difficulty_rating,
@@ -35,14 +36,14 @@ const Challenge = ({ challenge, isUserContext }) => {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [slideUpModalContentType, setSlideUpModalContentType] = useState(null)
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
+  const { username, name: gameName } = useParams()
+  const basePath = username ? `/users/${username}` : `/games/${gameName}`
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showModal)
   }
 
   const handleSlideUpModalToggle = contentType => {
-    console.log(contentType)
-
     setSlideUpModalContentType(contentType)
     setShowSlideUpModal(!showSlideUpModal)
   }
@@ -173,7 +174,13 @@ const Challenge = ({ challenge, isUserContext }) => {
             </div>
           )}
           <div className={classes['bottom-bar']}>
-            <VoteButton upvotes={upvotes} downvotes={downvotes} />
+            <VoteButton
+              userVote={user_vote}
+              upvotes={upvotes}
+              downvotes={downvotes}
+              basePath={basePath}
+              challengeId={id}
+            />
             <CommentButton
               commentsCount={formatNumber(comments_count)}
               onClick={() => handleSlideUpModalToggle('comments')}
