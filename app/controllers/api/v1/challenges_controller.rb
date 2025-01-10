@@ -18,17 +18,27 @@ class Api::V1::ChallengesController < ApplicationController
     paginated_challenges = challenges.paginate(page: params[:page], per_page: 10)
 
     user_votes = if current_user
-                   Vote.where(user: current_user)
-                       .where(challenge_id: paginated_challenges.pluck(:id))
-                       .pluck(:challenge_id, :vote_type)
-                       .to_h
+                   Vote.where(user: current_user, challenge_id: paginated_challenges.pluck(:id)).pluck(
+                     :challenge_id, :vote_type
+                   ).to_h
                  else
                    {}
                  end
 
+    user_attempts = if current_user
+                      Attempt.where(user: current_user, challenge_id: paginated_challenges.pluck(:id))
+                             .pluck(:challenge_id, :id).to_h
+                    else
+                      {}
+                    end
+
     challenges_with_metadata = paginated_challenges.map do |challenge|
       formatted_challenge = format_challenge(challenge)
-      formatted_challenge.merge('user_vote' => user_votes[challenge.id])
+      formatted_challenge.merge(
+        'user_vote' => user_votes[challenge.id],
+        'user_attempted' => user_attempts.key?(challenge.id),
+        'user_attempt_id' => user_attempts[challenge.id]
+      )
     end
 
     render json: challenges_with_metadata
@@ -37,10 +47,13 @@ class Api::V1::ChallengesController < ApplicationController
   def show
     is_owner = current_user.present? && current_user == @challenge.user
     user_vote = current_user ? Vote.find_by(user: current_user, challenge: @challenge)&.vote_type : nil
+    user_attempt = current_user ? Attempt.find_by(user: current_user, challenge: @challenge) : nil
 
     render json: format_challenge(@challenge).merge({
                                                       is_owner:,
-                                                      user_vote:
+                                                      user_vote:,
+                                                      user_attempted: user_attempt.present?,
+                                                      user_attempt_id: user_attempt&.id
                                                     })
   end
 

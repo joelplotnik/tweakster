@@ -16,7 +16,7 @@ import classes from './ChallengePage.module.css'
 const ChallengePage = () => {
   const challenge = useSelector(state => state.challengePage.challenge)
   const { username, name: gameName } = useParams()
-  const basePath = username ? `/users/${username}` : `/games/${gameName}`
+  const basePath = username ? `users/${username}` : `games/${gameName}`
 
   const tabs = [
     {

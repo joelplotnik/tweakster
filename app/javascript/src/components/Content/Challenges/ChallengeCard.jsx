@@ -55,7 +55,14 @@ const ChallengeCard = ({ challenge, isOwner, basePath }) => {
           </Link>
         </div>
         <div className={classes['attempt-button']}>
-          <AttemptButton />
+          <AttemptButton
+            userAttempted={challenge.user_attempted}
+            userAttemptId={
+              challenge.user_attempted ? challenge.user_attempt_id : null
+            }
+            basePath={basePath}
+            challengeId={challenge.id}
+          />
         </div>
       </div>
       <hr className={classes.divider} />

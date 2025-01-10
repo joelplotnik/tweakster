@@ -73,7 +73,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           {games.map(game => (
             <Link
               key={game.id}
-              to={`/games/${game.id}`}
+              to={`/games/${game.slug}`}
               className={classes.link}
               onClick={onClose}
               onMouseEnter={() => setHoveredLink(game.name)}
@@ -93,7 +93,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           {users.map(user => (
             <Link
               key={user.id}
-              to={`/users/${user.id}`}
+              to={`/users/${user.slug}`}
               className={classes.link}
               onClick={onClose}
               onMouseEnter={() => setHoveredLink(user.username)}

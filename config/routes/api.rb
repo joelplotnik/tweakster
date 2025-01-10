@@ -8,7 +8,7 @@ concern :challengeable do
       get 'replies', to: 'comments#replies', on: :member
     end
 
-    resources :attempts, only: %i[index show create] do
+    resources :attempts, only: %i[index show create destroy] do
       resources :approvals, only: [:create]
 
       resources :comments, only: %i[index create destroy] do

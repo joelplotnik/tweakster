@@ -26,6 +26,8 @@ const Challenge = ({ challenge, isUserContext }) => {
     upvotes,
     downvotes,
     difficulty_rating,
+    user_attempted,
+    user_attempt_id,
     attempts_count,
     comments_count,
     game,
@@ -37,7 +39,7 @@ const Challenge = ({ challenge, isUserContext }) => {
   const [slideUpModalContentType, setSlideUpModalContentType] = useState(null)
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
   const { username, name: gameName } = useParams()
-  const basePath = username ? `/users/${username}` : `/games/${gameName}`
+  const basePath = username ? `users/${username}` : `games/${gameName}`
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showModal)
@@ -162,7 +164,12 @@ const Challenge = ({ challenge, isUserContext }) => {
             </div>
           </div>
           <div className={classes['attempt-button']}>
-            <AttemptButton />
+            <AttemptButton
+              userAttempted={user_attempted}
+              userAttemptId={user_attempted ? user_attempt_id : null}
+              basePath={basePath}
+              challengeId={id}
+            />
           </div>
           {image_url && (
             <div className={classes['image-container']}>

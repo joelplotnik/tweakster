@@ -2,7 +2,7 @@ class Api::V1::AttemptsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[create update destroy]
   before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
-  before_action :set_challenge, only: [:index]
+  before_action :set_challenge, only: %i[index create destroy]
   before_action :set_attempt, only: %i[show update destroy]
 
   def index
@@ -32,7 +32,7 @@ class Api::V1::AttemptsController < ApplicationController
     attempt = current_user.attempts.new(attempt_params.merge(challenge_id: @challenge.id))
 
     if attempt.save
-      render json: { message: 'Challenge attempt created successfully', attempt: format_attempt(attempt) },
+      render json: { message: 'Challenge attempt created successfully', attempt: },
              status: :created
     else
       render json: { errors: attempt.errors.full_messages }, status: :unprocessable_entity
@@ -53,13 +53,13 @@ class Api::V1::AttemptsController < ApplicationController
   end
 
   def destroy
-    if @attempt.present? && current_user == @attempt.user
-      @attempt.destroy
-      render json: { message: 'Attempt deleted successfully' }, status: :no_content
-    elsif !@attempt
-      render json: { error: 'Attempt not found' }, status: :not_found
+    attempt = current_user.attempts.find_by(id: params[:id], challenge_id: params[:challenge_id])
+
+    if attempt
+      attempt.destroy
+      render json: { message: 'Attempt deleted successfully', attempt_id: attempt.id }, status: :ok
     else
-      render json: { error: 'You are not authorized to delete this attempt' }, status: :forbidden
+      render json: { error: 'Attempt not found or unauthorized' }, status: :not_found
     end
   end
 
