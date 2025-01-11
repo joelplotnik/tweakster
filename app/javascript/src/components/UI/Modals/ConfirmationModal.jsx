@@ -1,6 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { RiBookmark3Line, RiCloseCircleLine, RiCloseLine } from 'react-icons/ri'
+import {
+  RiCloseLine,
+  RiDeleteBin5Line,
+  RiInformationLine,
+} from 'react-icons/ri'
 
 import { Backdrop } from './Backdrop'
 import classes from './ConfirmationModal.module.css'
@@ -35,9 +39,9 @@ const ConfirmationModal = ({
               onClick={e => e.stopPropagation()}
             >
               {type === 'confirm' ? (
-                <RiBookmark3Line className={classes['subscribe-icon']} />
+                <RiInformationLine className={classes['info-icon']} />
               ) : (
-                <RiCloseCircleLine className={classes['close-circle-icon']} />
+                <RiDeleteBin5Line className={classes['close-circle-icon']} />
               )}
               <h2 className={classes['modal-header']}>
                 {header ? header : 'Are you sure?'}

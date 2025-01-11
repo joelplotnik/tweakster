@@ -55,9 +55,8 @@
   gap: 8px;
 }
 
-.follow-button,
 .edit-button {
-  background-color: var(--primary-red-color);
+  background-color: var(--primary-blue-color);
   color: var(--primary-text-color);
   font-size: 0.8em;
   font-weight: bold;
@@ -67,9 +66,8 @@
   cursor: pointer;
 }
 
-.follow-button:hover,
 .edit-button:hover {
-  background-color: var(--primary-red-color-hover);
+  background-color: var(--primary-blue-color-hover);
 }
 
 .stats-section {

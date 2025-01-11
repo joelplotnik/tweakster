@@ -28,7 +28,7 @@ const Challenge = ({ challenge, isUserContext }) => {
     difficulty_rating,
     user_attempted,
     user_attempt_id,
-    attempts_count,
+    active_attempts_count,
     comments_count,
     game,
     user,
@@ -125,7 +125,7 @@ const Challenge = ({ challenge, isUserContext }) => {
                 Attempts:
               </label>
               <p className={classes.category} id="attemptsCount">
-                {attempts_count}
+                {active_attempts_count}
               </p>
             </div>
             <div className={classes['small-details-container']}>

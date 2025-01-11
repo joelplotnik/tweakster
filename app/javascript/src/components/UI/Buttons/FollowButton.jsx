@@ -7,7 +7,7 @@ import { API_URL } from '../../../constants/constants'
 import { userPageActions } from '../../../store/userPage'
 import classes from './FollowButton.module.css'
 
-const FollowButton = ({ userId, isFollowing, followerCount }) => {
+const FollowButton = ({ userFollowing, userId, followerCount }) => {
   const token = useRouteLoaderData('root')
   const dispatch = useDispatch()
   const [isHovered, setIsHovered] = useState(false)
@@ -26,7 +26,6 @@ const FollowButton = ({ userId, isFollowing, followerCount }) => {
         throw new Error('Failed to follow')
       }
 
-      dispatch(userPageActions.updateFollowerState(true))
       dispatch(userPageActions.updateFollowerCount(followerCount + 1))
     } catch (error) {
       console.error('Error: ', error.message)
@@ -48,7 +47,6 @@ const FollowButton = ({ userId, isFollowing, followerCount }) => {
         throw new Error('Failed to unfollow')
       }
 
-      dispatch(userPageActions.updateFollowerState(false))
       dispatch(userPageActions.updateFollowerCount(followerCount - 1))
     } catch (error) {
       console.error('Error: ', error.message)
@@ -56,7 +54,7 @@ const FollowButton = ({ userId, isFollowing, followerCount }) => {
     }
   }
 
-  const buttonContent = isFollowing
+  const buttonContent = userFollowing
     ? isHovered
       ? 'Unfollow'
       : 'Following'
@@ -65,8 +63,8 @@ const FollowButton = ({ userId, isFollowing, followerCount }) => {
   return (
     <>
       <button
-        className={classes.btn}
-        onClick={isFollowing ? handleUnfollow : handleFollow}
+        className={classes['follow-button']}
+        onClick={userFollowing ? handleUnfollow : handleFollow}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

@@ -225,7 +225,7 @@ end
 
 # Create Attempts
 attempts = []
-statuses = ['To Do', 'Complete']
+statuses = %w[Pending Complete]
 
 users.each do |attempt_user|
   num_attempts = rand(20..40)

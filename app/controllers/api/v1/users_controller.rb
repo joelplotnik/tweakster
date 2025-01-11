@@ -104,7 +104,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def attempts
-    attempts = @user.attempts.includes(:challenge, challenge: :game)
+    attempts = @user.attempts.includes(:challenge, challenge: :game).where.not(status: 'Pending')
 
     # Order attempts based on status and timestamps
     attempts = attempts.order(

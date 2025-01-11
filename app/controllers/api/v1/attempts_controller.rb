@@ -8,7 +8,7 @@ class Api::V1::AttemptsController < ApplicationController
   def index
     attempts = @challenge.attempts
                          .includes(:challenge, challenge: :game)
-                         .where.not(status: 'To Do')
+                         .where.not(status: 'Pending')
                          .order(created_at: :desc)
 
     paginated_attempts = attempts.paginate(page: params[:page], per_page: 10)

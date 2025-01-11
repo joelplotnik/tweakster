@@ -5,8 +5,8 @@ import classes from './AttemptStatus.module.css'
 const AttemptStatus = ({ status }) => {
   const renderIcon = () => {
     switch (status) {
-      case 'To Do':
-        return <RiFlag2Fill className={classes['to-do']} />
+      case 'Pending':
+        return <RiFlag2Fill className={classes['pending']} />
       case 'In Progress':
         return <RiFlag2Fill className={classes['in-progress']} />
       case 'Complete':

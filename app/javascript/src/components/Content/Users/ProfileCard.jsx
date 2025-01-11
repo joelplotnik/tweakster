@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import { formatNumber } from '../../../util/format'
+import FollowButton from '../../UI/Buttons/FollowButton'
 import classes from './ProfileCard.module.css'
 
 const ProfileCard = ({ user, isOwner }) => {
@@ -17,12 +18,13 @@ const ProfileCard = ({ user, isOwner }) => {
         <div className={classes['top-section']}>
           <h1 className={classes['username']}>{user.username}</h1>
           <div className={classes['button-group']}>
-            {!isOwner && (
-              <button className={classes['follow-button']}>Follow</button>
-            )}
-            {isOwner && (
-              <button className={classes['edit-button']}>Edit Profile</button>
-            )}
+            <div className={classes['button-group']}>
+              {!isOwner ? (
+                <FollowButton />
+              ) : (
+                <button className={classes['edit-button']}>Edit Profile</button>
+              )}
+            </div>
           </div>
         </div>
         <div className={classes['stats-section']}>

@@ -5,7 +5,7 @@
   gap: 8px;
 }
 
-.to-do {
+.pending {
   color: var(--primary-red-color);
 }
 

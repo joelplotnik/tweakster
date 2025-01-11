@@ -36,3 +36,26 @@
 .tab-content {
   padding: 0;
 }
+
+.divider {
+  border: none;
+  height: 0.5px;
+  width: 100%;
+  background-color: var(--primary-border-color);
+  margin-top: 0px;
+  margin-bottom: 12px;
+}
+
+.link {
+  display: inline-block;
+  margin: 0 auto;
+  margin-bottom: 12px;
+  color: var(--primary-red-color);
+  text-decoration: none;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

@@ -19,13 +19,15 @@ function AboutPage() {
           ultimate mastery test, your creations can take center stage. Players
           can attempt these unique achievements, and once completed, validation
           comes straight from the community—users confirm each other’s
-          accomplishments to keep things authentic. The best part? The most
-          innovative and exciting challenges rise to the top as players can
-          'like' their favorites, making it easy to find popular achievements
-          for each game.
+          accomplishments to keep things authentic. The best part is not that
+          users can vote for the best challenges by upvoting or downvoting, it's
+          that Tweakster brings players together to push boundaries and create
+          experiences no one has thought of before. The most innovative and
+          exciting challenges naturally rise to the top, making it easy to find
+          popular challenges for each game.
         </p>
         <p className={classes.goal}>
-          Tweakster isn't just an achievement tracker—it's a platform where
+          Tweakster isn't just an achievement tracker, it's a platform where
           gamers shape the experience for one another. Elevate your gameplay,
           showcase your creativity, and discover a whole new way to play.
         </p>

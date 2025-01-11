@@ -44,7 +44,7 @@ class Challenge < ApplicationRecord
   end
 
   def active_attempts_count
-    attempts.where.not(status: 'To Do').size
+    attempts.where.not(status: 'Pending').size
   end
 
   def difficulty_rating

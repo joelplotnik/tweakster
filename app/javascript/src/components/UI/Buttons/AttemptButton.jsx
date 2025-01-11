@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { RiDeleteBin5Line, RiGamepadFill } from 'react-icons/ri'
 import { useSelector } from 'react-redux'
 
 import { API_URL } from '../../../constants/constants'
 import AuthModal from '../Modals/AuthModal'
+import ConfirmationModal from '../Modals/ConfirmationModal'
 import classes from './AttemptButton.module.css'
 
 const AttemptButton = ({
@@ -13,6 +15,7 @@ const AttemptButton = ({
 }) => {
   const token = useSelector(state => state.token.token)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [attemptId, setAttemptId] = useState(
     userAttempted ? userAttemptId : null
   )
@@ -63,13 +66,40 @@ const AttemptButton = ({
     }
   }
 
+  const handleDropClick = () => {
+    setShowConfirmModal(true)
+  }
+
+  const handleConfirmDrop = () => {
+    setShowConfirmModal(false)
+    handleAttemptClick()
+  }
+
+  const handleCancelDrop = () => {
+    setShowConfirmModal(false)
+  }
+
   return (
     <>
-      <button className={classes.attemptButton} onClick={handleAttemptClick}>
+      <button
+        className={
+          attemptId ? classes['drop-button'] : classes['attempt-button']
+        }
+        onClick={attemptId ? handleDropClick : handleAttemptClick}
+      >
         {attemptId ? 'Drop' : 'Attempt'}
       </button>
       {showAuthModal && (
         <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+      )}
+      {showConfirmModal && (
+        <ConfirmationModal
+          header="Are you sure?"
+          message="Dropping this challenge will permanently delete your attempt. This action cannot be undone."
+          button="Drop it"
+          onClick={handleCancelDrop}
+          onConfirm={handleConfirmDrop}
+        />
       )}
     </>
   )

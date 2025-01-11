@@ -6,7 +6,7 @@ class Attempt < ApplicationRecord
   has_many :approvals, dependent: :destroy
 
   validates :user_id, uniqueness: { scope: :challenge_id }
-  validates :status, inclusion: { in: ['To Do', 'In Progress', 'Complete'] }
+  validates :status, inclusion: { in: ['Pending', 'In Progress', 'Complete'] }
 
   validate :single_in_progress_attempt, if: -> { status == 'In Progress' }
 
