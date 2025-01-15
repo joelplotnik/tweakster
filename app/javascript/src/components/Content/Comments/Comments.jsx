@@ -34,7 +34,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         newCommentIds
       )}`
 
-      const response = await fetch(`${API_URL}${path}`, {
+      const response = await fetch(`${API_URL}/${path}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -68,7 +68,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
         newReplyIds
       )}`
 
-      const response = await fetch(`${API_URL}${path}`, {
+      const response = await fetch(`${API_URL}/${path}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,

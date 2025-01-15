@@ -20,7 +20,11 @@ const ProfileCard = ({ user, isOwner }) => {
           <div className={classes['button-group']}>
             <div className={classes['button-group']}>
               {!isOwner ? (
-                <FollowButton />
+                <FollowButton
+                  userFollowing={user.is_following}
+                  userId={user.id}
+                  followerCount={user.followers_count}
+                />
               ) : (
                 <button className={classes['edit-button']}>Edit Profile</button>
               )}
@@ -36,13 +40,13 @@ const ProfileCard = ({ user, isOwner }) => {
           </div>
           <div className={classes['stats-item']}>
             <span className={classes['stats-number']}>
-              {formatNumber(user.followers)}
+              {formatNumber(user.followers_count)}
             </span>
             <span className={classes['stats-label']}>Followers</span>
           </div>
           <div className={classes['stats-item']}>
             <span className={classes['stats-number']}>
-              {formatNumber(user.following)}
+              {formatNumber(user.following_count)}
             </span>
             <span className={classes['stats-label']}>Following</span>
           </div>

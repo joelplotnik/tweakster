@@ -1,5 +1,7 @@
 class Api::V1::ApprovalsController < ApplicationController
   include Approveable
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create]
 
   def create
     existing_approval = current_user.approvals.find_by(attempt_id: approval_params[:attempt_id])

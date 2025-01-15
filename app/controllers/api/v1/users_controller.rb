@@ -17,10 +17,12 @@ class Api::V1::UsersController < ApplicationController
 
   def show
     is_owner = current_user.present? && current_user == @user
+    is_following = current_user.present? && current_user.following?(@user)
 
     render json: format_user(@user).merge({
                                             currently_playing: @user.currently_playing_game,
-                                            is_owner:
+                                            is_owner:,
+                                            is_following:
                                           })
   end
 
@@ -191,8 +193,8 @@ class Api::V1::UsersController < ApplicationController
                          points: user.points,
                          attempts_count: user.attempts_count,
                          challenges_count: user.challenges_count,
-                         following: user.followees_count,
-                         followers: user.followers_count
+                         following_count: user.followees_count,
+                         followers_count: user.followers_count
                        })
   end
 

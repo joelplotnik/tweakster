@@ -136,6 +136,10 @@ class User < ApplicationRecord
     attempts.joins(:approvals).count
   end
 
+  def following?(other_user)
+    followees.exists?(id: other_user.id)
+  end
+
   def followers_count
     followers.size
   end

@@ -1,60 +1,65 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { useRouteLoaderData } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../../constants/constants'
 import { userPageActions } from '../../../store/userPage'
+import AuthModal from '../Modals/AuthModal'
 import classes from './FollowButton.module.css'
 
-const FollowButton = ({ userFollowing, userId, followerCount }) => {
-  const token = useRouteLoaderData('root')
+const FollowButton = () => {
+  const token = useSelector(state => state.token.token)
+  const user = useSelector(state => state.userPage.user)
   const dispatch = useDispatch()
   const [isHovered, setIsHovered] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
-  const handleFollow = async () => {
+  const handleAuthModalToggle = () => {
+    setShowAuthModal(prev => !prev)
+  }
+
+  const handleFollowAction = async action => {
+    if (!token) {
+      setShowAuthModal(true)
+      return
+    }
+
     try {
-      const response = await fetch(`${API_URL}/users/${userId}/follow`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await fetch(
+        `${API_URL}/users/${user.id}/${
+          action === 'follow' ? 'follow' : 'unfollow'
+        }`,
+        {
+          method: action === 'follow' ? 'POST' : 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
 
       if (!response.ok) {
-        throw new Error('Failed to follow')
+        throw new Error(`Failed to ${action}`)
       }
 
-      dispatch(userPageActions.updateFollowerCount(followerCount + 1))
+      const updatedCount =
+        action === 'follow'
+          ? user.followers_count + 1
+          : user.followers_count - 1
+
+      dispatch(
+        userPageActions.updateFollowState({
+          isFollowing: action === 'follow',
+          followerCount: updatedCount,
+        })
+      )
     } catch (error) {
       console.error('Error: ', error.message)
-      toast.error('Error following')
+      toast.error(`Error ${action === 'follow' ? 'following' : 'unfollowing'}`)
     }
   }
 
-  const handleUnfollow = async () => {
-    try {
-      const response = await fetch(`${API_URL}/users/${userId}/unfollow`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to unfollow')
-      }
-
-      dispatch(userPageActions.updateFollowerCount(followerCount - 1))
-    } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error unfollowing')
-    }
-  }
-
-  const buttonContent = userFollowing
+  const buttonContent = user.is_following
     ? isHovered
       ? 'Unfollow'
       : 'Following'
@@ -64,12 +69,17 @@ const FollowButton = ({ userFollowing, userId, followerCount }) => {
     <>
       <button
         className={classes['follow-button']}
-        onClick={userFollowing ? handleUnfollow : handleFollow}
+        onClick={() =>
+          handleFollowAction(user.is_following ? 'unfollow' : 'follow')
+        }
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {buttonContent}
       </button>
+      {showAuthModal && (
+        <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+      )}
     </>
   )
 }
