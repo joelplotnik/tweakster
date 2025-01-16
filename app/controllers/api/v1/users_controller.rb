@@ -125,7 +125,10 @@ class Api::V1::UsersController < ApplicationController
     paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
 
     attempts_with_metadata = paginated_attempts.map do |attempt|
-      format_attempt(attempt).merge(is_owner: current_user == attempt.user)
+      format_attempt(attempt).merge(
+        is_owner: current_user == attempt.user,
+        user_approved: current_user&.approvals&.exists?(attempt:)
+      )
     end
 
     render json: attempts_with_metadata
@@ -202,7 +205,7 @@ class Api::V1::UsersController < ApplicationController
     attempt.as_json(
       include: {
         challenge: {
-          include: :game,
+          include: %i[game user],
           methods: [:difficulty_rating]
         },
         user: {

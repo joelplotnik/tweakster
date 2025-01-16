@@ -7,9 +7,8 @@ import { userPageActions } from '../../../store/userPage'
 import AuthModal from '../Modals/AuthModal'
 import classes from './FollowButton.module.css'
 
-const FollowButton = () => {
+const FollowButton = ({ userFollowing, userId, followersCount }) => {
   const token = useSelector(state => state.token.token)
-  const user = useSelector(state => state.userPage.user)
   const dispatch = useDispatch()
   const [isHovered, setIsHovered] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -26,7 +25,7 @@ const FollowButton = () => {
 
     try {
       const response = await fetch(
-        `${API_URL}/users/${user.id}/${
+        `${API_URL}/users/${userId}/${
           action === 'follow' ? 'follow' : 'unfollow'
         }`,
         {
@@ -43,9 +42,7 @@ const FollowButton = () => {
       }
 
       const updatedCount =
-        action === 'follow'
-          ? user.followers_count + 1
-          : user.followers_count - 1
+        action === 'follow' ? followersCount + 1 : followersCount - 1
 
       dispatch(
         userPageActions.updateFollowState({
@@ -59,7 +56,7 @@ const FollowButton = () => {
     }
   }
 
-  const buttonContent = user.is_following
+  const buttonContent = userFollowing
     ? isHovered
       ? 'Unfollow'
       : 'Following'
@@ -70,7 +67,7 @@ const FollowButton = () => {
       <button
         className={classes['follow-button']}
         onClick={() =>
-          handleFollowAction(user.is_following ? 'unfollow' : 'follow')
+          handleFollowAction(userFollowing ? 'unfollow' : 'follow')
         }
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

@@ -40,6 +40,8 @@ const Challenge = ({ challenge, isUserContext }) => {
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
   const { username, name: gameName } = useParams()
   const basePath = username ? `users/${username}` : `games/${gameName}`
+  const rootUrl = window.location.origin
+  const pathToShare = `${rootUrl}/${basePath}/challenges/${id}`
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showModal)
@@ -192,7 +194,7 @@ const Challenge = ({ challenge, isUserContext }) => {
               commentsCount={formatNumber(comments_count)}
               onClick={() => handleSlideUpModalToggle('comments')}
             />
-            <ShareButton />
+            <ShareButton pathToShare={pathToShare} />
             <ReportButton />
           </div>
         </div>

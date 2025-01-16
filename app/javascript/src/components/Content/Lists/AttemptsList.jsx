@@ -13,8 +13,7 @@ const AttemptsList = () => {
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [page, setPage] = useState(1)
-  const { username, name: gameName, id: challengeId } = useParams()
-  const isUserContext = !challengeId
+  const { username, name: gameName, challengeId: challengeId } = useParams()
 
   const getEndpoint = page => {
     if (username && !challengeId && !gameName) {
@@ -78,11 +77,7 @@ const AttemptsList = () => {
         endMessage={<p>No more attempts to show</p>}
       >
         {attempts.map(attempt => (
-          <Attempt
-            key={attempt.id}
-            attempt={attempt}
-            isUserContext={isUserContext}
-          />
+          <Attempt key={attempt.id} attempt={attempt} />
         ))}
       </InfiniteScroll>
     </div>

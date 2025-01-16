@@ -17,6 +17,7 @@ class Api::V1::AttemptsController < ApplicationController
       attempt_data = format_attempt(attempt)
 
       attempt_data[:is_owner] = (current_user == attempt.user)
+      attempt_data[:user_approved] = current_user.approvals.exists?(attempt_id: attempt.id)
 
       attempt_data
     end
@@ -102,7 +103,7 @@ class Api::V1::AttemptsController < ApplicationController
     attempt.as_json(
       include: {
         challenge: {
-          include: :game,
+          include: %i[game user],
           methods: [:difficulty_rating]
         },
         user: {

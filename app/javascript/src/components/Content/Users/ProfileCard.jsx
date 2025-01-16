@@ -23,7 +23,7 @@ const ProfileCard = ({ user, isOwner }) => {
                 <FollowButton
                   userFollowing={user.is_following}
                   userId={user.id}
-                  followerCount={user.followers_count}
+                  followersCount={user.followers_count}
                 />
               ) : (
                 <button className={classes['edit-button']}>Edit Profile</button>

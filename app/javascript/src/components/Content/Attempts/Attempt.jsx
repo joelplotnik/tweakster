@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import { formatNumber } from '../../../util/format'
 import AttemptStatus from '../../UI/AttemptStatus'
@@ -11,7 +11,7 @@ import ShareButton from '../../UI/Buttons/ShareButton'
 import Difficulty from '../../UI/Difficulty'
 import classes from './Attempt.module.css'
 
-const Attempt = ({ attempt, isUserContext }) => {
+const Attempt = ({ attempt }) => {
   const {
     id,
     status,
@@ -21,9 +21,21 @@ const Attempt = ({ attempt, isUserContext }) => {
     proof_url,
     challenge,
     user,
+    user_approved,
   } = attempt
   const descriptionLimit = 250
   const [isExpanded, setIsExpanded] = useState(false)
+  const rootUrl = window.location.origin
+  const { username, name: gameName, challengeId } = useParams()
+  const basePath = username ? `users/${username}` : `games/${gameName}`
+  const isUserPage = username && !challengeId
+  const isGameChallenge = gameName && challengeId
+  const gameAttemptPath = `${rootUrl}/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`
+  const userAttemptPath = `${rootUrl}/users/${challenge.user.slug}/challenges/${challenge.id}/attempts/${id}`
+  const pathToShare =
+    isUserPage || isGameChallenge ? gameAttemptPath : userAttemptPath
+
+  console.log(attempt)
 
   const toggleExpanded = () => {
     setIsExpanded(prev => !prev)
@@ -38,7 +50,7 @@ const Attempt = ({ attempt, isUserContext }) => {
   return (
     <div className={classes.attempt}>
       <div className={classes['user-game-details']}>
-        {!isUserContext && (
+        {!isUserPage && (
           <>
             <div className={classes['user-info']}>
               <img
@@ -55,7 +67,7 @@ const Attempt = ({ attempt, isUserContext }) => {
             </div>
           </>
         )}
-        {isUserContext && (
+        {isUserPage && (
           <div className={classes['game-info']}>
             <Link
               to={`/games/${challenge.game.slug}`}
@@ -70,7 +82,7 @@ const Attempt = ({ attempt, isUserContext }) => {
         )}
       </div>
       <div className={classes['challenge-details']}>
-        {isUserContext && (
+        {isUserPage && (
           <>
             <div className={classes['challenge-header']}>
               <h3 className={classes['challenge-title']}>
@@ -88,7 +100,7 @@ const Attempt = ({ attempt, isUserContext }) => {
             </div>
           </>
         )}
-        {isUserContext && (
+        {isUserPage && (
           <>
             <hr className={classes.divider} />
             <div className={classes['category-difficulty']}>
@@ -150,11 +162,15 @@ const Attempt = ({ attempt, isUserContext }) => {
             <div className={classes['bottom-bar']}>
               {status === 'Complete' && (
                 <ApprovalButton
+                  userApproval={user_approved}
                   approvalsCount={formatNumber(approvals_count)}
+                  basePath={basePath}
+                  challengeId={challenge.id}
+                  attemptId={id}
                 />
               )}
               <CommentButton commentsCount={formatNumber(comments_count)} />
-              <ShareButton />
+              <ShareButton pathToShare={pathToShare} />
               <ReportButton />
             </div>
           </>
