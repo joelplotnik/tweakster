@@ -29,7 +29,7 @@ import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
 
 const MainNavigation = () => {
-  const token = useRouteLoaderData('root')
+  const token = useSelector(state => state.token.token)
   // const cableContext = useContext(CableContext)
   // const cable = cableContext ? cableContext.cable : null
   const [showMenu, setShowMenu] = useState(false)

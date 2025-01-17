@@ -26,7 +26,9 @@ const ProfileCard = ({ user, isOwner }) => {
                   followersCount={user.followers_count}
                 />
               ) : (
-                <button className={classes['edit-button']}>Edit Profile</button>
+                <Link to="edit" className={classes['edit-button']}>
+                  Edit Profile
+                </Link>
               )}
             </div>
           </div>

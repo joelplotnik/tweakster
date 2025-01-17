@@ -35,8 +35,6 @@ const Attempt = ({ attempt }) => {
   const pathToShare =
     isUserPage || isGameChallenge ? gameAttemptPath : userAttemptPath
 
-  console.log(attempt)
-
   const toggleExpanded = () => {
     setIsExpanded(prev => !prev)
   }

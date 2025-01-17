@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, only: %i[me]
+  before_action :authenticate_devise_api_token!, only: %i[me update destroy]
   before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
   before_action :set_user, only: %i[show update destroy attempts following popular_users]
 
@@ -27,44 +27,29 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def update
-    if current_user.admin?
-      if params[:user][:avatar].present?
-        @user.avatar.attach(params[:user][:avatar])
-      elsif params[:user][:remove_avatar] == 'true'
-        @user.reset_avatar_to_default
-      end
+    # Handle avatar updates
+    if params[:user][:avatar].present?
+      @user.avatar.attach(params[:user][:avatar])
+    elsif params[:user][:remove_avatar] == 'true'
+      @user.reset_avatar_to_default
+    end
 
-      if params[:user][:new_password].present?
+    # Check if the user is trying to update their password
+    if params[:user][:new_password].present?
+      if @user.valid_password?(params[:user][:password])
         if @user.update(password: params[:user][:new_password])
-          render_updated_user(@user)
+          render json: format_user(@user)
         else
           render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
         end
-      elsif @user.update(user_params.except(:password, :new_password))
-        render_updated_user(@user)
       else
-        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+        render json: { error: 'Invalid current password' }, status: :unauthorized
       end
-    elsif @user.valid_password?(params[:user][:password])
-      if params[:user][:avatar].present?
-        @user.avatar.attach(params[:user][:avatar])
-      elsif params[:user][:remove_avatar] == 'true'
-        @user.reset_avatar_to_default
-      end
-
-      if params[:user][:new_password].present?
-        if @user.update(password: params[:user][:new_password])
-          render_updated_user(@user)
-        else
-          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-        end
-      elsif @user.update(user_params.except(:password, :new_password))
-        render_updated_user(@user)
-      else
-        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-      end
+    # Update other fields, excluding password fields
+    elsif @user.update(user_params.except(:password, :new_password))
+      render json: format_user(@user)
     else
-      render json: { error: 'Invalid password' }, status: :unauthorized
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -178,7 +163,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:avatar, :username, :email, :url, :bio, :password, :new_password, :favorite_users)
+    params.require(:user).permit(:avatar, :username, :email, :bio, :password, :new_password)
   end
 
   def set_user

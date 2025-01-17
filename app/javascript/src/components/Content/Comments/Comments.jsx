@@ -153,7 +153,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
       const commentableType = attemptId ? 'Attempt' : 'Challenge'
       const parentId = replyingTo?.parent_id || replyingTo?.id || null
 
-      const response = await fetch(`${API_URL}${path}`, {
+      const response = await fetch(`${API_URL}/${path}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -236,7 +236,7 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
     try {
       const path = `${basePathWithId}/comments/${commentId}`
 
-      const response = await fetch(`${API_URL}${path}`, {
+      const response = await fetch(`${API_URL}/${path}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

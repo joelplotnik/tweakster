@@ -26,7 +26,7 @@ const LikeButton = ({ userLiked, likesCount, basePathWithId, commentId }) => {
     try {
       const path = `${basePathWithId}/comments/${commentId}/likes`
 
-      const response = await fetch(`${API_URL}${path}`, {
+      const response = await fetch(`${API_URL}/${path}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

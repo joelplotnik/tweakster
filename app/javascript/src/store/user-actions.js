@@ -13,6 +13,7 @@ export const fetchUserData = () => {
     try {
       const response = await fetch(`${API_URL}/me`, {
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       })

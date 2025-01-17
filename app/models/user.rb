@@ -42,7 +42,7 @@ class User < ApplicationRecord
                        uniqueness: { case_sensitive: false },
                        length: { minimum: 4, maximum: 25 },
                        format: { with: /\A[a-zA-Z0-9_]*\z/, multiline: true }
-  validates :bio, allow_blank: true, length: { minimum: 2, maximum: 280 }
+  validates :bio, length: { in: 2..255 }, allow_blank: true
 
   after_create :set_default_avatar, if: -> { !avatar.attached? }
   before_destroy :retain_default_avatar_if_needed
