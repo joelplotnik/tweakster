@@ -22,7 +22,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     fetchGames(5)
   }, [])
 
-  const fetchUsers = async limit => {
+  const fetchUsers = async () => {
     try {
       const response = await fetch(`${API_URL}/popular_users`)
       const data = await response.json()
@@ -33,7 +33,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     }
   }
 
-  const fetchGames = async limit => {
+  const fetchGames = async () => {
     try {
       const response = await fetch(`${API_URL}/popular_games`)
       const data = await response.json()
@@ -73,18 +73,14 @@ const Sidebar = ({ isOpen, onClose }) => {
           {games.map(game => (
             <Link
               key={game.id}
-              to={`/games/${game.id}`}
+              to={`/games/${game.slug}`}
               className={classes.link}
               onClick={onClose}
               onMouseEnter={() => setHoveredLink(game.name)}
               onMouseLeave={() => setHoveredLink(null)}
             >
               <div className={classes.info}>
-                <img
-                  src={game?.image_url}
-                  alt="Game"
-                  className={classes.image}
-                />
+                <img src={game?.cover} alt="Game" className={classes.image} />
                 <span className={classes.name}>{game.name}</span>
               </div>
             </Link>
@@ -97,7 +93,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           {users.map(user => (
             <Link
               key={user.id}
-              to={`/users/${user.id}`}
+              to={`/users/${user.slug}`}
               className={classes.link}
               onClick={onClose}
               onMouseEnter={() => setHoveredLink(user.username)}

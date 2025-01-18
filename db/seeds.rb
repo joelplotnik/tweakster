@@ -2,6 +2,7 @@
 User.delete_all
 Relationship.delete_all
 Game.delete_all
+UserGame.delete_all
 Challenge.delete_all
 Attempt.delete_all
 Comment.delete_all
@@ -16,7 +17,7 @@ ActiveRecord::Base.connection.execute('DELETE FROM noticed_events')
 
 # Create Users
 users = []
-20.times do
+while users.size < 20
   email = Faker::Internet.email
   next if User.exists?(email:)
 
@@ -24,9 +25,7 @@ users = []
     email:,
     password: 'Password11!!',
     username: Faker::Internet.username,
-    url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100),
-    currently_playing: Faker::Game.title
+    bio: Faker::Lorem.paragraph_by_chars(number: 150)
   )
 
   avatar_url = Faker::Avatar.image(slug: user.username, size: '300x300', format: 'png')
@@ -36,6 +35,7 @@ users = []
       user.avatar.attach(io: URI.open(avatar_url), filename: 'avatar.png')
     rescue StandardError => e
       puts "Error attaching avatar for #{user.username}: #{e.message}. Skipping this user."
+      next
     end
   else
     puts "No avatar URL generated for #{user.username}. Skipping avatar attachment."
@@ -57,9 +57,7 @@ unless User.exists?(email: admin_email)
     password: 'Password11!!',
     username: 'superadmin',
     role: 'admin',
-    url: Faker::Internet.url,
-    bio: Faker::Lorem.paragraph_by_chars(number: 100),
-    currently_playing: Faker::Game.title
+    bio: Faker::Lorem.paragraph_by_chars(number: 150)
   )
 
   avatar_url = Faker::Avatar.image(slug: admin_user.username, size: '300x300', format: 'png')
@@ -76,6 +74,7 @@ unless User.exists?(email: admin_email)
 
   begin
     admin_user.save!
+    users << admin_user
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Admin User: #{e.message}. Skipping this user."
   end
@@ -84,7 +83,7 @@ end
 # Create Relationships
 users.each do |follower|
   relationships_count = rand(1..[users.size - 1, 3].min)
-  followees = users.reject { |user| user == follower }.sample(relationships_count)
+  followees = users.reject { |follower_user| follower_user == follower }.sample(relationships_count)
 
   followees.each do |followee|
     next if Relationship.exists?(follower_id: follower.id, followee_id: followee.id)
@@ -111,27 +110,32 @@ PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
     game = Game.create!(
       name:,
       platform: PLATFORMS.sample,
-      description: Faker::Lorem.paragraph(sentence_count: 3)
+      description: Faker::Lorem.paragraph(sentence_count: 3),
+      cover: Faker::LoremFlickr.image(size: '300x400', search_terms: ['games'])
     )
-
-    image_url = Faker::LoremFlickr.image(size: '300x400', search_terms: ['games'])
-
-    if image_url.present?
-      begin
-        game.image.attach(io: URI.open(image_url), filename: "#{name.parameterize}_image.png")
-      rescue StandardError => e
-        puts "Error attaching image for #{game.name}: #{e.message}. Skipping image attachment."
-      end
-    else
-      puts "No image URL generated for #{game.name}. Skipping image attachment."
-    end
 
     games << game
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Game: #{e.message}. Skipping this game."
   rescue StandardError => e
-    puts "Error attaching image for Game: #{e.message}. Skipping this game."
+    puts "Error assigning cover URL for Game: #{e.message}. Skipping this game."
   end
+end
+
+# Create UserGames
+if games.any?
+  User.all.each do |game_user|
+    game = games.sample
+    begin
+      UserGame.create!(user: game_user, game:)
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error assigning game to user #{game_user.name}: #{e.message}. Skipping this user."
+    rescue StandardError => e
+      puts "Error assigning game to user #{game_user.name}: #{e.message}. Skipping this user."
+    end
+  end
+else
+  puts 'No games available to assign to users.'
 end
 
 # Create Challenges
@@ -156,11 +160,24 @@ challenges = []
   begin
     challenge = Challenge.create!(
       title:,
-      description: Faker::Lorem.paragraph(sentence_count: 5),
+      description: Faker::Lorem.paragraph(sentence_count: rand(5..15)),
       game: games.sample,
       user: users.sample,
       category: categories.sample
     )
+
+    image_url = Faker::LoremFlickr.image(size: '400x300', search_terms: ['challenges'])
+
+    if image_url.present?
+      begin
+        challenge.image.attach(io: URI.open(image_url), filename: 'challenge_image.png')
+      rescue StandardError => e
+        puts "Error attaching image for challenge #{challenge.title}: #{e.message}. Skipping this challenge."
+      end
+    else
+      puts "No image URL generated for challenge #{challenge.title}. Skipping image attachment."
+    end
+
     challenges << challenge
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Challenge: #{e.message}. Skipping this challenge."
@@ -208,23 +225,36 @@ end
 
 # Create Attempts
 attempts = []
-statuses = ['To Do', 'In Progress', 'Complete']
+statuses = %w[Pending Complete]
 
-60.times do
-  next if Attempt.exists?(challenge: challenges.sample)
+users.each do |attempt_user|
+  num_attempts = rand(20..40)
 
-  status = statuses.sample # Sample status
+  sampled_challenges = challenges.sample(num_attempts)
 
-  begin
-    attempt = Attempt.create!(
-      challenge: challenges.sample,
-      user: users.sample,
-      status:,
-      completed_at: status == 'Complete' ? Faker::Date.between(from: '2023-01-01', to: '2024-01-01') : nil
-    )
-    attempts << attempt
-  rescue ActiveRecord::RecordInvalid => e
-    puts "Validation error for Attempt: #{e.message}. Skipping this attempt."
+  first_attempt = true
+
+  sampled_challenges.each do |challenge|
+    next if Attempt.exists?(user_id: attempt_user.id, challenge_id: challenge.id)
+
+    status = if first_attempt
+               first_attempt = false
+               'In Progress'
+             else
+               statuses.sample
+             end
+
+    begin
+      attempt = Attempt.create!(
+        challenge:,
+        user: attempt_user,
+        status:,
+        completed_at: status == 'Complete' ? Faker::Date.between(from: '2023-01-01', to: '2024-01-01') : nil
+      )
+      attempts << attempt
+    rescue ActiveRecord::RecordInvalid => e
+      puts "Validation error for Attempt: #{e.message}. Skipping this attempt."
+    end
   end
 end
 
@@ -232,7 +262,7 @@ end
 attempts.each do |attempt|
   next unless attempt.status == 'Complete'
 
-  num_approvals = rand(0..10)
+  num_approvals = rand(0..5)
   approvers = users.sample(num_approvals).uniq
 
   approvers.each do |approver|
@@ -254,7 +284,7 @@ end
 
 # Create Comments on Challenges
 challenges.each do |challenge|
-  num_comments = rand(0..5)
+  num_comments = rand(0..4)
 
   # Sample unique users to prevent duplicate user comments
   comment_users = users.sample(num_comments)
@@ -272,7 +302,7 @@ challenges.each do |challenge|
     CommentNotifier.with(record: parent_comment).deliver(challenge.user) if challenge.respond_to?(:user)
 
     # Create child comments (nested)
-    num_child_comments = rand(0..3)
+    num_child_comments = rand(0..2)
     child_comment_users = users.sample(num_child_comments).uniq
 
     child_comment_users.each do |child_comment_user|
@@ -300,7 +330,7 @@ end
 
 # Create Comments on Attempts
 attempts.each do |attempt|
-  num_comments = rand(0..5)
+  num_comments = rand(0..4)
 
   comment_users = users.sample(num_comments)
 
@@ -316,7 +346,7 @@ attempts.each do |attempt|
     CommentNotifier.with(record: parent_comment).deliver(attempt.user) if attempt.respond_to?(:user)
 
     # Create child comments (nested)
-    num_child_comments = rand(0..3)
+    num_child_comments = rand(0..2)
     child_comment_users = users.sample(num_child_comments).uniq
 
     child_comment_users.each do |child_comment_user|
@@ -345,7 +375,7 @@ end
 # Create Likes on Comments
 comments = Comment.all
 comments.each do |comment|
-  num_likes = rand(0..20)
+  num_likes = rand(0..10)
   likers = users.sample(num_likes).uniq
   likers.each do |liker|
     next if Like.exists?(user: liker, comment_id: comment.id)
@@ -366,29 +396,43 @@ end
 
 # Create Reports
 report_reasons = %w[spam inappropriate offensive harassing]
-users.each do |user|
+users.each do |report_user|
   # Challenges
-  challenges_to_report = Challenge.where.not(user_id: user.id)
+  challenges_to_report = Challenge.where.not(user_id: report_user.id)
   sampled_challenges = challenges_to_report.sample(rand(1..[10, challenges_to_report.count].min))
   sampled_challenges.each do |challenge|
     Report.create!(
       content_type: 'challenge',
       content_id: challenge.id,
-      reporter_id: user.id,
+      reporter_id: report_user.id,
       reason: report_reasons.sample
     )
   rescue ActiveRecord::RecordInvalid => e
     puts "Validation error for Report on Challenge: #{e.message}. Skipping this report."
   end
 
+  # Attempts
+  attempts_to_report = Attempt.where.not(user_id: report_user.id)
+  sampled_attempts = attempts_to_report.sample(rand(1..[10, attempts_to_report.count].min))
+  sampled_attempts.each do |attempt|
+    Report.create!(
+      content_type: 'attempt',
+      content_id: attempt.id,
+      reporter_id: report_user.id,
+      reason: report_reasons.sample
+    )
+  rescue ActiveRecord::RecordInvalid => e
+    puts "Validation error for Report on Attempt: #{e.message}. Skipping this report."
+  end
+
   # Comments
-  comments_to_report = Comment.where.not(user_id: user.id)
+  comments_to_report = Comment.where.not(user_id: report_user.id)
   sampled_comments = comments_to_report.sample(rand(1..[10, comments_to_report.count].min))
   sampled_comments.each do |comment|
     Report.create!(
       content_type: 'comment',
       content_id: comment.id,
-      reporter_id: user.id,
+      reporter_id: report_user.id,
       reason: report_reasons.sample
     )
   rescue ActiveRecord::RecordInvalid => e
@@ -396,13 +440,13 @@ users.each do |user|
   end
 
   # Users
-  users_to_report = User.where.not(id: user.id)
+  users_to_report = User.where.not(id: report_user.id)
   sampled_users = users_to_report.sample(rand(1..[10, users_to_report.count].min))
-  sampled_users.each do |report_user|
+  sampled_users.each do |reported_user|
     Report.create!(
       content_type: 'user',
-      content_id: report_user.id,
-      reporter_id: user.id,
+      content_id: reported_user.id,
+      reporter_id: report_user.id,
       reason: report_reasons.sample
     )
   rescue ActiveRecord::RecordInvalid => e

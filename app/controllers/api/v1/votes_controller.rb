@@ -1,5 +1,7 @@
 class Api::V1::VotesController < ApplicationController
   include Votable
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create]
 
   def create
     existing_vote = current_user.votes.find_by(challenge_id: vote_params[:challenge_id])

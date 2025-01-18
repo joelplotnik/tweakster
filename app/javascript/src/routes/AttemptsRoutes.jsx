@@ -4,18 +4,20 @@ import AttemptPage, {
 import AttemptsLayout from '../pages/Attempts/AttemptsLayout'
 import AttemptsPage from '../pages/Attempts/AttemptsPage'
 
-const attemptsRoutes = [
+const attemptsRoutes = context => [
   {
     path: 'attempts',
+    id: `${context}-attempts`,
     element: <AttemptsLayout />,
     children: [
       {
         index: true,
+        id: `${context}-attempts-index`,
         element: <AttemptsPage />,
       },
       {
-        path: ':id',
-        id: 'attempt',
+        path: ':attemptId',
+        id: `${context}-attempt`,
         loader: attemptLoader,
         element: <AttemptPage />,
       },

@@ -13,7 +13,7 @@ const gamesRoutes = [
         element: <GamesPage />,
       },
       {
-        path: ':id',
+        path: ':name',
         id: 'game',
         loader: gameLoader,
         children: [
@@ -21,7 +21,7 @@ const gamesRoutes = [
             index: true,
             element: <GamePage />,
           },
-          ...challengesRoutes,
+          ...challengesRoutes('game'),
           ,
         ],
       },

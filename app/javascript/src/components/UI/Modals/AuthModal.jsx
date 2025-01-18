@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
-import { useDispatch } from 'react-redux'
-import { Form, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Form, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import Logo from '../../../assets/logo_color.svg'
@@ -11,19 +10,17 @@ import {
   TWITCH_CLIENT_ID,
   TWITCH_REDIRECT_URI,
 } from '../../../constants/constants'
+import RefreshContext from '../../../context/refresh'
 import useInput from '../../../hooks/useInput'
-import { userActions } from '../../../store/user'
 import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
 import { Backdrop } from './Backdrop'
 
 export function AuthModal({ authType, onClick }) {
-  const dispatch = useDispatch()
+  const setRefreshRoot = useContext(RefreshContext)
   const [modalType, setModalType] = useState(authType)
   const [signupError, setSignupError] = useState(null)
   const [loginError, setLoginError] = useState(null)
-  const navigate = useNavigate()
-  const location = useLocation()
   const emailInputRef = useRef(null)
 
   useEffect(() => {
@@ -90,13 +87,9 @@ export function AuthModal({ authType, onClick }) {
   const storeUserData = async response => {
     const responseData = await response.json()
 
-    const { token, refresh_token, expires_in, resource_owner } = responseData
+    const { token, refresh_token, expires_in } = responseData
 
     storeTokens(token, refresh_token, expires_in)
-
-    const { id, username, avatar_url, role } = resource_owner
-
-    dispatch(userActions.setUser({ id, username, avatar_url, role }))
   }
 
   const handleSubmit = async event => {
@@ -152,7 +145,7 @@ export function AuthModal({ authType, onClick }) {
         resetPasswordInput()
         resetConfirmPasswordInput()
         onClick()
-        navigate(location.pathname)
+        setRefreshRoot(true)
       } else {
         if (!enteredEmailIsValid || !enteredPasswordIsValid) {
           return
@@ -186,7 +179,7 @@ export function AuthModal({ authType, onClick }) {
         resetUsernameInput()
         resetPasswordInput()
         onClick()
-        navigate(location.pathname)
+        setRefreshRoot(true)
       }
     } catch (error) {
       console.error('Error: ', error.message)

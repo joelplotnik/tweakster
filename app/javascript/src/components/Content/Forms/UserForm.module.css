@@ -1,14 +1,14 @@
 .form-container {
-  width: 600px;
-  margin: 0 auto;
-  margin-bottom: 2rem;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
+  justify-content: center;
   align-items: center;
+  background-color: var(--secondary-background-color);
+  display: flex;
+  width: 100%;
+  max-width: 50%;
+  padding: 5px 12px 12px 12px;
+  gap: 12px;
+  flex-direction: column;
 }
 
 .upload-avatar-container {
@@ -16,7 +16,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
 }
 
 .upload-avatar-btn {
@@ -28,21 +27,21 @@
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background-color: white;
-  border: 1px solid #cccccc;
+  background-color: var(--secondary-background-color);
+  border: 1px solid var(--secondary-background-color);
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
 
-.upload-avatar-btn:hover {
-  border: 1px solid black;
-}
-
 .upload-avatar-btn svg {
   width: 35px;
   height: 35px;
-  color: #d92563;
+  color: var(--primary-red-color);
+}
+
+.upload-avatar-btn svg:hover {
+  color: var(--primary-red-color-hover);
 }
 
 .remove-avatar-button-container {
@@ -50,10 +49,11 @@
 }
 
 .remove-avatar-button {
-  color: #d92563;
+  color: var(--primary-red-color);
+  font-size: 14px;
   border-radius: 50%;
-  background-color: white;
-  border: 1px solid #cccccc;
+  background-color: var(--secondar-background-color);
+  border: 1px solid var(--secondar-background-color);
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
@@ -61,8 +61,7 @@
 }
 
 .remove-avatar-button:hover {
-  color: #c3164b;
-  border: 1px solid black;
+  color: var(--primary-red-color-hover);
 }
 
 .remove-avatar-button:focus {
@@ -88,69 +87,75 @@
 }
 
 .form-input {
-  width: 50%;
+  box-sizing: border-box;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  width: 100%;
   padding: 10px;
   padding-left: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
   border-radius: 5px;
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-.url-input {
-  width: 50%;
-  padding: 10px;
-  padding-left: 8px;
-  font-size: 12px;
-  font-family: Arial, Helvetica, sans-serif;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  margin-bottom: 20px;
+  border: 1px solid var(--primary-border-color);
   text-align: left;
 }
 
 .form-textarea {
-  width: 50%;
+  box-sizing: border-box;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  width: 100%;
   padding: 10px;
   padding-left: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-family: Arial, Helvetica, sans-serif;
   border-radius: 5px;
-  border: 1px solid #ccc;
-  height: 150px;
-  margin-bottom: 20px;
-  resize: vertical;
-  min-height: 125px;
+  border: 1px solid var(--primary-border-color);
+  height: 100px;
+  resize: none;
 }
 
 .form-textarea:focus,
-.form-input:focus,
-.url-input:focus {
-  border: 1px solid black;
+.form-input:focus {
+  border: 1px solid var(--primary-red-color);
   outline: none;
 }
 
 .form-textarea:hover,
-.form-input:hover,
-.url-input:hover {
-  border: 1px solid black;
+.form-input:hover {
+  border: 1px solid var(--primary-red-color);
   outline: none;
 }
 
 .form-input::placeholder,
-.form-textarea::placeholder,
-.url-input::placeholder {
+.form-textarea::placeholder {
   padding-left: 4px;
-  font-size: 12px;
-  color: #999999;
+  font-size: 14px;
+  color: var(--primary-border-color);
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.change-password-btn {
+  align-self: flex-start;
+  color: var(--primary-red-color);
+  font-size: 14px;
+  border-radius: 50%;
+  background-color: var(--secondar-background-color);
+  border: 1px solid var(--secondar-background-color);
+  padding: 5px 10px 5px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.change-password-btn:hover {
+  color: var(--primary-red-color-hover);
+}
+
 .form-submit-button {
-  background-color: rgb(51, 153, 255);
-  color: #fff;
+  margin-top: 6px;
+  background-color: var(--primary-green-color);
+  color: var(--primary-text-color);
   border: none;
   border-radius: 5px;
   padding: 8px 16px;
@@ -158,11 +163,11 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  align-self: flex-end;
+  width: 100%;
 }
 
 .form-submit-button:hover {
-  background-color: rgb(31, 117, 195);
+  background-color: var(--primary-green-color-hover);
 }
 
 .input-wrapper {
@@ -173,43 +178,43 @@
 }
 
 .invalid input {
-  border: 1px solid #c3164b;
+  border: 1px solid var(--primary-red-color);
 }
 
 .invalid input:hover {
-  border-color: #ff9c40;
-}
-
-.invalid input:focus {
-  border-color: #ff9c40;
+  border-color: var(--primary-red-color);
 }
 
 .error-text {
   margin-top: 0;
-  font-size: 12px;
-  color: #c3164b;
+  font-size: 14px;
+  color: var(--primary-red-color);
 }
 
 .delete-button-container {
+  margin-top: 12px;
   display: flex;
   justify-content: center;
 }
 
 .delete-button {
-  display: inline-block;
-  background-color: #d92563;
-  color: #fff;
-  padding: 10px;
-  text-decoration: none;
-  border-radius: 5px;
-  border: none;
-  padding: 8px 16px;
+  color: var(--primary-red-color);
   font-size: 14px;
-  font-weight: bold;
+  border-radius: 50%;
+  background-color: var(--secondar-background-color);
+  border: 1px solid var(--secondar-background-color);
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .delete-button:hover {
-  background-color: #c3164b;
+  color: var(--primary-red-color-hover);
+}
+
+.delete-button:focus {
+  outline: none;
 }
 
 .form-error-list {
@@ -219,7 +224,30 @@
 }
 
 .form-error {
-  color: #c3164b;
-  font-size: 12px;
+  color: var(--primary-red-color);
+  font-size: 14px;
   margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    min-width: 100%;
+    padding: 5px 16px 16px 16px;
+  }
+
+  .remove-avatar-button-container {
+    margin-top: 5px;
+  }
+
+  .form-input {
+    font-size: 14px;
+  }
+  .form-textarea {
+    height: 125px;
+    font-size: 14px;
+  }
+
+  .form-submit-button {
+    font-size: 14px;
+  }
 }

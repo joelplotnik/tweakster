@@ -1,364 +1,379 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { RiAddFill } from 'react-icons/ri'
-import { useDispatch } from 'react-redux'
-import { useParams, useRouteLoaderData } from 'react-router-dom'
-import { toast } from 'react-toastify'
+import { useEffect, useState } from 'react'
+import { RiSubtractLine } from 'react-icons/ri'
+import InfiniteScroll from 'react-infinite-scroll-component'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { API_URL } from '../../../constants/constants'
-import { pieceActions } from '../../store/piece'
-import AuthModal from '../../UI/Modals/AuthModal'
+import { challengePageActions } from '../../../store/challengePage'
 import CommentForm from '../Forms/CommentForm'
-import SortDropdown from '../UI/SortDropdown'
 import Comment from './Comment'
 import classes from './Comments.module.css'
 
-const Comments = ({ commentable, commentableType, pieceClassModalRef }) => {
-  const token = useRouteLoaderData('root')
+const Comments = ({ basePath, challengeId, attemptId }) => {
+  const token = useSelector(state => state.token.token)
+  const isLoggedIn = !!token
   const [comments, setComments] = useState([])
-  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
-  const [commentsLeft, setCommentsLeft] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [replies, setReplies] = useState({})
+  const [replyingTo, setReplyingTo] = useState(null)
   const [newCommentIds, setNewCommentIds] = useState([])
-  const [selectedSortOption, setSelectedSortOption] = useState('old')
-  const selectedSortOptionRef = useRef(selectedSortOption)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [showCommentForm, setShowCommentForm] = useState(false)
-  const [activeComment, setActiveComment] = useState(null)
-  const commentsTitle =
-    commentable.comments_count === 1 ? 'Comment' : 'Comments'
+  const [newReplyIds, setNewReplyIds] = useState([])
+  const [highlightedCommentId, setHighlightedCommentId] = useState(null)
+  const [highlightedReplyId, setHighlightedReplyId] = useState(null)
   const dispatch = useDispatch()
-  const newCommentRef = useRef(null)
-  const params = useParams()
-  const wildcardParam = params['*']
+  const basePathWithId = `${basePath}/challenges/${challengeId}${
+    attemptId ? `/attempts/${attemptId}` : ''
+  }`
 
-  const handleAuthModalToggle = () => {
-    setShowAuthModal(!showAuthModal)
-  }
-
-  const handleSortChange = useCallback(option => {
-    if (option === selectedSortOptionRef.current) {
-      return
-    }
-
-    setNewCommentIds([])
-    setComments([])
-    setSelectedSortOption(option)
-    setPage(1)
-    setHasMore(true)
-  }, [])
-
-  const fetchComments = async (currentPage, loadAll = false) => {
+  const fetchComments = async page => {
+    setLoading(true)
     try {
-      let url = ''
+      const path = `${basePathWithId}/comments?page=${page}&exclude=${JSON.stringify(
+        newCommentIds
+      )}`
 
-      if (commentableType === 'Piece') {
-        url = `${API_URL}/${wildcardParam}/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
-          newCommentIds
-        )}${loadAll ? '&load_all=true' : ''}`
-      } else if (commentableType === 'Tweak') {
-        url = `${API_URL}/${wildcardParam}/tweaks/${
-          commentable.id
-        }/comments?page=${currentPage}&sort=${selectedSortOption}&exclude=${JSON.stringify(
-          newCommentIds
-        )}${loadAll ? '&load_all=true' : ''}`
-      }
-
-      const response = await fetch(url)
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch comments')
-      }
-
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error fetching comments')
-    }
-  }
-
-  const fetchData = async (loadAll = false) => {
-    if (!isLoading && hasMore) {
-      setIsLoading(true)
-
-      const commentsFromServer = await fetchComments(page, loadAll)
-
-      if (commentsFromServer) {
-        if (selectedSortOption !== selectedSortOptionRef.current) {
-          // If the selectedSortOption has changed, reset comments
-          selectedSortOptionRef.current = selectedSortOption
-          setComments(commentsFromServer.comments)
-        } else {
-          // If the sort option is the same, append fetched data
-          setComments(prevComments => [
-            ...prevComments,
-            ...commentsFromServer.comments,
-          ])
-        }
-
-        setHasMore(commentsFromServer.meta.has_more)
-        setCommentsLeft(commentsFromServer.meta.comments_left)
-        setPage(prevPage => prevPage + 1)
-      }
-
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSortOption])
-
-  const updateCommentMessage = (commentsArray, targetCommentId, newMessage) => {
-    return commentsArray.map(comment => {
-      if (comment.id === targetCommentId) {
-        // If this is the edited comment, update its message
-        return {
-          ...comment,
-          message: newMessage,
-        }
-      } else {
-        return comment
-      }
-    })
-  }
-
-  const handleCommentSubmit = async (
-    message,
-    commentableId,
-    commentId = null
-  ) => {
-    try {
-      let url = ''
-      let method = commentId ? 'PUT' : 'POST'
-
-      if (commentableType === 'Piece') {
-        url = commentId
-          ? `${API_URL}/${wildcardParam}/comments/${commentId}`
-          : `${API_URL}/${wildcardParam}/comments`
-      } else if (commentableType === 'Tweak') {
-        url = commentId
-          ? `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments/${commentId}`
-          : `${API_URL}/${wildcardParam}/tweaks/${commentableId}/comments`
-      }
-
-      const commentData = {
-        message: message,
-        commentable_id: commentableId,
-        commentable_type: commentableType,
-      }
-
-      const response = await fetch(url, {
-        method: method,
+      const response = await fetch(`${API_URL}/${path}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(commentData),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to submit comment')
-      }
+      if (!response.ok) throw new Error('Failed to fetch comments')
 
-      const newComment = await response.json()
-      const newCommentId = newComment.id
+      const data = await response.json()
+      if (Array.isArray(data)) {
+        const filteredComments = data.filter(
+          comment =>
+            !comments.some(existingComment => existingComment.id === comment.id)
+        )
 
-      // Handle the state update based on the comment action
-      if (commentId) {
-        // Edit comment
-        setComments(prevComments => {
-          return updateCommentMessage(prevComments, commentId, message)
-        })
+        setComments(prevComments => [...prevComments, ...filteredComments])
+        setHasMore(data.length === 10)
       } else {
-        // New comment
-        setNewCommentIds(prevIds => [...prevIds, newCommentId])
-        setComments(prevComments => [...prevComments, newComment])
-        newCommentRef.current = newCommentId
-        dispatch(pieceActions.increaseCommentCount())
+        console.error('Unexpected response format:', data)
       }
-      setActiveComment(null)
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error submitting comment')
+      console.error('Failed to fetch comments:', error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const deleteComment = (commentsArray, targetCommentId) => {
-    return commentsArray.filter(comment => {
-      if (comment.id === targetCommentId) {
-        return false
-      } else {
-        return !comment.deleted // Filter out deleted comments
-      }
-    })
-  }
-
-  const markCommentAsDeleted = (commentsArray, targetCommentId) => {
-    return commentsArray.map(comment => {
-      if (comment.id === targetCommentId) {
-        // Mark the comment as deleted
-        return {
-          ...comment,
-          deleted: true,
-        }
-      } else {
-        return comment
-      }
-    })
-  }
-
-  const handleDeleteComment = async commentId => {
+  const fetchReplies = async (parentId, page) => {
     try {
-      const response = await fetch(
-        `${API_URL}/${wildcardParam}/comments/${commentId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const path = `${basePathWithId}/comments/${parentId}/replies?page=${page}&exclude=${JSON.stringify(
+        newReplyIds
+      )}`
+
+      const response = await fetch(`${API_URL}/${path}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      if (!response.ok) throw new Error('Failed to fetch replies')
+
+      return await response.json()
+    } catch (error) {
+      console.error('Failed to fetch replies:', error)
+      return null
+    }
+  }
+
+  const handleLoadMoreReplies = async parentId => {
+    const currentReplies = replies[parentId] || {
+      data: [],
+      remaining: 0,
+      page: 1,
+      allRepliesLoaded: false,
+    }
+
+    const data = await fetchReplies(parentId, currentReplies.page)
+    if (data) {
+      const allRepliesLoaded = data.remaining_replies === 0
+      setReplies(prevReplies => ({
+        ...prevReplies,
+        [parentId]: {
+          data: [...currentReplies.data, ...data.replies],
+          remaining: data.remaining_replies,
+          page: currentReplies.page + 1,
+          allRepliesLoaded,
+        },
+      }))
+    }
+  }
+
+  const handleHideReplies = parentId => {
+    const currentReplies = replies[parentId]?.data || []
+
+    // Count how many replies in `newReplyIds` belong to this parent comment
+    const newRepliesCount = currentReplies.filter(reply =>
+      newReplyIds.includes(reply.id)
+    ).length
+
+    // Update the replies_count of the parent comment
+    setComments(prevComments =>
+      prevComments.map(comment =>
+        comment.id === parentId
+          ? {
+              ...comment,
+              replies_count: comment.replies_count + newRepliesCount,
+            }
+          : comment
       )
+    )
 
-      if (!response.ok) {
-        throw new Error('Failed to delete comment')
-      }
+    // Remove replies from the state and update `newReplyIds`
+    setReplies(prevReplies => ({
+      ...prevReplies,
+      [parentId]: undefined, // Remove replies for this parent comment
+    }))
 
-      setActiveComment(null)
+    setNewReplyIds(prevIds =>
+      prevIds.filter(id => !currentReplies.some(reply => reply.id === id))
+    )
+  }
 
-      // Find the deleted comment in the state
-      const commentToDelete = comments.find(comment => comment.id === commentId)
+  const handleReplyClick = comment => {
+    setReplyingTo(comment)
+  }
 
-      if (!commentToDelete) {
-        return // Comment not found, nothing to delete
-      }
+  const handleInputChange = text => {
+    if (replyingTo && !text.startsWith(`@${replyingTo.user.username} `)) {
+      setReplyingTo(null)
+    }
+  }
 
-      const decreaseCommentCountBy = 1
-      dispatch(pieceActions.decreaseCommentCount({ decreaseCommentCountBy }))
+  const handleSubmitComment = async commentText => {
+    try {
+      const path = `${basePathWithId}/comments`
+      const commentableType = attemptId ? 'Attempt' : 'Challenge'
+      const parentId = replyingTo?.parent_id || replyingTo?.id || null
 
-      setComments(prevComments => {
-        return deleteComment(
-          markCommentAsDeleted(prevComments, commentId),
-          commentId
-        )
+      const response = await fetch(`${API_URL}/${path}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          comment: {
+            message: commentText,
+            commentable_type: commentableType,
+            commentable_id: attemptId || challengeId,
+            parent_id: parentId,
+          },
+        }),
       })
 
-      if (newCommentIds.includes(commentId)) {
-        setNewCommentIds(prevIds => prevIds.filter(id => id !== commentId))
+      if (!response.ok) throw new Error('Failed to post comment')
+
+      const newComment = await response.json()
+      if (parentId) {
+        setNewReplyIds(prevIds => [...prevIds, newComment.id])
+        setReplies(prevReplies => {
+          const currentReplies = prevReplies[parentId] || {
+            data: [],
+            remaining: 0,
+            page: 1,
+            allRepliesLoaded: false,
+          }
+          return {
+            ...prevReplies,
+            [parentId]: {
+              ...currentReplies,
+              data: [...currentReplies.data, newComment],
+            },
+          }
+        })
+
+        setHighlightedReplyId(newComment.id)
+      } else {
+        setNewCommentIds(prevIds => [...prevIds, newComment.id])
+        setComments(prevComments => [newComment, ...prevComments])
+        setHighlightedCommentId(newComment.id)
       }
+
+      dispatch(challengePageActions.incrementCommentsCount(1))
+      setReplyingTo(null)
     } catch (error) {
-      console.error('Error: ', error.message)
-      toast.error('Error deleting comment')
+      console.error('Failed to post comment:', error)
     }
   }
 
   useEffect(() => {
-    if (newCommentRef.current) {
-      const newCommentElement = document.getElementById(newCommentRef.current)
-
+    if (highlightedCommentId) {
+      const newCommentElement = document.getElementById(
+        `comment-${highlightedCommentId}`
+      )
       if (newCommentElement) {
-        if (pieceClassModalRef === 'page') {
-          const topOffset = 48
-          const elementPosition = newCommentElement.getBoundingClientRect().top
-          const offsetPosition = elementPosition + window.scrollY - topOffset
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth',
-          })
-        } else {
-          newCommentElement.scrollIntoView({ behavior: 'smooth' })
-        }
+        newCommentElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
       }
-      newCommentRef.current = null
     }
-  }, [comments, pieceClassModalRef])
+  }, [highlightedCommentId])
 
-  const handleShowAllComments = () => {
-    fetchData(true)
+  useEffect(() => {
+    if (highlightedReplyId) {
+      const newReplyElement = document.getElementById(
+        `reply-${highlightedReplyId}`
+      )
+      if (newReplyElement) {
+        newReplyElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        })
+      }
+    }
+  }, [highlightedReplyId])
+
+  const handleDeleteComment = async commentId => {
+    try {
+      const path = `${basePathWithId}/comments/${commentId}`
+
+      const response = await fetch(`${API_URL}/${path}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) throw new Error('Failed to delete comment')
+
+      // Find the comment to delete, either in top-level comments or in replies
+      const deletedComment =
+        comments.find(comment => comment.id === commentId) ||
+        Object.values(replies)
+          .flatMap(replyGroup => replyGroup.data)
+          .find(reply => reply.id === commentId)
+
+      if (!deletedComment) {
+        console.error('Comment not found for deletion.')
+        return
+      }
+
+      let totalCountToRemove = 1 // Start with 1 for the comment itself
+
+      // If it's a top-level comment, account for its replies
+      if (deletedComment.replies_count) {
+        totalCountToRemove += deletedComment.replies_count
+        setReplies(prevReplies => {
+          const newReplies = { ...prevReplies }
+          delete newReplies[commentId] // Remove all replies of the top-level comment
+          return newReplies
+        })
+      } else if (deletedComment.parent_id) {
+        // If it's a reply, decrement the replies_count for the parent
+        setComments(prevComments =>
+          prevComments.map(comment =>
+            comment.id === deletedComment.parent_id
+              ? { ...comment, replies_count: comment.replies_count - 1 }
+              : comment
+          )
+        )
+      }
+
+      // Update comments and replies state
+      setComments(prevComments =>
+        prevComments.filter(comment => comment.id !== commentId)
+      )
+
+      setReplies(prevReplies => {
+        const newReplies = { ...prevReplies }
+        Object.keys(newReplies).forEach(parentId => {
+          if (newReplies[parentId]?.data) {
+            newReplies[parentId].data = newReplies[parentId].data.filter(
+              reply => reply.id !== commentId
+            )
+          }
+        })
+        return newReplies
+      })
+
+      // Decrement comments count in challengePage state
+      dispatch(challengePageActions.decrementCommentsCount(totalCountToRemove))
+    } catch (error) {
+      console.error('Failed to delete comment:', error)
+    }
   }
 
+  useEffect(() => {
+    fetchComments(page)
+  }, [page])
+
   return (
-    <>
-      <div className={classes.comments}>
-        {commentableType === 'Piece' && (
-          <div className={classes['header-container']}>
-            <h2 className={classes.title}>
-              {commentable.comments_count} {commentsTitle}
-            </h2>
-            {comments.length > 0 && (
-              <SortDropdown onSortChange={handleSortChange} />
-            )}
+    <div className={classes['comments-section']}>
+      <InfiniteScroll
+        dataLength={comments.length}
+        next={() => setPage(prevPage => prevPage + 1)}
+        hasMore={hasMore}
+        loader={<p>Loading...</p>}
+      >
+        {comments.map(comment => (
+          <div key={comment.id} id={`comment-${comment.id}`}>
+            <Comment
+              comment={comment}
+              userLiked={comment.user_liked}
+              reply={false}
+              onReplyClick={handleReplyClick}
+              onDeleteClick={handleDeleteComment}
+              isLoggedIn={isLoggedIn}
+              basePathWithId={basePathWithId}
+            />
+
+            {replies[comment.id]?.data.map(reply => (
+              <div key={reply.id} id={`reply-${reply.id}`}>
+                <Comment
+                  comment={reply}
+                  userLiked={reply.user_liked}
+                  reply={true}
+                  onReplyClick={handleReplyClick}
+                  onDeleteClick={handleDeleteComment}
+                  isLoggedIn={isLoggedIn}
+                  basePathWithId={basePathWithId}
+                />
+              </div>
+            ))}
+
+            {comment.replies_count > 0 &&
+              (replies[comment.id]?.allRepliesLoaded ? (
+                <button
+                  onClick={() => handleHideReplies(comment.id)}
+                  className={classes['load-more-replies']}
+                >
+                  <RiSubtractLine className={classes['separator-icon']} />
+                  Hide replies
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleLoadMoreReplies(comment.id)}
+                  className={classes['load-more-replies']}
+                >
+                  <RiSubtractLine className={classes['separator-icon']} />
+                  View{' '}
+                  {Math.min(
+                    replies[comment.id]?.remaining || comment.replies_count,
+                    10
+                  )}{' '}
+                  more replies
+                </button>
+              ))}
           </div>
-        )}
-        <div className={classes.commentList}>
-          {comments.map(comment => (
-            <div
-              key={comment.id}
-              id={
-                comment.id === newCommentRef.current
-                  ? newCommentRef.current
-                  : undefined
-              }
-            >
-              <Comment
-                comment={comment}
-                commentable={commentable}
-                commentableType={commentableType}
-                onEdit={(message, commentId) =>
-                  handleCommentSubmit(message, commentable.id, commentId)
-                }
-                onDelete={commentId => handleDeleteComment(commentId)}
-                activeComment={activeComment}
-                setActiveComment={setActiveComment}
-              />
-            </div>
-          ))}
-        </div>
-        <div className={classes['buttons-container']}>
-          {hasMore ? (
-            <button
-              className={classes['comments-button']}
-              onClick={handleShowAllComments}
-              disabled={isLoading}
-            >
-              {isLoading
-                ? 'Loading...'
-                : commentsLeft === 1
-                ? 'Show 1 more comment'
-                : `Show ${commentsLeft} more comments`}
-            </button>
-          ) : token ? (
-            <button
-              className={classes['comments-button']}
-              onClick={() => setShowCommentForm(true)}
-            >
-              Leave A Comment
-            </button>
-          ) : (
-            <button
-              className={classes['comments-button']}
-              onClick={handleAuthModalToggle}
-            >
-              Leave A Comment
-            </button>
-          )}
-        </div>
-        {showCommentForm && (
-          <CommentForm
-            onCancel={() => setShowCommentForm(false)}
-            onSubmit={message => handleCommentSubmit(message, commentable.id)}
-            showCancel={true}
-          />
-        )}
+        ))}
+      </InfiniteScroll>
+      <div className={classes['comment-form-container']}>
+        <CommentForm
+          onSubmit={handleSubmitComment}
+          replyingTo={replyingTo}
+          onTextChange={handleInputChange}
+        />
       </div>
-      {showAuthModal && (
-        <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
-      )}
-    </>
+    </div>
   )
 }
 

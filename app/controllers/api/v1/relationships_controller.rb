@@ -1,4 +1,7 @@
 class Api::V1::RelationshipsController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create destroy]
+
   def create
     user_to_follow = User.find(params[:id])
 
@@ -22,11 +25,6 @@ class Api::V1::RelationshipsController < ApplicationController
 
     if relationship
       relationship.destroy
-
-      if current_user.favorite_users.include?(user_to_unfollow.id)
-        current_user.favorite_users.delete(user_to_unfollow.id)
-        current_user.save
-      end
 
       render json: { message: "You have unfollowed #{user_to_unfollow.username}" }
     else

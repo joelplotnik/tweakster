@@ -1,0 +1,27 @@
+.approval-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.25em;
+}
+
+.icon-selected {
+  color: var(--primary-green-color);
+}
+
+.icon-unselected {
+  color: var(--primary-text-color);
+}
+
+.approval-count {
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+.selected {
+  color: var(--primary-green-color);
+}
+
+.unselected {
+  color: var(--primary-text-color);
+}

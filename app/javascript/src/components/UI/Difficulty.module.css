@@ -1,0 +1,15 @@
+.difficulty {
+  display: flex;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.filled {
+  color: var(--primary-yellow-color);
+  font-size: 1rem;
+}
+
+.unfilled {
+  color: var(--primary-text-color);
+  font-size: 1rem;
+}

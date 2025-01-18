@@ -1,0 +1,26 @@
+.modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--secondary-background-color);
+  border-radius: 16px 16px 0 0;
+  padding: 16px;
+  max-height: 75%;
+  min-height: 25%;
+  overflow-y: auto;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(100%);
+  animation: slide-up 0.3s ease-out forwards;
+  z-index: 12;
+  box-sizing: border-box;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

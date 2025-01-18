@@ -1,0 +1,106 @@
+.search-bar {
+  position: relative;
+  width: 100%;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input {
+  box-sizing: border-box;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  width: 100%;
+  padding: 10px;
+  padding-left: 8px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  border-radius: 5px;
+  border: 1px solid var(--primary-border-color);
+  text-align: left;
+}
+
+.search-input:focus {
+  border: 1px solid var(--primary-red-color);
+  outline: none;
+}
+
+.search-input:hover {
+  border: 1px solid var(--primary-red-color);
+  outline: none;
+}
+
+.form-input::placeholder {
+  padding-left: 4px;
+  font-size: 14px;
+  color: var(--primary-border-color);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.clear-icon {
+  cursor: pointer;
+}
+
+.search-results {
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 5px;
+  background-color: var(--primary-background-color);
+  border: 1px solid var(--primary-red-color);
+  z-index: 10;
+}
+
+.game-result {
+  padding: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--secondary-background-color);
+  color: var(--primary-text-color);
+  transition: background-color 0.2s, transform 0.2s;
+  gap: 12px;
+}
+
+.game-result:hover {
+  background-color: var(--primary-border-color);
+  transform: scale(1.02);
+}
+
+.selected-game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  color: var(--primary-text-color);
+  font-size: 14px;
+}
+
+.platform {
+  color: var(--primary-text-color-hover);
+}
+
+.remove-button {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  color: var(--primary-red-color);
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.remove-button:hover {
+  border: none;
+  color: var(--primary-red-color-hover);
+}

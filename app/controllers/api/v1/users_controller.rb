@@ -1,29 +1,139 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, only: [:restricted]
-  before_action :set_user, only: %i[show update destroy following check_ownership]
+  before_action :authenticate_devise_api_token!, only: %i[me update destroy]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
+  before_action :set_user, only: %i[show update destroy attempts following popular_users]
 
-  # This is for testing purposes
-  def restricted
-    devise_api_token = current_devise_api_token
-    if devise_api_token
-      render json: { message: "You are logged in as #{devise_api_token.resource_owner.username}" }, status: :ok
+  def index
+    users = User.with_attached_avatar
+                .order(created_at: :asc)
+
+    paginated_users = users.paginate(page: params[:page], per_page: 10)
+
+    users_with_metadata = paginated_users.map { |user| format_user(user) }
+
+    render json: users_with_metadata
+  end
+
+  def show
+    is_owner = current_user.present? && current_user == @user
+    is_following = current_user.present? && current_user.following?(@user)
+
+    render json: format_user(@user).merge({
+                                            currently_playing: @user.currently_playing_game,
+                                            is_owner:,
+                                            is_following:
+                                          })
+  end
+
+  def update
+    # Handle avatar updates
+    if params[:user][:avatar].present?
+      @user.avatar.attach(params[:user][:avatar])
+    elsif params[:user][:remove_avatar] == 'true'
+      @user.reset_avatar_to_default
+    end
+
+    # Handle currently_playing updates
+    if params[:user][:currently_playing].present?
+      game_id = params[:user][:currently_playing]
+
+      if game_id == 'none'
+        @user.user_game.destroy if @user.user_game.present?
+      else
+        user_game = @user.user_game
+
+        if user_game.present?
+          user_game.update(game_id:)
+        else
+          @user.create_user_game(game_id:)
+        end
+      end
+    end
+
+    # Check if the user is trying to update their password
+    if params[:user][:new_password].present?
+      if @user.valid_password?(params[:user][:password])
+        if @user.update(password: params[:user][:new_password])
+          render json: format_user(@user)
+        else
+          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+        end
+      else
+        render json: { error: 'Invalid current password' }, status: :unauthorized
+      end
+    # Update other fields, excluding password fields
+    elsif @user.update(user_params.except(:password, :new_password))
+      render json: format_user(@user)
     else
-      render json: { message: 'You are not logged in' }, status: :ok
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  def index
-    limit = params[:limit] || 25
-    page = params[:page] || 1
+  def destroy
+    if @user.destroy
+      sign_out if !@user.admin? || @user == current_user
+      render json: { message: 'User deleted successfully' }
+    else
+      render json: { error: 'Unauthorized' }, status: :unauthorized
+    end
+  end
 
-    users = User
-            .with_attached_avatar
-            .paginate(page:, per_page: limit)
+  def me
+    devise_api_token = current_devise_api_token
+    if devise_api_token && (user = devise_api_token.resource_owner)
+      render json: format_user(user), status: :ok
+    else
+      render json: { error: 'User not authenticated' }, status: :unauthorized
+    end
+  end
+
+  def search
+    search_term = params[:search_term].downcase.strip
+    users = User.where('LOWER(username) LIKE ?', "#{search_term}%")
+
+    users = users
+            .paginate(page: params[:page], per_page: 5)
             .order(created_at: :asc)
-            .map { |user| format_user(user) }
+            .map do |user|
+      {
+        id: user.id,
+        username: user.username,
+        avatar_url: user.avatar_url,
+        slug: user.slug
+      }
+    end
 
     render json: users
+  end
+
+  def attempts
+    attempts = @user.attempts.includes(:challenge, challenge: :game).where.not(status: 'Pending')
+
+    # Order attempts based on status and timestamps
+    attempts = attempts.order(
+      Arel.sql(<<~SQL)
+        CASE status
+          WHEN 'In Progress' THEN 0
+          WHEN 'Complete' THEN 1
+          ELSE 2
+        END,
+        COALESCE(completed_at, created_at) DESC
+      SQL
+    )
+
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
+
+    attempts_with_metadata = paginated_attempts.map do |attempt|
+      format_attempt(attempt).merge(
+        is_owner: current_user == attempt.user,
+        user_approved: current_user&.approvals&.exists?(attempt:)
+      )
+    end
+
+    render json: attempts_with_metadata
   end
 
   def popular_users
@@ -42,79 +152,6 @@ class Api::V1::UsersController < ApplicationController
                     .map { |user| format_user(user) }
 
     render json: { users: popular_users, point_in_time: }, status: :ok
-  end
-
-  def show
-    render json: format_user(@user)
-  end
-
-  def update
-    if current_user.admin?
-      if params[:user][:avatar].present?
-        @user.avatar.attach(params[:user][:avatar])
-      elsif params[:user][:remove_avatar] == 'true'
-        @user.reset_avatar_to_default
-      end
-
-      if params[:user][:new_password].present?
-        if @user.update(password: params[:user][:new_password])
-          render_updated_user(@user)
-        else
-          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-        end
-      elsif @user.update(user_params.except(:password, :new_password))
-        render_updated_user(@user)
-      else
-        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-      end
-    elsif @user.valid_password?(params[:user][:password])
-      if params[:user][:avatar].present?
-        @user.avatar.attach(params[:user][:avatar])
-      elsif params[:user][:remove_avatar] == 'true'
-        @user.reset_avatar_to_default
-      end
-
-      if params[:user][:new_password].present?
-        if @user.update(password: params[:user][:new_password])
-          render_updated_user(@user)
-        else
-          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-        end
-      elsif @user.update(user_params.except(:password, :new_password))
-        render_updated_user(@user)
-      else
-        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-      end
-    else
-      render json: { error: 'Invalid password' }, status: :unauthorized
-    end
-  end
-
-  def destroy
-    if @user.destroy
-      sign_out if !@user.admin? || @user == current_user
-      render json: { message: 'User deleted successfully' }
-    else
-      render json: { error: 'Unauthorized' }, status: :unauthorized
-    end
-  end
-
-  def search
-    search_term = params[:search_term].downcase.strip
-    users = User.where('LOWER(username) LIKE ?', "#{search_term}%")
-
-    users = users
-            .paginate(page: params[:page], per_page: 5)
-            .order(created_at: :asc)
-            .map do |user|
-      {
-        id: user.id,
-        username: user.username,
-        avatar_url: user.avatar_url
-      }
-    end
-
-    render json: users
   end
 
   def following
@@ -140,19 +177,14 @@ class Api::V1::UsersController < ApplicationController
     render json: followees_data
   end
 
-  def check_ownership
-    belongs_to_user = @user == current_user || current_user.admin?
-    render json: { belongs_to_user: }
-  end
-
   private
 
-  def set_user
-    @user = User.friendly.find(params[:id])
+  def user_params
+    params.require(:user).permit(:avatar, :username, :email, :bio, :password, :new_password)
   end
 
-  def user_params
-    params.require(:user).permit(:avatar, :username, :email, :url, :bio, :password, :new_password, :favorite_users)
+  def set_user
+    @user = User.friendly.find(params[:id]) if params[:id]
   end
 
   def render_updated_user(user)
@@ -162,7 +194,28 @@ class Api::V1::UsersController < ApplicationController
 
   def format_user(user)
     user.as_json.merge({
-                         avatar_url: user.avatar_url
+                         avatar_url: user.avatar_url,
+                         points: user.points,
+                         attempts_count: user.attempts_count,
+                         challenges_count: user.challenges_count,
+                         following_count: user.followees_count,
+                         followers_count: user.followers_count
                        })
+  end
+
+  def format_attempt(attempt)
+    attempt.as_json(
+      include: {
+        challenge: {
+          include: %i[game user],
+          methods: [:difficulty_rating]
+        },
+        user: {
+          only: %i[username slug],
+          methods: [:avatar_url]
+        }
+      },
+      methods: %i[comments_count approvals_count]
+    )
   end
 end

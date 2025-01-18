@@ -1,4 +1,6 @@
 class Api::V1::GamesController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create update destroy]
   before_action :set_game, only: %i[show update destroy]
 
   def index
@@ -6,29 +8,11 @@ class Api::V1::GamesController < ApplicationController
     page = params[:page] || 1
 
     games = Game
-            .with_attached_image
             .paginate(page:, per_page: limit)
             .order(name: :asc)
             .map { |game| format_game(game) }
 
     render json: games
-  end
-
-  def popular_games
-    limit = params[:limit] || 5
-    page = params[:page] || 1
-    point_in_time = params[:point_in_time] || Time.current
-
-    popular_games = Game
-                    .with_attached_image
-                    .left_joins(challenges: :attempts)
-                    .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
-                    .group('games.id')
-                    .order('COUNT(attempts.id) DESC')
-                    .paginate(page:, per_page: limit)
-                    .map { |game| format_game(game) }
-
-    render json: { games: popular_games, point_in_time: }, status: :ok
   end
 
   def show
@@ -67,6 +51,22 @@ class Api::V1::GamesController < ApplicationController
     render json: games
   end
 
+  def popular_games
+    limit = params[:limit] || 5
+    page = params[:page] || 1
+    point_in_time = params[:point_in_time] || Time.current
+
+    popular_games = Game
+                    .left_joins(challenges: :attempts)
+                    .where('attempts.created_at >= ? AND attempts.created_at <= ?', 7.days.ago, point_in_time)
+                    .group('games.id')
+                    .order('COUNT(attempts.id) DESC')
+                    .paginate(page:, per_page: limit)
+                    .map { |game| format_game(game) }
+
+    render json: { games: popular_games, point_in_time: }, status: :ok
+  end
+
   private
 
   def game_params
@@ -80,8 +80,6 @@ class Api::V1::GamesController < ApplicationController
   end
 
   def format_game(game)
-    game.as_json.merge({
-                         image_url: game.image_url
-                       })
+    game.as_json
   end
 end

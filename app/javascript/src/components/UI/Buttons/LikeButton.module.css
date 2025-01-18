@@ -1,0 +1,32 @@
+.like-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.25em;
+}
+
+.icon-selected {
+  color: var(--primary-red-color);
+}
+
+.icon-unselected {
+  color: var(--primary-text-color);
+}
+
+.like-button:hover .icon-unselected {
+  color: var(--primary-red-color);
+}
+
+.like-count {
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.selected {
+  color: var(--primary-red-color);
+}
+
+.unselected {
+  color: var(--primary-text-color);
+}

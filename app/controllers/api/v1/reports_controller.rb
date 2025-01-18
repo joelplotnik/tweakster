@@ -1,38 +1,44 @@
 class Api::V1::ReportsController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[index]
+
   def index
-    if current_user.admin?
+    if current_user.role == 'admin'
       per_page = 10
       reports = Report.all.order(created_at: :asc).paginate(page: params[:page], per_page:)
       total_pages = (reports.total_entries.to_f / per_page).ceil
 
       reports_with_details = reports.map do |report|
         case report.content_type
-        when 'piece'
-          piece = Piece.find(report.content_id)
-          channel = piece.channel
-          reporter = User.find(report.reporter_id)
-          creator = piece.user
-          {
-            report:,
-            piece:,
-            channel:,
-            reporter:,
-            creator:
-          }
         when 'comment'
           comment = Comment.find(report.content_id)
-          piece = comment.commentable.is_a?(Piece) ? comment.commentable : comment.commentable.piece
-          channel = piece.channel
-          reporter = User.find(report.reporter_id)
-          creator = piece.user
-          {
-            report:,
-            comment:,
-            piece:,
-            channel:,
-            reporter:,
-            creator:
-          }
+          if comment.commentable.is_a?(Challenge)
+            challenge = comment.commentable
+            reporter = User.find(report.reporter_id)
+            creator = challenge.user
+            {
+              report:,
+              comment:,
+              challenge:,
+              reporter:,
+              creator:
+            }
+          elsif comment.commentable.is_a?(Attempt)
+            attempt = comment.commentable
+            challenge = attempt.challenge
+            reporter = User.find(report.reporter_id)
+            creator = attempt.user
+            {
+              report:,
+              comment:,
+              attempt:,
+              challenge:,
+              reporter:,
+              creator:
+            }
+          else
+            { error: 'Invalid comment association' }
+          end
         when 'user'
           reporter = User.find(report.reporter_id)
           reported_user = User.find(report.content_id)
@@ -41,13 +47,25 @@ class Api::V1::ReportsController < ApplicationController
             reporter:,
             creator: reported_user
           }
-        when 'channel'
-          channel = Channel.find(report.content_id)
+        when 'challenge'
+          challenge = Challenge.find(report.content_id)
           reporter = User.find(report.reporter_id)
-          creator = channel.user
+          creator = challenge.user
           {
             report:,
-            channel:,
+            challenge:,
+            reporter:,
+            creator:
+          }
+        when 'attempt'
+          attempt = Attempt.find(report.content_id)
+          challenge = attempt.challenge
+          reporter = User.find(report.reporter_id)
+          creator = attempt.user
+          {
+            report:,
+            attempt:,
+            challenge:,
             reporter:,
             creator:
           }

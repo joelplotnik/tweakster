@@ -1,0 +1,42 @@
+.vote-section {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.vote-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.vote-count {
+  font-size: 12px;
+  color: var(--primary-text-color);
+}
+
+.upvote,
+.downvote {
+  color: var(--primary-text-color);
+  font-size: 1.25rem;
+}
+
+.upvote-filled {
+  font-size: 1.25rem;
+  color: var(--primary-red-color);
+}
+
+.downvote-filled {
+  font-size: 1.25rem;
+  color: var(--primary-blue-color);
+}
+
+.vote-button:hover .upvote {
+  font-size: 1.25rem;
+  color: var(--primary-red-color);
+}
+
+.vote-button:hover .downvote {
+  font-size: 1.25rem;
+  color: var(--primary-blue-color);
+}

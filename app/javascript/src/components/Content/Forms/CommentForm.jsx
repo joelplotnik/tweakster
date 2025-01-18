@@ -1,50 +1,82 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { RiArrowUpLine } from 'react-icons/ri'
+import { useSelector } from 'react-redux'
 
+import AuthModal from '../../UI/Modals/AuthModal'
 import classes from './CommentForm.module.css'
 
-const PieceCommentForm = ({ comment, onCancel, onSubmit, showCancel }) => {
-  const [message, setMessage] = useState('')
+const CommentForm = ({ onSubmit, replyingTo, onTextChange }) => {
+  const token = useSelector(state => state.token.token)
+  const [commentText, setCommentText] = useState('')
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const inputRef = useRef(null)
 
   useEffect(() => {
-    if (comment) {
-      setMessage(comment.message)
+    if (replyingTo) {
+      const usernamePrefix = `@${replyingTo.user.username} `
+      if (!commentText.startsWith(usernamePrefix)) {
+        setCommentText(usernamePrefix)
+
+        // Set focus at the end of the pre-filled text
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.focus()
+            inputRef.current.setSelectionRange(
+              usernamePrefix.length,
+              usernamePrefix.length
+            )
+          }
+        }, 0)
+      }
     }
-  }, [comment])
+  }, [replyingTo])
+
+  const handleChange = event => {
+    const value = event.target.value
+    setCommentText(value)
+    if (onTextChange) {
+      onTextChange(value)
+    }
+  }
 
   const handleSubmit = event => {
     event.preventDefault()
+    if (!token) {
+      setShowAuthModal(true)
+      return
+    }
+    if (commentText.trim()) {
+      onSubmit(commentText)
+      setCommentText('')
+    }
+  }
 
-    const commentId = comment ? comment.id : null
-
-    onSubmit(message, commentId)
-    setMessage('')
-    showCancel && onCancel()
+  const handleAuthModalToggle = () => {
+    setShowAuthModal(!showAuthModal)
   }
 
   return (
-    <form className={classes['comment-form']} onSubmit={handleSubmit}>
-      <textarea
-        className={classes['comment-text-area']}
-        value={message}
-        onChange={event => setMessage(event.target.value)}
-        placeholder="Add a comment..."
-      />
-      <div className={classes['button-container']}>
-        <button className={classes['comment-submit-button']} type="submit">
-          {comment ? 'Update Comment' : 'Comment'}
+    <>
+      <form onSubmit={handleSubmit} className={classes['comment-form']}>
+        <input
+          type="text"
+          ref={inputRef}
+          placeholder={
+            token ? 'Add a comment...' : 'Log in to leave a comment...'
+          }
+          value={commentText}
+          onChange={handleChange}
+          className={classes['comment-input']}
+        />
+        <button type="submit" className={classes['submit-button']}>
+          <RiArrowUpLine className={classes['submit-icon']} />
         </button>
-        {showCancel && (
-          <button
-            className={classes['cancel-button']}
-            type="button"
-            onClick={onCancel}
-          >
-            Cancel
-          </button>
-        )}
-      </div>
-    </form>
+      </form>
+      {showAuthModal && (
+        <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+      )}
+    </>
   )
 }
 
-export default PieceCommentForm
+export default CommentForm

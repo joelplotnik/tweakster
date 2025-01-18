@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
-import { RiCloseLine, RiFlagLine } from 'react-icons/ri'
+import { RiCloseLine, RiSkullLine } from 'react-icons/ri'
 import { useRouteLoaderData } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -73,8 +73,8 @@ const ReportModal = ({ onClick, content }) => {
             className={classes['modal-content']}
             onClick={e => e.stopPropagation()}
           >
-            <RiFlagLine className={classes['flag-icon']} />
-            <h2 className={classes['modal-header']}>Report Piece</h2>
+            <RiSkullLine className={classes['flag-icon']} />
+            <h2 className={classes['modal-header']}>Report Content</h2>
             <p className={classes.text}>
               Select a reason for reporting this post:
             </p>

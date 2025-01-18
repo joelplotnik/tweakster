@@ -29,7 +29,7 @@ import SearchBar from './SearchBar'
 import Sidebar from './Sidebar'
 
 const MainNavigation = () => {
-  const token = useRouteLoaderData('root')
+  const token = useSelector(state => state.token.token)
   // const cableContext = useContext(CableContext)
   // const cable = cableContext ? cableContext.cable : null
   const [showMenu, setShowMenu] = useState(false)
@@ -181,7 +181,10 @@ const MainNavigation = () => {
             </div>
           )}
           {token && (
-            <NavLink to="new" className={classes['icon-button']}>
+            <NavLink
+              to={`users/${user?.username}/challenges/new`}
+              className={classes['icon-button']}
+            >
               <RiAddFill />
             </NavLink>
           )}
@@ -234,7 +237,7 @@ const MainNavigation = () => {
               <div className={classes['dropdown-menu']}>
                 {token && (
                   <NavLink
-                    to={`users/${user.id}`}
+                    to={`users/${user.username}`}
                     className={({ isActive }) =>
                       isActive ? classes.active : undefined
                     }

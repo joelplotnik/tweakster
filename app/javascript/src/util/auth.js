@@ -1,6 +1,6 @@
-import { json, redirect } from 'react-router-dom'
-
 import { API_URL, EXPIRED_TOKEN } from '../constants/constants'
+import store from '../store'
+import { tokenActions } from '../store/session'
 
 export function storeTokens(token, refresh, expiration) {
   localStorage.setItem('token', token)
@@ -9,12 +9,14 @@ export function storeTokens(token, refresh, expiration) {
   const expirationDate = new Date()
   expirationDate.setSeconds(expirationDate.getSeconds() + expiration)
   localStorage.setItem('expiration', expirationDate.toISOString())
+  store.dispatch(tokenActions.setToken(token))
 }
 
-export function clearLocalStorage() {
+export function clearTokens() {
   localStorage.removeItem('token')
   localStorage.removeItem('refresh')
   localStorage.removeItem('expiration')
+  store.dispatch(tokenActions.clearToken())
 }
 
 export function tokenLoader() {
@@ -31,11 +33,7 @@ export async function getAuthToken() {
 
   if (tokenDuration < 0) {
     const refreshedToken = await refreshAuthToken()
-    if (refreshedToken) {
-      return refreshedToken
-    } else {
-      return EXPIRED_TOKEN
-    }
+    return refreshedToken || EXPIRED_TOKEN
   }
 
   return token
@@ -50,7 +48,7 @@ export function getTokenDuration() {
   return duration
 }
 
-async function refreshAuthToken() {
+export async function refreshAuthToken() {
   const refresh = localStorage.getItem('refresh')
 
   if (!refresh) {
@@ -67,7 +65,7 @@ async function refreshAuthToken() {
 
   if (!response.ok) {
     console.error('Failed to refresh token')
-    clearLocalStorage()
+    clearTokens()
     return null
   }
 
@@ -77,41 +75,4 @@ async function refreshAuthToken() {
   storeTokens(token, refresh_token, expires_in)
 
   return token
-}
-
-export async function checkAuthLoader({ params }) {
-  const token = getAuthToken()
-
-  if (!token) {
-    return redirect('/')
-  }
-
-  const { id } = params
-  const parsedID = parseInt(id, 10)
-
-  // User attempting to edit their profile
-  if (parsedID) {
-    const response = await fetch(
-      `${API_URL}/users/${parsedID}/check_ownership`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      const data = await response.json()
-
-      if (response.status === 401 || !data.belongs_to_user) {
-        return redirect('/')
-      } else {
-        throw json({ message: 'Could not make request.' }, { status: 500 })
-      }
-    }
-  }
-
-  return null
 }

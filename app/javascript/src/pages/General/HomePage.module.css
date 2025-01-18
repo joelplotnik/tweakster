@@ -5,9 +5,9 @@
 
 .container {
   font-size: 2rem;
-  color: #fff;
+  color: var(--primary-text-color);
   padding: 20px;
-  border: 1px solid #fff;
+  border: 1px solid var(--primary-text-color);
   border-radius: 8px;
   background-color: rgba(255, 255, 255, 0.1);
 }

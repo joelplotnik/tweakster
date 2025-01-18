@@ -1,0 +1,18 @@
+.attempt-status {
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pending {
+  color: var(--primary-red-color);
+}
+
+.in-progress {
+  color: var(--primary-yellow-color);
+}
+
+.complete {
+  color: var(--primary-green-color);
+}

@@ -2,7 +2,7 @@ import { redirect } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../constants/constants'
-import { clearLocalStorage } from '../../util/auth'
+import { clearTokens } from '../../util/auth'
 
 export const action = async () => {
   try {
@@ -22,11 +22,9 @@ export const action = async () => {
       }
 
       toast.success('Successfully logged out')
-    } else {
-      toast.warn('No active session found')
     }
 
-    clearLocalStorage()
+    clearTokens()
   } catch (error) {
     console.error('Error: ', error.message)
     toast.error('Failed to log out')

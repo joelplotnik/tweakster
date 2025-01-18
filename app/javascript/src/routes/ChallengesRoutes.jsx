@@ -5,38 +5,40 @@ import ChallengesLayout from '../pages/Challenges/ChallengesLayout'
 import ChallengesPage from '../pages/Challenges/ChallengesPage'
 import EditChallengePage from '../pages/Challenges/EditChallengePage'
 import NewChallengePage from '../pages/Challenges/NewChallengePage'
-import { checkAuthLoader } from '../util/auth'
 import attemptsRoutes from './AttemptsRoutes'
 
-const challengesRoutes = [
+const challengesRoutes = context => [
   {
     path: 'challenges',
+    id: `${context}-challenges`,
     element: <ChallengesLayout />,
     children: [
       {
         index: true,
+        id: `${context}-challenges-index`,
         element: <ChallengesPage />,
       },
       {
         path: 'new',
+        id: `${context}-challenges-new`,
         element: <NewChallengePage />,
-        loader: checkAuthLoader,
       },
       {
-        path: ':id',
-        id: 'challenge',
+        path: ':challengeId',
+        id: `${context}-challenge`,
         loader: challengeLoader,
         children: [
           {
             index: true,
+            id: `${context}-challenge-index`,
             element: <ChallengePage />,
           },
           {
             path: 'edit',
+            id: `${context}-challenge-edit`,
             element: <EditChallengePage />,
-            loader: checkAuthLoader,
           },
-          ...attemptsRoutes,
+          ...attemptsRoutes(`${context}-challenge`),
         ],
       },
     ],

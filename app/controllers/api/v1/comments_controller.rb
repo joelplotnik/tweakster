@@ -1,18 +1,31 @@
-require 'will_paginate/array'
-
 class Api::V1::CommentsController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create destroy]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[index replies]
+
   def index
     comments = Comment.where(commentable: find_commentable, parent_id: nil)
                       .includes(user: { avatar_attachment: :blob })
                       .order(likes_count: :desc)
 
-    per_page = 10
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-    paginated_comments = comments.offset((page - 1) * per_page).limit(per_page)
+    excluded_comment_ids = JSON.parse(params[:exclude] || '[]')
+    comments = comments.where.not(id: excluded_comment_ids)
+
+    paginated_comments = comments.paginate(page: params[:page], per_page: 10)
+
+    user_likes = if current_user
+                   Like.where(user: current_user, comment_id: paginated_comments.pluck(:id)).pluck(:comment_id)
+                 else
+                   []
+                 end
+    user_likes_set = user_likes.to_set
 
     comments_with_replies_count = paginated_comments.map do |comment|
       formatted_comment = format_comment(comment)
-      formatted_comment.merge('replies_count' => comment.children.count)
+      formatted_comment.merge(
+        'replies_count' => comment.children.count,
+        'user_liked' => user_likes_set.include?(comment.id)
+      )
     end
 
     render json: comments_with_replies_count
@@ -21,16 +34,33 @@ class Api::V1::CommentsController < ApplicationController
   def replies
     parent_comment = Comment.find(params[:id])
 
-    replies = parent_comment.children.includes(user: { avatar_attachment: :blob }).order(likes_count: :desc)
+    excluded_reply_ids = JSON.parse(params[:exclude] || '[]')
 
-    per_page = 10
-    page = params[:page].to_i.positive? ? params[:page].to_i : 1
-    paginated_replies = replies.offset((page - 1) * per_page).limit(per_page)
+    replies = parent_comment.children
+                            .where.not(id: excluded_reply_ids)
+                            .includes(user: { avatar_attachment: :blob })
+                            .order(likes_count: :desc)
 
-    replies_json = paginated_replies.map { |reply| format_comment(reply) }
+    paginated_replies = replies.paginate(page: params[:page], per_page: 10)
+
+    user_likes = if current_user
+                   Like.where(user: current_user, comment_id: paginated_replies.pluck(:id)).pluck(:comment_id)
+                 else
+                   []
+                 end
+    user_likes_set = user_likes.to_set
+
+    replies_json = paginated_replies.map do |reply|
+      format_comment(reply).merge('user_liked' => user_likes_set.include?(reply.id))
+    end
+
+    total_replies = replies.count
+    replies_shown = paginated_replies.current_page * paginated_replies.per_page
+    remaining_replies = [total_replies - replies_shown, 0].max
 
     render json: {
-      replies: replies_json
+      replies: replies_json,
+      remaining_replies:
     }
   end
 
@@ -39,28 +69,19 @@ class Api::V1::CommentsController < ApplicationController
     comment = commentable.comments.new(comment_params)
     comment.user = current_user
 
-    comment.parent_id = params[:id] if params[:id].present?
-
     if comment.save
-      CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == commentable.user
+      if comment.parent_id.present?
+        parent_comment = Comment.find(comment.parent_id)
+        CommentNotifier.with(record: comment).deliver(parent_comment.user) unless parent_comment.user == current_user
+      else
+        CommentNotifier.with(record: comment).deliver(commentable.user) unless comment.user == commentable.user
+      end
 
-      render json: comment, include: {
-        user: { only: [:username], methods: [:avatar_url] },
-        likes: { only: [:user_id] }
-      }, status: :created
-    else
-      render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
+      formatted_comment = format_comment(comment)
+      formatted_comment['replies_count'] = comment.children.count
+      formatted_comment['user_liked'] = false
 
-  def update
-    comment = Comment.find(params[:id])
-
-    if comment.update(comment_params.except(:parent_id))
-      render json: comment, include: {
-        user: { only: [:username], methods: [:avatar_url] },
-        likes: { only: [:user_id] }
-      }, status: :ok
+      render json: formatted_comment, status: :created
     else
       render json: { error: comment.errors.full_messages }, status: :unprocessable_entity
     end
@@ -68,25 +89,24 @@ class Api::V1::CommentsController < ApplicationController
 
   def destroy
     comment = Comment.find(params[:id])
-    comment.destroy
 
-    if comment.destroyed?
-      render json: { message: 'Comment successfully deleted' }, status: :ok
+    if comment.user == current_user || comment.commentable.user == current_user
+      comment.destroy
+
+      if comment.destroyed?
+        render json: { message: 'Comment successfully deleted' }, status: :ok
+      else
+        render json: { error: 'Failed to delete comment' }, status: :unprocessable_entity
+      end
     else
-      render json: { error: 'Failed to delete comment' }, status: :unprocessable_entity
+      render json: { error: 'Unauthorized to delete this comment' }, status: :unauthorized
     end
-  end
-
-  def check_ownership
-    comment = Comment.find(params[:id])
-    belongs_to_user = comment.user == current_user || current_user.admin?
-    render json: { belongs_to_user: }
   end
 
   private
 
   def comment_params
-    params.require(:comment).permit(:message, :commentable_id, :commentable_type)
+    params.require(:comment).permit(:message, :commentable_id, :commentable_type, :parent_id)
   end
 
   def find_commentable
@@ -103,6 +123,7 @@ class Api::V1::CommentsController < ApplicationController
     comment.as_json.merge({
                             user: {
                               username: comment.user.username,
+                              slug: comment.user.slug,
                               avatar_url: comment.user.avatar.attached? ? url_for(comment.user.avatar) : nil
                             }
                           })

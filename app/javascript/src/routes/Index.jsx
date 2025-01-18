@@ -3,6 +3,7 @@ import HomePage from '../pages/General/HomePage'
 import RootLayout from '../pages/RootLayout'
 import { tokenLoader } from '../util/auth'
 import authRoutes from './AuthRoutes'
+import gamesRoutes from './GamesRoutes'
 import generalRoutes from './GeneralRoutes'
 import usersRoutes from './UsersRoutes'
 
@@ -21,7 +22,7 @@ const routes = [
       ...generalRoutes,
       ...authRoutes,
       ...usersRoutes,
-      // ...gamesRoutes,
+      ...gamesRoutes,
     ],
   },
 ]

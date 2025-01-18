@@ -6,18 +6,23 @@ class Attempt < ApplicationRecord
   has_many :approvals, dependent: :destroy
 
   validates :user_id, uniqueness: { scope: :challenge_id }
-  validates :status, inclusion: { in: ['To Do', 'In Progress', 'Complete'] }
+  validates :status, inclusion: { in: ['Pending', 'In Progress', 'Complete'] }
 
-  after_create :increment_attempt_count
-  after_destroy :decrement_attempt_count
+  validate :single_in_progress_attempt, if: -> { status == 'In Progress' }
+
+  def comments_count
+    comments.size
+  end
+
+  def approvals_count
+    approvals.size
+  end
 
   private
 
-  def increment_attempt_count
-    challenge.increment!(:attempt_count)
-  end
+  def single_in_progress_attempt
+    return unless Attempt.where(user_id:, status: 'In Progress').where.not(id:).exists?
 
-  def decrement_attempt_count
-    challenge.decrement!(:attempt_count)
+    errors.add(:status, 'Only one attempt can be "In Progress" at a time.')
   end
 end

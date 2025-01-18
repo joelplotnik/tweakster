@@ -1,66 +1,62 @@
 .comment-form {
   display: flex;
-  flex-direction: column;
-  margin-left: 3rem;
-  margin-right: 2rem;
+  gap: 12px;
+  padding: 12px;
 }
 
-.comment-text-area {
+.comment-input {
+  flex: 1;
+  background-color: var(--secondary-background-color);
+  padding: 8px;
+  border: 1px solid var(--primary-text-color-hover);
+  border-radius: 5px;
+}
+
+.comment-input[type='text'] {
+  border-radius: 5px;
+  background-color: transparent;
+  color: var(--primary-text-color);
+  font-size: 0.9rem;
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  resize: vertical;
-  min-height: 45px;
-}
-
-.comment-text-area:focus {
+  width: 30vw;
   outline: none;
-  border-color: black;
+  flex-grow: 1;
 }
 
-.button-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+.comment-input:focus {
+  border: 1px solid var(--primary-text-color);
 }
 
-.comment-submit-button {
-  padding: 0.6rem 0.8rem;
-  font-weight: bold;
-  font-size: 14px;
-  background-color: #007bff;
-  color: #fff;
+.comment-input:hover {
+  border: 1px solid var(--primary-text-color);
+}
+
+.submit-icon {
+  font-size: 1.5em;
+}
+
+.submit-button {
+  background-color: var(--primary-blue-color);
+  color: var(--primary-text-color);
   border: none;
-  border-radius: 4px;
+  padding: 8px 8px;
+  border-radius: 5px;
   cursor: pointer;
+  height: 34px;
 }
 
-.comment-submit-button:hover {
-  background-color: #0056b3;
+.submit-button:hover {
+  background-color: var(--primary-blue-color-hover);
 }
 
-.comment-submit-button--disabled {
-  background-color: lightgrey;
-  cursor: not-allowed;
-}
-
-.comment-submit-button--disabled:hover {
-  background-color: lightgrey;
-  cursor: not-allowed;
-}
-
-.cancel-button {
-  background-color: #d92563;
-  margin-left: 5px;
-  font-weight: 600;
-  color: white;
-  padding: 5px 10px;
+.reply-button {
+  background: none;
+  color: var(--primary-blue-color);
   border: none;
-  border-radius: 4px;
   cursor: pointer;
+  margin-top: 5px;
 }
 
-.cancel-button:hover {
-  background-color: #b01f54;
+.reply-button:hover {
+  text-decoration: underline;
 }

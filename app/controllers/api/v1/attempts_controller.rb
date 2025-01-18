@@ -1,23 +1,69 @@
-class Api::V1::AttempsController < ApplicationController
-  before_action :set_user, only: [:index]
-  before_action :set_challenge, only: [:index]
+class Api::V1::AttemptsController < ApplicationController
+  skip_before_action :verify_authenticity_token, raise: false
+  before_action :authenticate_devise_api_token!, only: %i[create update destroy]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
+  before_action :set_challenge, only: %i[index create destroy]
   before_action :set_attempt, only: %i[show update destroy]
 
-  # GET /api/v1/users/:user_id/attempts
-  # GET /api/v1/games/:game_id/challenges/:challenge_id/attempts
   def index
-    if @challenge
-      @attempts = @challenge.attempts.includes(:challenge, challenge: :game)
-    elsif @user
-      @attempts = @user.attempts.includes(:challenge, challenge: :game)
-    else
-      render json: { error: 'User or challenge must be specified' }, status: :unprocessable_entity and return
+    attempts = @challenge.attempts
+                         .includes(:challenge, challenge: :game)
+                         .where.not(status: 'Pending')
+                         .order(created_at: :desc)
+
+    paginated_attempts = attempts.paginate(page: params[:page], per_page: 10)
+
+    attempts_with_metadata = paginated_attempts.map do |attempt|
+      attempt_data = format_attempt(attempt)
+
+      attempt_data[:is_owner] = (current_user == attempt.user)
+      attempt_data[:user_approved] = current_user.approvals.exists?(attempt_id: attempt.id)
+
+      attempt_data
     end
 
-    render json: @attempts.map { |attempt| format_attempt(attempt) }
+    render json: attempts_with_metadata
   end
 
-  # GET /api/v1/popular_attempts
+  def show
+    render json: format_attempt(@attempt)
+  end
+
+  def create
+    attempt = current_user.attempts.new(attempt_params.merge(challenge_id: @challenge.id))
+
+    if attempt.save
+      render json: { message: 'Challenge attempt created successfully', attempt: },
+             status: :created
+    else
+      render json: { errors: attempt.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def update
+    if @attempt.present? && current_user == @attempt.user
+      if @attempt.update(attempt_params)
+        render json: { message: 'Attempt updated successfully',
+                       attempt: format_attempt(@attempt) }
+      else
+        render json: { errors: @attempt.errors.full_messages }, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'You are not authorized to update this challenge' }, status: :forbidden
+    end
+  end
+
+  def destroy
+    attempt = current_user.attempts.find_by(id: params[:id], challenge_id: params[:challenge_id])
+
+    if attempt
+      attempt.destroy
+      render json: { message: 'Attempt deleted successfully', attempt_id: attempt.id }, status: :ok
+    else
+      render json: { error: 'Attempt not found or unauthorized' }, status: :not_found
+    end
+  end
+
   def popular_attempts
     limit = params[:limit] || 5
     page = params[:page] || 1
@@ -35,47 +81,6 @@ class Api::V1::AttempsController < ApplicationController
     render json: { attempts: popular_attempts, point_in_time: }, status: :ok
   end
 
-  # GET /api/v1/users/:user_id/attempts/:id
-  def show
-    render json: format_attempt(@attempt)
-  end
-
-  # POST /api/v1/games/:game_id/challenges/:challenge_id/attempts
-  def create
-    attempt = current_user.attempts.new(attempt_params.merge(challenge_id: @challenge.id))
-
-    if attempt.save
-      render json: { message: 'Challenge attempt created successfully', attempt: format_attempt(attempt) },
-             status: :created
-    else
-      render json: { errors: attempt.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-
-  # PATCH/PUT /api/v1/users/:user_id/attempts/:id
-  def update
-    if @attempt.user_id == current_user.id
-      if @attempt.update(attempt_params)
-        render json: { message: 'Attempt updated successfully',
-                       attempt: format_attempt(@attempt) }
-      else
-        render json: { errors: @attempt.errors.full_messages }, status: :unprocessable_entity
-      end
-    else
-      render json: { error: 'You are not authorized to update this challenge' }, status: :forbidden
-    end
-  end
-
-  # DELETE /api/v1/users/:user_id/attempts/:id
-  def destroy
-    if @attempt.user_id == current_user.id
-      @attempt.destroy
-      render json: { message: 'Attempt deleted successfully' }, status: :no_content
-    else
-      render json: { error: 'You are not authorized to delete this challenge' }, status: :forbidden
-    end
-  end
-
   private
 
   def attempt_params
@@ -83,7 +88,7 @@ class Api::V1::AttempsController < ApplicationController
   end
 
   def set_user
-    @user = User.find(params[:user_id]) if params[:user_id]
+    @user = User.friendly.find(params[:user_id]) if params[:user_id]
   end
 
   def set_challenge
@@ -91,14 +96,22 @@ class Api::V1::AttempsController < ApplicationController
   end
 
   def set_attempt
-    @attempt = Attempt.find(params[:id])
+    @attempt = Attempt.find(params[:id]) if params[:id]
   end
 
   def format_attempt(attempt)
-    attempt.as_json(include: {
-                      challenge: {
-                        include: :game
-                      }
-                    })
+    attempt.as_json(
+      include: {
+        challenge: {
+          include: %i[game user],
+          methods: [:difficulty_rating]
+        },
+        user: {
+          only: %i[username slug],
+          methods: [:avatar_url]
+        }
+      },
+      methods: %i[comments_count approvals_count]
+    )
   end
 end

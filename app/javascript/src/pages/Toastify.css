@@ -1,20 +1,20 @@
 .Toastify__toast-theme--colored.Toastify__toast--default {
-  background-color: #424242;
-  color: white;
+  background-color: var(--primary-border-color);
+  color: var(--primary-text-color);
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--info {
-  background-color: #17a2b8;
+  background-color: var(--primary-blue-color);
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--success {
-  background-color: #28a745;
+  background-color: var(--primary-green-color);
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--warning {
-  background-color: #ffc107;
+  background-color: var(--primary-yellow-color);
 }
 
 .Toastify__toast-theme--colored.Toastify__toast--error {
-  background-color: #ff5e57;
+  background-color: var(--primary-red-color);
 }

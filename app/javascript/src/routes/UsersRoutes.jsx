@@ -5,7 +5,6 @@ import FollowingPage from '../pages/Users/FollowingPage'
 import UserPage, { loader as userLoader } from '../pages/Users/UserPage'
 import UsersLayout from '../pages/Users/UsersLayout'
 import UsersPage from '../pages/Users/UsersPage'
-import { checkAuthLoader } from '../util/auth'
 import challengesRoutes from './ChallengesRoutes'
 
 const usersRoutes = [
@@ -18,7 +17,7 @@ const usersRoutes = [
         element: <UsersPage />,
       },
       {
-        path: ':id',
+        path: ':username',
         id: 'user',
         loader: userLoader,
         children: [
@@ -30,14 +29,12 @@ const usersRoutes = [
             path: 'edit',
             element: <EditUserPage />,
             action: editUserAction,
-            loader: checkAuthLoader,
           },
           {
             path: 'following',
             element: <FollowingPage />,
-            loader: checkAuthLoader,
           },
-          ...challengesRoutes,
+          ...challengesRoutes('user'),
         ],
       },
     ],

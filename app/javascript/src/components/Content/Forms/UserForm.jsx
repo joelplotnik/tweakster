@@ -1,19 +1,20 @@
 import React, { useRef, useState } from 'react'
 import { RiImageAddLine } from 'react-icons/ri'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Form,
   Link,
   useActionData,
   useNavigate,
   useNavigation,
-  useRouteLoaderData,
 } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../../constants/constants'
 import useInput from '../../../hooks/useInput'
 import { userActions } from '../../../store/user'
+import { clearTokens } from '../../../util/auth'
+import GameSelectDropdown from '../../UI/Buttons/GameSelectDropdown'
 import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
 import classes from './UserForm.module.css'
 
@@ -26,9 +27,14 @@ const UserForm = ({ method, user }) => {
   const fileInput = useRef(null)
   const [showModal, setShowModal] = useState(false)
   const dispatch = useDispatch()
-  const token = useRouteLoaderData('root')
-  const currentUser = useSelector(state => state.userPage.user)
+  const token = useSelector(state => state.token.token)
   const [removeAvatar, setRemoveAvatar] = useState(false)
+  const [showPasswordFields, setShowPasswordFields] = useState(false)
+  const [selectedGame, setSelectedGame] = useState(user?.currently_playing)
+
+  const handleGameSelect = game => {
+    setSelectedGame(game)
+  }
 
   const {
     value: enteredUsername,
@@ -109,6 +115,7 @@ const UserForm = ({ method, user }) => {
 
   const handleRemoveAvatar = event => {
     event.preventDefault()
+    // setAvatar(null) // Clear the avatar state WORK HERE !!!!!!!!!!!!!!!!!!!!
     setRemoveAvatar(true)
     fileInput.current.value = null
   }
@@ -117,31 +124,34 @@ const UserForm = ({ method, user }) => {
     setShowModal(!showModal)
   }
 
+  const togglePasswordFields = () => {
+    setShowPasswordFields(prevState => {
+      if (prevState) {
+        handlePasswordChange({ target: { value: '' } })
+        handleNewPasswordChange({ target: { value: '' } })
+        handleConfirmPasswordChange({ target: { value: '' } })
+      }
+      return !prevState
+    })
+  }
+
   const handleDelete = async () => {
     try {
-      const userIdInt = parseInt(currentUser.id, 10)
+      const response = await fetch(`${API_URL}/users/${user.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-      if (currentUser.role === 'admin' || userIdInt === user.id) {
-        const response = await fetch(`${API_URL}/users/${user.id}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        if (!response.ok) {
-          throw new Error('Could not delete user')
-        }
-
-        if (currentUser.role === 'admin' && userIdInt === user.id) {
-          dispatch(userActions.clearUser())
-          localStorage.clear()
-        } else if (currentUser.role !== 'admin' && userIdInt === user.id) {
-          dispatch(userActions.clearUser())
-          localStorage.clear()
-        }
+      if (!response.ok) {
+        throw new Error('Could not delete user')
       }
+
+      clearTokens()
+      dispatch(userActions.clearUser())
+
       return navigate('/')
     } catch (error) {
       console.error('Error: ', error.message)
@@ -228,14 +238,6 @@ const UserForm = ({ method, user }) => {
             required
           />
         </div>
-        <input
-          className={classes['url-input']}
-          type="text"
-          id="url"
-          name="url"
-          placeholder="Url"
-          defaultValue={user ? user.url : ''}
-        />
         <textarea
           className={classes['form-textarea']}
           id="bio"
@@ -243,56 +245,76 @@ const UserForm = ({ method, user }) => {
           placeholder="Bio"
           defaultValue={user ? user.bio : ''}
         />
-        <div className={`${classes['input-wrapper']} ${newPasswordInvalid}`}>
-          {newPasswordInputHasError && (
-            <p className={classes['error-text']}>
-              Please enter a valid password.
-            </p>
-          )}
-          <input
-            className={classes['form-input']}
-            type="password"
-            id="newPassword"
-            name="newPassword"
-            onChange={handleNewPasswordChange}
-            onBlur={handleNewPasswordBlur}
-            placeholder="New Password"
+        <div className={classes['input-wrapper']}>
+          <GameSelectDropdown
+            onGameSelect={handleGameSelect}
+            selectedGame={selectedGame}
           />
         </div>
-        <div
-          className={`${classes['input-wrapper']} ${confirmPasswordInvalidClass}`}
-        >
-          {confirmPasswordInputHasError && (
-            <p className={classes['error-text']}>Passwords do not match.</p>
-          )}
-          <input
-            className={classes['form-input']}
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            onChange={handleConfirmPasswordChange}
-            onBlur={handleConfirmPasswordBlur}
-            placeholder="Confirm Password"
-            required={enteredNewPassword.trim().length > 0}
-          />
+        <div className={classes['input-wrapper']}>
+          <button
+            type="button"
+            onClick={togglePasswordFields}
+            className={classes['change-password-btn']}
+          >
+            {showPasswordFields ? 'Hide password fields' : 'Change password?'}
+          </button>
         </div>
-        <div className={`${classes['input-wrapper']} ${passwordInvalid}`}>
-          {passwordInputHasError && (
-            <p className={classes['error-text']}>
-              Please enter a valid password.
-            </p>
-          )}
-          <input
-            className={classes['form-input']}
-            type="password"
-            id="password"
-            name="password"
-            onChange={handlePasswordChange}
-            onBlur={handlePasswordBlur}
-            placeholder="Current Password"
-            required={currentUser.role !== 'admin'}
-          />
-        </div>
+        {showPasswordFields && (
+          <>
+            <div
+              className={`${classes['input-wrapper']} ${newPasswordInvalid}`}
+            >
+              {newPasswordInputHasError && (
+                <p className={classes['error-text']}>
+                  Please enter a valid password.
+                </p>
+              )}
+              <input
+                className={classes['form-input']}
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                onChange={handleNewPasswordChange}
+                onBlur={handleNewPasswordBlur}
+                placeholder="New password"
+              />
+            </div>
+            <div
+              className={`${classes['input-wrapper']} ${confirmPasswordInvalidClass}`}
+            >
+              {confirmPasswordInputHasError && (
+                <p className={classes['error-text']}>Passwords do not match.</p>
+              )}
+              <input
+                className={classes['form-input']}
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                onChange={handleConfirmPasswordChange}
+                onBlur={handleConfirmPasswordBlur}
+                placeholder="Confirm password"
+                required={enteredNewPassword.trim().length > 0}
+              />
+            </div>
+            <div className={`${classes['input-wrapper']} ${passwordInvalid}`}>
+              {passwordInputHasError && (
+                <p className={classes['error-text']}>
+                  Please enter a valid password.
+                </p>
+              )}
+              <input
+                className={classes['form-input']}
+                type="password"
+                id="password"
+                name="password"
+                onChange={handlePasswordChange}
+                onBlur={handlePasswordBlur}
+                placeholder="Current password"
+              />
+            </div>{' '}
+          </>
+        )}
         {data && data.error && (
           <ul className={classes['form-error-list']}>
             <li className={classes['form-error']}>{data.error}</li>
@@ -315,7 +337,7 @@ const UserForm = ({ method, user }) => {
           className={classes['delete-button']}
           onClick={() => handleModalToggle()}
         >
-          Delete Account
+          Delete account
         </Link>
       </div>
       {showModal && (

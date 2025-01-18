@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
+import debounce from 'lodash/debounce'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RiArrowLeftLine, RiCloseLine, RiSearchLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
@@ -11,6 +12,7 @@ function SearchBar({ mobile, handleBackClick }) {
   const [gameResults, setGameResults] = useState([])
   const [isFocused, setIsFocused] = useState(false)
   const searchRef = useRef(null)
+  const inputRef = useRef(null)
 
   useEffect(() => {
     const handleClickOutside = event => {
@@ -25,12 +27,17 @@ function SearchBar({ mobile, handleBackClick }) {
     }
   }, [])
 
-  useEffect(() => {
-    const fetchResults = async () => {
+  const fetchResults = useCallback(
+    debounce(async query => {
+      if (!query) {
+        setUserResults([])
+        setGameResults([])
+        return
+      }
       try {
         const [userResponse, gameResponse] = await Promise.all([
-          fetch(`${API_URL}/users/search?search_term=${searchTerm}`),
-          fetch(`${API_URL}/games/search?search_term=${searchTerm}`),
+          fetch(`${API_URL}/users/search?search_term=${query}`),
+          fetch(`${API_URL}/games/search?search_term=${query}`),
         ])
         if (!userResponse.ok || !gameResponse.ok) {
           throw new Error('Network response was not ok')
@@ -40,17 +47,23 @@ function SearchBar({ mobile, handleBackClick }) {
         setUserResults(userData)
         setGameResults(gameData)
       } catch (error) {
-        console.error('Error: ', error.message)
+        console.error('Error fetching results:', error.message)
       }
-    }
+    }, 300), // 300ms debounce delay
+    []
+  )
 
-    if (searchTerm && isFocused) {
-      fetchResults()
-    } else {
-      setUserResults([])
-      setGameResults([])
+  useEffect(() => {
+    fetchResults(searchTerm)
+    // Cleanup the debounced function on unmount
+    return () => fetchResults.cancel()
+  }, [searchTerm, fetchResults])
+
+  useEffect(() => {
+    if (mobile && inputRef.current) {
+      inputRef.current.focus()
     }
-  }, [searchTerm, isFocused])
+  }, [mobile])
 
   const handleInputChange = event => {
     setSearchTerm(event.target.value)
@@ -89,6 +102,7 @@ function SearchBar({ mobile, handleBackClick }) {
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           autoComplete="off"
+          ref={inputRef}
         />
         <div className={classes['clear-icon']} onClick={clearInput}>
           {searchTerm && <RiCloseLine className={classes.icon} />}
@@ -109,10 +123,13 @@ function SearchBar({ mobile, handleBackClick }) {
 
               {userResults.map(result => (
                 <Link
-                  to={`/users/${result.id}`}
-                  key={result.id}
+                  to={`/users/${result.slug}`}
+                  key={result.slug}
                   className={classes['user-result']}
-                  onClick={clearInput}
+                  onClick={() => {
+                    clearInput()
+                    handleBackClick()
+                  }}
                 >
                   <div className={classes['user-avatar-container']}>
                     <img
@@ -135,19 +152,25 @@ function SearchBar({ mobile, handleBackClick }) {
 
               {gameResults.map(result => (
                 <Link
-                  to={`/games/${result.id}`}
-                  key={result.id}
+                  to={`/games/${result.slug}`}
+                  key={result.slug}
                   className={classes['game-result']}
-                  onClick={clearInput}
+                  onClick={() => {
+                    clearInput()
+                    handleBackClick()
+                  }}
                 >
-                  <div className={classes['game-image-container']}>
-                    <img
-                      src={result.image_url}
-                      alt="Game"
-                      className={classes['game-visual']}
-                    />
+                  <div className={classes['game-name-image-container']}>
+                    <div className={classes['game-image-container']}>
+                      <img
+                        src={result.cover}
+                        alt="Game"
+                        className={classes['game-visual']}
+                      />
+                    </div>
+                    <span>{result.name}</span>
                   </div>
-                  {result.name}
+                  <span className={classes.platform}>{result.platform}</span>
                 </Link>
               ))}
             </div>

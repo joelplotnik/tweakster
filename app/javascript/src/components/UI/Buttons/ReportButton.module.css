@@ -1,0 +1,15 @@
+.report-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.25em;
+}
+
+.icon {
+  color: var(--primary-text-color);
+}
+
+.text {
+  margin-left: 5px;
+  font-size: 12px;
+}

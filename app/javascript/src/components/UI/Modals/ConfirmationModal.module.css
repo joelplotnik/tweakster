@@ -6,7 +6,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 21;
+  z-index: 12;
   overflow: hidden;
 }
 
@@ -15,7 +15,7 @@
 }
 
 .modal-content {
-  background-color: white;
+  background-color: var(--primary-background-color);
   padding: 3rem;
   border-radius: 0.5rem;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
@@ -43,13 +43,13 @@
 }
 
 .close-circle-icon {
-  color: #d92563;
+  color: var(--primary-red-color);
   font-size: 4rem;
   margin-bottom: 1rem;
 }
 
-.subscribe-icon {
-  color: rgb(51, 153, 255);
+.info-icon {
+  color: var(--primary-blue-color);
   font-size: 4rem;
   margin-bottom: 1rem;
 }
@@ -59,7 +59,7 @@
   top: 0.5rem;
   right: 0.5rem;
   font-size: 1.5rem;
-  color: #999;
+  color: var(--primary-text-color);
   cursor: pointer;
   transition: color 0.2s ease-in-out;
   z-index: 22;
@@ -68,7 +68,7 @@
 }
 
 .close-icon:hover {
-  color: #000;
+  color: var(--primary-text-color-hover);
 }
 
 .button-container {
@@ -78,9 +78,9 @@
 }
 
 .cancel-button {
-  background-color: #333;
+  background-color: var(--primary-border-color-hover);
   border: none;
-  color: #fff;
+  color: var(--primary-text-color);
   font-weight: bold;
   padding: 0.5rem 1rem;
   margin-right: 0.5rem;
@@ -90,12 +90,12 @@
 }
 
 .cancel-button:hover {
-  background-color: #444;
+  background-color: var(--primary-border-color);
 }
 
 .delete-button {
-  background-color: #d92563;
-  color: #fff;
+  background-color: var(--primary-red-color);
+  color: var(--primary-text-color);
   border: none;
   border-radius: 4px;
   font-weight: bold;
@@ -106,12 +106,12 @@
 }
 
 .delete-button:hover {
-  background-color: #c3164b;
+  background-color: var(--primary-red-color-hover);
 }
 
 .confirm-button {
-  background-color: rgb(51, 153, 255);
-  color: #fff;
+  background-color: var(--primary-blue-color);
+  color: var(--primary-text-color);
   border: none;
   border-radius: 4px;
   font-weight: bold;
@@ -122,5 +122,5 @@
 }
 
 .confirm-button:hover {
-  background-color: rgb(31, 117, 195);
+  background-color: var(--primary-blue-color-hover);
 }
