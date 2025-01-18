@@ -63,6 +63,10 @@ gem 'image_processing', '~> 1.2'
 # Ruby static code analyzer (a.k.a. linter) and code formatter
 gem 'rubocop', require: false
 
+# Keeps the app stable while ensuring compatibility with Rails 7.0.x.
+# Upgrading to Rails 7.1 would fix the issue here as well
+gem 'concurrent-ruby', '1.3.4'
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 
