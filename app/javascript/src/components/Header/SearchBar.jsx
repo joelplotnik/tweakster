@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import debounce from 'lodash/debounce'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RiArrowLeftLine, RiCloseLine, RiSearchLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
@@ -26,12 +27,17 @@ function SearchBar({ mobile, handleBackClick }) {
     }
   }, [])
 
-  useEffect(() => {
-    const fetchResults = async () => {
+  const fetchResults = useCallback(
+    debounce(async query => {
+      if (!query) {
+        setUserResults([])
+        setGameResults([])
+        return
+      }
       try {
         const [userResponse, gameResponse] = await Promise.all([
-          fetch(`${API_URL}/users/search?search_term=${searchTerm}`),
-          fetch(`${API_URL}/games/search?search_term=${searchTerm}`),
+          fetch(`${API_URL}/users/search?search_term=${query}`),
+          fetch(`${API_URL}/games/search?search_term=${query}`),
         ])
         if (!userResponse.ok || !gameResponse.ok) {
           throw new Error('Network response was not ok')
@@ -41,17 +47,17 @@ function SearchBar({ mobile, handleBackClick }) {
         setUserResults(userData)
         setGameResults(gameData)
       } catch (error) {
-        console.error('Error: ', error.message)
+        console.error('Error fetching results:', error.message)
       }
-    }
+    }, 300), // 300ms debounce delay
+    []
+  )
 
-    if (searchTerm && isFocused) {
-      fetchResults()
-    } else {
-      setUserResults([])
-      setGameResults([])
-    }
-  }, [searchTerm, isFocused])
+  useEffect(() => {
+    fetchResults(searchTerm)
+    // Cleanup the debounced function on unmount
+    return () => fetchResults.cancel()
+  }, [searchTerm, fetchResults])
 
   useEffect(() => {
     if (mobile && inputRef.current) {
@@ -149,16 +155,22 @@ function SearchBar({ mobile, handleBackClick }) {
                   to={`/games/${result.slug}`}
                   key={result.slug}
                   className={classes['game-result']}
-                  onClick={clearInput}
+                  onClick={() => {
+                    clearInput()
+                    handleBackClick()
+                  }}
                 >
-                  <div className={classes['game-image-container']}>
-                    <img
-                      src={result.cover}
-                      alt="Game"
-                      className={classes['game-visual']}
-                    />
+                  <div className={classes['game-name-image-container']}>
+                    <div className={classes['game-image-container']}>
+                      <img
+                        src={result.cover}
+                        alt="Game"
+                        className={classes['game-visual']}
+                      />
+                    </div>
+                    <span>{result.name}</span>
                   </div>
-                  {result.name}
+                  <span className={classes.platform}>{result.platform}</span>
                 </Link>
               ))}
             </div>

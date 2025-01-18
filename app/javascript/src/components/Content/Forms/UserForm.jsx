@@ -14,6 +14,7 @@ import { API_URL } from '../../../constants/constants'
 import useInput from '../../../hooks/useInput'
 import { userActions } from '../../../store/user'
 import { clearTokens } from '../../../util/auth'
+import GameSelectDropdown from '../../UI/Buttons/GameSelectDropdown'
 import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
 import classes from './UserForm.module.css'
 
@@ -29,6 +30,11 @@ const UserForm = ({ method, user }) => {
   const token = useSelector(state => state.token.token)
   const [removeAvatar, setRemoveAvatar] = useState(false)
   const [showPasswordFields, setShowPasswordFields] = useState(false)
+  const [selectedGame, setSelectedGame] = useState(user?.currently_playing)
+
+  const handleGameSelect = game => {
+    setSelectedGame(game)
+  }
 
   const {
     value: enteredUsername,
@@ -240,6 +246,12 @@ const UserForm = ({ method, user }) => {
           defaultValue={user ? user.bio : ''}
         />
         <div className={classes['input-wrapper']}>
+          <GameSelectDropdown
+            onGameSelect={handleGameSelect}
+            selectedGame={selectedGame}
+          />
+        </div>
+        <div className={classes['input-wrapper']}>
           <button
             type="button"
             onClick={togglePasswordFields}
@@ -265,7 +277,7 @@ const UserForm = ({ method, user }) => {
                 name="newPassword"
                 onChange={handleNewPasswordChange}
                 onBlur={handleNewPasswordBlur}
-                placeholder="New Password"
+                placeholder="New password"
               />
             </div>
             <div
@@ -281,7 +293,7 @@ const UserForm = ({ method, user }) => {
                 name="confirmPassword"
                 onChange={handleConfirmPasswordChange}
                 onBlur={handleConfirmPasswordBlur}
-                placeholder="Confirm Password"
+                placeholder="Confirm password"
                 required={enteredNewPassword.trim().length > 0}
               />
             </div>
@@ -298,7 +310,7 @@ const UserForm = ({ method, user }) => {
                 name="password"
                 onChange={handlePasswordChange}
                 onBlur={handlePasswordBlur}
-                placeholder="Current Password"
+                placeholder="Current password"
               />
             </div>{' '}
           </>
@@ -325,7 +337,7 @@ const UserForm = ({ method, user }) => {
           className={classes['delete-button']}
           onClick={() => handleModalToggle()}
         >
-          Delete Account
+          Delete account
         </Link>
       </div>
       {showModal && (

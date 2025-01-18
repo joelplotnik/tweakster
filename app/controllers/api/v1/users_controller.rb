@@ -34,6 +34,23 @@ class Api::V1::UsersController < ApplicationController
       @user.reset_avatar_to_default
     end
 
+    # Handle currently_playing updates
+    if params[:user][:currently_playing].present?
+      game_id = params[:user][:currently_playing]
+
+      if game_id == 'none'
+        @user.user_game.destroy if @user.user_game.present?
+      else
+        user_game = @user.user_game
+
+        if user_game.present?
+          user_game.update(game_id:)
+        else
+          @user.create_user_game(game_id:)
+        end
+      end
+    end
+
     # Check if the user is trying to update their password
     if params[:user][:new_password].present?
       if @user.valid_password?(params[:user][:password])

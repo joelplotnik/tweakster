@@ -134,15 +134,22 @@
   border-radius: 5px;
 }
 
+.game-name-image-container {
+  display: flex;
+  align-items: center;
+}
+
 .game-result {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   color: var(--primary-text-color);
   padding: 0.25rem 0.25rem 0.25rem 1.5rem;
   font-size: 12px;
   font-weight: 600;
   background-color: var(--secondary-background-color);
   border-radius: 5px;
+  gap: 12px;
 }
 
 .user-result:hover,
@@ -177,6 +184,10 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.platform {
+  color: var(--primary-text-color-hover);
 }
 
 @media (max-width: 768px) {
