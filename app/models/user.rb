@@ -121,7 +121,7 @@ class User < ApplicationRecord
     user_game = self.user_game
     return nil unless user_game
 
-    user_game.game.slice(:name, :slug)
+    user_game.game.slice(:id, :name, :slug)
   end
 
   def challenges_count
