@@ -7,9 +7,9 @@ challenges, making every game experience unique and community-driven.
 
 Make sure you have the following software installed on your machine before proceeding with the setup:
 
-- Ruby 3.3.1
+- Ruby 3.2.2
 - Rails 7.0.8 or higher
-- MySQL 8.3.0 or higher
+- MySQL 9.0.1 or higher
 
 ## 📦 Installation
 
