@@ -41,6 +41,7 @@
 }
 
 .clear-icon {
+  padding-left: 6px;
   cursor: pointer;
 }
 
@@ -87,20 +88,4 @@
 
 .platform {
   color: var(--primary-text-color-hover);
-}
-
-.remove-button {
-  margin-left: 10px;
-  background: none;
-  border: none;
-  color: var(--primary-red-color);
-  padding: 4px 8px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.remove-button:hover {
-  border: none;
-  color: var(--primary-red-color-hover);
 }

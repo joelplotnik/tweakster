@@ -10,6 +10,7 @@ import {
 } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
+import placeholderAvatar from '../../../assets/default-avatar.png'
 import { API_URL } from '../../../constants/constants'
 import useInput from '../../../hooks/useInput'
 import { userActions } from '../../../store/user'
@@ -115,7 +116,7 @@ const UserForm = ({ method, user }) => {
 
   const handleRemoveAvatar = event => {
     event.preventDefault()
-    // setAvatar(null) // Clear the avatar state WORK HERE !!!!!!!!!!!!!!!!!!!!
+    setAvatar(placeholderAvatar)
     setRemoveAvatar(true)
     fileInput.current.value = null
   }
