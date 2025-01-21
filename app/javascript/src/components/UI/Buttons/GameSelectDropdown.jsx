@@ -6,11 +6,12 @@ import { API_URL } from '../../../constants/constants'
 import classes from './GameSelectDropdown.module.css'
 
 const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState(
+    selectedGame ? selectedGame.name : ''
+  )
   const [gameResults, setGameResults] = useState([])
   const [isFocused, setIsFocused] = useState(false)
   const searchRef = useRef(null)
-  const inputRef = useRef(null)
 
   const fetchGames = useCallback(
     debounce(async query => {
@@ -52,21 +53,21 @@ const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
   }, [])
 
   const handleInputChange = event => {
-    setSearchTerm(event.target.value)
-  }
-
-  const clearInput = () => {
-    setSearchTerm('')
-  }
-
-  const handleInputFocus = () => {
-    setIsFocused(true)
+    const value = event.target.value
+    setSearchTerm(value)
+    if (selectedGame && value !== selectedGame.name) {
+      onGameSelect(null)
+    }
   }
 
   const handleGameSelect = game => {
     onGameSelect(game)
-    setSearchTerm('')
+    setSearchTerm(game.name)
     setIsFocused(false)
+  }
+
+  const handleInputFocus = () => {
+    setIsFocused(true)
   }
 
   const handleClearGame = () => {
@@ -74,37 +75,24 @@ const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
     setSearchTerm('')
   }
 
-  const inputValue = selectedGame ? selectedGame.name : searchTerm
-
   return (
     <div className={classes['search-bar']} ref={searchRef}>
       <div className={classes['search']}>
         <input
           type="text"
           placeholder="What are you playing?"
-          value={inputValue}
+          value={searchTerm}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          ref={inputRef}
           autoComplete="off"
           className={classes['search-input']}
         />
-        <div className={classes['clear-icon']} onClick={clearInput}>
-          {searchTerm && !selectedGame && (
+        {searchTerm && (
+          <div className={classes['clear-icon']} onClick={handleClearGame}>
             <RiCloseLine className={classes.icon} />
-          )}
-        </div>
+          </div>
+        )}
       </div>
-      {selectedGame && (
-        <div className={classes['selected-game']}>
-          <button
-            className={classes['remove-button']}
-            onClick={handleClearGame}
-          >
-            Remove current game
-          </button>
-        </div>
-      )}
       {isFocused && gameResults.length > 0 && (
         <div className={classes['search-results']}>
           <div className={classes['games']}>
