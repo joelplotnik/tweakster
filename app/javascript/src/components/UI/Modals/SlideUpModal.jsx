@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import Backdrop from './Backdrop'
 import classes from './SlideUpModal.module.css'
 
-const SlideUpModal = ({ onClick, children }) => {
+const SlideUpModal = ({ onClick, children, header }) => {
   return (
     <>
       {ReactDOM.createPortal(
@@ -20,7 +20,9 @@ const SlideUpModal = ({ onClick, children }) => {
           className={classes.modal}
           onClick={event => event.stopPropagation()}
         >
-          {children}
+          <h2 className={classes.header}>{header}</h2>
+          <hr className={classes.divider} />
+          <div className={classes.content}>{children}</div>
         </div>,
         document.getElementById('overlay-root')
       )}

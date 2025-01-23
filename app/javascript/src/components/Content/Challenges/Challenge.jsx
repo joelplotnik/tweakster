@@ -11,7 +11,7 @@ import VoteButton from '../../UI/Buttons/VoteButton'
 import Difficulty from '../../UI/Difficulty'
 import AuthModal from '../../UI/Modals/AuthModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
-import DifficultyForm from '../Forms/DifficultyForm'
+import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
 import classes from './Challenge.module.css'
 
 const Challenge = ({ challenge, isUserContext }) => {
@@ -25,6 +25,8 @@ const Challenge = ({ challenge, isUserContext }) => {
     user_vote,
     upvotes,
     downvotes,
+    user_rating,
+    difficulties_count,
     difficulty_rating,
     user_attempted,
     user_attempt_id,
@@ -42,6 +44,19 @@ const Challenge = ({ challenge, isUserContext }) => {
   const basePath = username ? `users/${username}` : `games/${gameName}`
   const rootUrl = window.location.origin
   const pathToShare = `${rootUrl}/${basePath}/challenges/${id}`
+  const [userRating, setUserRating] = useState(user_rating)
+  const [difficultyRating, setDifficultyRating] = useState(difficulty_rating)
+  const [difficultiesCount, setDifficultiesCount] = useState(difficulties_count)
+
+  const handleDifficultyRating = (
+    newUserRating,
+    newDifficultyRating,
+    newDifficultiesCount
+  ) => {
+    setUserRating(newUserRating)
+    setDifficultyRating(newDifficultyRating)
+    setDifficultiesCount(newDifficultiesCount)
+  }
 
   const handleAuthModalToggle = () => {
     setShowAuthModal(!showModal)
@@ -109,7 +124,7 @@ const Challenge = ({ challenge, isUserContext }) => {
                 Difficulty:
               </label>
               <Difficulty
-                rating={difficulty_rating}
+                rating={difficultyRating}
                 id="difficulty-rating"
                 onClick={() => handleSlideUpModalToggle('rateDifficulty')}
               />
@@ -203,12 +218,27 @@ const Challenge = ({ challenge, isUserContext }) => {
         <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
       )}
       {showSlideUpModal && (
-        <SlideUpModal onClick={() => handleSlideUpModalToggle(null)}>
-          {slideUpModalContentType === 'rateDifficulty' && <DifficultyForm />}
+        <SlideUpModal
+          header={
+            slideUpModalContentType === 'comments'
+              ? 'Comments'
+              : 'Rate Difficulty'
+          }
+          onClick={() => handleSlideUpModalToggle(null)}
+        >
+          {slideUpModalContentType === 'rateDifficulty' && (
+            <DifficultySlideUpForm
+              userRating={userRating}
+              difficultiesCount={difficultiesCount}
+              average={difficultyRating}
+              basePath={basePath}
+              challengeId={id}
+              handleDifficultyRating={handleDifficultyRating}
+            />
+          )}
           {slideUpModalContentType === 'comments' && (
             <div>
-              <h3>Comments</h3>
-              {/* Comments section goes here */}
+              <p>HERES WHERE STUFF GOES</p>
             </div>
           )}
         </SlideUpModal>

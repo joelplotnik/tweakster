@@ -25,6 +25,13 @@ class Api::V1::ChallengesController < ApplicationController
                    {}
                  end
 
+    user_ratings = if current_user
+                     Difficulty.where(user: current_user, challenge_id: paginated_challenges.pluck(:id))
+                               .pluck(:challenge_id, :rating).to_h
+                   else
+                     {}
+                   end
+
     user_attempts = if current_user
                       Attempt.where(user: current_user, challenge_id: paginated_challenges.pluck(:id))
                              .pluck(:challenge_id, :id).to_h
@@ -36,6 +43,7 @@ class Api::V1::ChallengesController < ApplicationController
       formatted_challenge = format_challenge(challenge)
       formatted_challenge.merge(
         'user_vote' => user_votes[challenge.id],
+        'user_rating' => user_ratings[challenge.id],
         'user_attempted' => user_attempts.key?(challenge.id),
         'user_attempt_id' => user_attempts[challenge.id]
       )
@@ -47,11 +55,13 @@ class Api::V1::ChallengesController < ApplicationController
   def show
     is_owner = current_user.present? && current_user == @challenge.user
     user_vote = current_user ? Vote.find_by(user: current_user, challenge: @challenge)&.vote_type : nil
+    user_rating = current_user ? Difficulty.find_by(user: current_user, challenge: @challenge)&.rating : nil
     user_attempt = current_user ? Attempt.find_by(user: current_user, challenge: @challenge) : nil
 
     render json: format_challenge(@challenge).merge({
                                                       is_owner:,
                                                       user_vote:,
+                                                      user_rating:,
                                                       user_attempted: user_attempt.present?,
                                                       user_attempt_id: user_attempt&.id
                                                     })
@@ -130,6 +140,6 @@ class Api::V1::ChallengesController < ApplicationController
                           methods: [:avatar_url]
                         }
                       },
-                      methods: %i[comments_count active_attempts_count difficulty_rating image_url])
+                      methods: %i[comments_count active_attempts_count difficulties_count difficulty_rating image_url])
   end
 end

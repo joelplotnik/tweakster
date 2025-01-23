@@ -1,7 +1,7 @@
 concern :challengeable do
   resources :challenges, only: %i[show index create update destroy] do
     resources :votes, only: %i[create]
-    resources :difficulty_ratings, only: [:create]
+    resources :difficulties, only: [:create]
 
     resources :comments, only: %i[index create destroy] do
       resources :likes, only: [:create]

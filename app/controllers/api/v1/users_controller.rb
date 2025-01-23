@@ -126,10 +126,21 @@ class Api::V1::UsersController < ApplicationController
     page = params[:page].to_i.positive? ? params[:page].to_i : 1
     paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
 
+    challenge_ids = paginated_attempts.map(&:challenge_id)
+
+    user_ratings = if current_user
+                     Difficulty.where(user: current_user, challenge_id: challenge_ids)
+                               .pluck(:challenge_id, :rating)
+                               .to_h
+                   else
+                     {}
+                   end
+
     attempts_with_metadata = paginated_attempts.map do |attempt|
       format_attempt(attempt).merge(
         is_owner: current_user == attempt.user,
-        user_approved: current_user&.approvals&.exists?(attempt:)
+        user_approved: current_user&.approvals&.exists?(attempt:),
+        user_challenge_rating: user_ratings[attempt.challenge_id]
       )
     end
 
@@ -208,7 +219,7 @@ class Api::V1::UsersController < ApplicationController
       include: {
         challenge: {
           include: %i[game user],
-          methods: [:difficulty_rating]
+          methods: %i[difficulty_rating difficulties_count]
         },
         user: {
           only: %i[username slug],

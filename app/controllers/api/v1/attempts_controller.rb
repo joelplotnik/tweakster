@@ -13,11 +13,19 @@ class Api::V1::AttemptsController < ApplicationController
 
     paginated_attempts = attempts.paginate(page: params[:page], per_page: 10)
 
+    user_ratings = if current_user
+                     Difficulty.where(user: current_user, challenge_id: paginated_attempts.pluck(:challenge_id))
+                               .pluck(:challenge_id, :rating).to_h
+                   else
+                     {}
+                   end
+
     attempts_with_metadata = paginated_attempts.map do |attempt|
       attempt_data = format_attempt(attempt)
 
       attempt_data[:is_owner] = (current_user == attempt.user)
       attempt_data[:user_approved] = current_user.approvals.exists?(attempt_id: attempt.id)
+      attempt_data[:user_challenge_rating] = user_ratings[attempt.challenge_id]
 
       attempt_data
     end
@@ -104,7 +112,7 @@ class Api::V1::AttemptsController < ApplicationController
       include: {
         challenge: {
           include: %i[game user],
-          methods: [:difficulty_rating]
+          methods: %i[difficulty_rating difficulties_count]
         },
         user: {
           only: %i[username slug],
