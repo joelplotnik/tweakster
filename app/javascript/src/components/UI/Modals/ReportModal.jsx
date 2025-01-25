@@ -8,7 +8,7 @@ import { API_URL } from '../../../constants/constants'
 import { Backdrop } from './Backdrop'
 import classes from './ReportModal.module.css'
 
-const ReportModal = ({ onClick, content }) => {
+const ReportModal = ({ onClick, content, isSlideUpPresent }) => {
   const token = useRouteLoaderData('root')
   const [reportReason, setReportReason] = useState('')
   const [otherReason, setOtherReason] = useState('')
@@ -61,7 +61,7 @@ const ReportModal = ({ onClick, content }) => {
   return (
     <>
       {ReactDOM.createPortal(
-        <Backdrop onClick={onClick} />,
+        <Backdrop onClick={onClick} isSlideUpPresent={isSlideUpPresent} />,
         document.getElementById('backdrop-root')
       )}
       {ReactDOM.createPortal(

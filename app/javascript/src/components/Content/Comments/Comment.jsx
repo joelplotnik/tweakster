@@ -17,6 +17,7 @@ const Comment = ({
   onDeleteClick,
   isLoggedIn,
   basePathWithId,
+  isSlideUpPresent,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false)
   const dropdownRef = useRef(null)
@@ -147,18 +148,24 @@ const Comment = ({
         </div>
       </div>
       {showAuthModal && (
-        <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+        <AuthModal
+          authType={'login'}
+          onClick={handleAuthModalToggle}
+          isSlideUpPresent={isSlideUpPresent}
+        />
       )}
       {showConfirmationModal && (
         <ConfirmationModal
           onConfirm={handleDeleteClick}
           onClick={handleConfirmationModalToggle}
+          isSlideUpPresent={isSlideUpPresent}
         />
       )}
       {showReportModal && (
         <ReportModal
           onClick={handleReportModalToggle}
           content={{ type: 'comment', id: comment.id }}
+          isSlideUpPresent={isSlideUpPresent}
         />
       )}
     </>

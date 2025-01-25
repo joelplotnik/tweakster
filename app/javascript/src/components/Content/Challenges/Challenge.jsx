@@ -11,6 +11,7 @@ import VoteButton from '../../UI/Buttons/VoteButton'
 import Difficulty from '../../UI/Difficulty'
 import AuthModal from '../../UI/Modals/AuthModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
+import CommentSlideUpForm from '../Forms/CommentSlideUpForm'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
 import classes from './Challenge.module.css'
 
@@ -237,9 +238,7 @@ const Challenge = ({ challenge, isUserContext }) => {
             />
           )}
           {slideUpModalContentType === 'comments' && (
-            <div>
-              <p>HERES WHERE STUFF GOES</p>
-            </div>
+            <CommentSlideUpForm basePath={basePath} challengeId={id} />
           )}
         </SlideUpModal>
       )}

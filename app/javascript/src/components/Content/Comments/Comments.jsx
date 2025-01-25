@@ -9,7 +9,7 @@ import CommentForm from '../Forms/CommentForm'
 import Comment from './Comment'
 import classes from './Comments.module.css'
 
-const Comments = ({ basePath, challengeId, attemptId }) => {
+const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
   const token = useSelector(state => state.token.token)
   const isLoggedIn = !!token
   const [comments, setComments] = useState([])
@@ -308,65 +308,75 @@ const Comments = ({ basePath, challengeId, attemptId }) => {
 
   return (
     <div className={classes['comments-section']}>
-      <InfiniteScroll
-        dataLength={comments.length}
-        next={() => setPage(prevPage => prevPage + 1)}
-        hasMore={hasMore}
-        loader={<p>Loading...</p>}
-      >
-        {comments.map(comment => (
-          <div key={comment.id} id={`comment-${comment.id}`}>
-            <Comment
-              comment={comment}
-              userLiked={comment.user_liked}
-              reply={false}
-              onReplyClick={handleReplyClick}
-              onDeleteClick={handleDeleteComment}
-              isLoggedIn={isLoggedIn}
-              basePathWithId={basePathWithId}
-            />
+      <div className={classes.comments}>
+        <InfiniteScroll
+          dataLength={comments.length}
+          next={() => setPage(prevPage => prevPage + 1)}
+          hasMore={hasMore}
+          loader={<p>Loading...</p>}
+        >
+          {comments.map(comment => (
+            <div key={comment.id} id={`comment-${comment.id}`}>
+              <Comment
+                comment={comment}
+                userLiked={comment.user_liked}
+                reply={false}
+                onReplyClick={handleReplyClick}
+                onDeleteClick={handleDeleteComment}
+                isLoggedIn={isLoggedIn}
+                basePathWithId={basePathWithId}
+                isSlideUpPresent={isSlideUpPresent}
+              />
 
-            {replies[comment.id]?.data.map(reply => (
-              <div key={reply.id} id={`reply-${reply.id}`}>
-                <Comment
-                  comment={reply}
-                  userLiked={reply.user_liked}
-                  reply={true}
-                  onReplyClick={handleReplyClick}
-                  onDeleteClick={handleDeleteComment}
-                  isLoggedIn={isLoggedIn}
-                  basePathWithId={basePathWithId}
-                />
-              </div>
-            ))}
-
-            {comment.replies_count > 0 &&
-              (replies[comment.id]?.allRepliesLoaded ? (
-                <button
-                  onClick={() => handleHideReplies(comment.id)}
-                  className={classes['load-more-replies']}
-                >
-                  <RiSubtractLine className={classes['separator-icon']} />
-                  Hide replies
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleLoadMoreReplies(comment.id)}
-                  className={classes['load-more-replies']}
-                >
-                  <RiSubtractLine className={classes['separator-icon']} />
-                  View{' '}
-                  {Math.min(
-                    replies[comment.id]?.remaining || comment.replies_count,
-                    10
-                  )}{' '}
-                  more replies
-                </button>
+              {replies[comment.id]?.data.map(reply => (
+                <div key={reply.id} id={`reply-${reply.id}`}>
+                  <Comment
+                    comment={reply}
+                    userLiked={reply.user_liked}
+                    reply={true}
+                    onReplyClick={handleReplyClick}
+                    onDeleteClick={handleDeleteComment}
+                    isLoggedIn={isLoggedIn}
+                    basePathWithId={basePathWithId}
+                    isSlideUpPresent={isSlideUpPresent}
+                  />
+                </div>
               ))}
-          </div>
-        ))}
-      </InfiniteScroll>
-      <div className={classes['comment-form-container']}>
+
+              {comment.replies_count > 0 &&
+                (replies[comment.id]?.allRepliesLoaded ? (
+                  <button
+                    onClick={() => handleHideReplies(comment.id)}
+                    className={classes['load-more-replies']}
+                  >
+                    <RiSubtractLine className={classes['separator-icon']} />
+                    Hide replies
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleLoadMoreReplies(comment.id)}
+                    className={classes['load-more-replies']}
+                  >
+                    <RiSubtractLine className={classes['separator-icon']} />
+                    View{' '}
+                    {Math.min(
+                      replies[comment.id]?.remaining || comment.replies_count,
+                      10
+                    )}{' '}
+                    more replies
+                  </button>
+                ))}
+            </div>
+          ))}
+        </InfiniteScroll>
+      </div>
+      <div
+        className={
+          isSlideUpPresent
+            ? classes['comment-form-container-slide-up']
+            : classes['comment-form-container']
+        }
+      >
         <CommentForm
           onSubmit={handleSubmitComment}
           replyingTo={replyingTo}
