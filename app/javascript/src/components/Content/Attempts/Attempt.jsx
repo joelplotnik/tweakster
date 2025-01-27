@@ -6,9 +6,9 @@ import { formatNumber } from '../../../util/format'
 import AttemptStatus from '../../UI/AttemptStatus'
 import ApprovalButton from '../../UI/Buttons/ApprovalButton'
 import CommentButton from '../../UI/Buttons/CommentButton'
+import DifficultyButton from '../../UI/Buttons/DifficultyButton'
 import ReportButton from '../../UI/Buttons/ReportButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
-import Difficulty from '../../UI/Difficulty'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
 import classes from './Attempt.module.css'
@@ -130,7 +130,7 @@ const Attempt = ({ attempt }) => {
             <>
               <hr className={classes.divider} />
               <div className={classes['category-difficulty']}>
-                <Difficulty
+                <DifficultyButton
                   rating={difficultyRating}
                   onClick={() => handleSlideUpModalToggle('rateDifficulty')}
                 />

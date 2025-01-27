@@ -5,10 +5,10 @@ import { Link, useParams } from 'react-router-dom'
 import { formatNumber } from '../../../util/format'
 import AttemptButton from '../../UI/Buttons/AttemptButton'
 import CommentButton from '../../UI/Buttons/CommentButton'
+import DifficultyButton from '../../UI/Buttons/DifficultyButton'
 import ReportButton from '../../UI/Buttons/ReportButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
 import VoteButton from '../../UI/Buttons/VoteButton'
-import Difficulty from '../../UI/Difficulty'
 import AuthModal from '../../UI/Modals/AuthModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import CommentSlideUpForm from '../Forms/CommentSlideUpForm'
@@ -124,7 +124,7 @@ const Challenge = ({ challenge, isUserContext }) => {
               <label htmlFor="difficulty-rating" className={classes.label}>
                 Difficulty:
               </label>
-              <Difficulty
+              <DifficultyButton
                 rating={difficultyRating}
                 id="difficulty-rating"
                 onClick={() => handleSlideUpModalToggle('rateDifficulty')}

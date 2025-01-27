@@ -143,6 +143,7 @@ const Comment = ({
               likesCount={comment.likes_count}
               basePathWithId={basePathWithId}
               commentId={comment.id}
+              isSlideUpPresent={isSlideUpPresent}
             />
           </div>
         </div>

@@ -381,6 +381,7 @@ const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
           onSubmit={handleSubmitComment}
           replyingTo={replyingTo}
           onTextChange={handleInputChange}
+          isSlideUpPresent={isSlideUpPresent}
         />
       </div>
     </div>

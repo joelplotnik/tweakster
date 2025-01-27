@@ -7,7 +7,13 @@ import { formatNumber } from '../../../util/format'
 import AuthModal from '../Modals/AuthModal'
 import classes from './LikeButton.module.css'
 
-const LikeButton = ({ userLiked, likesCount, basePathWithId, commentId }) => {
+const LikeButton = ({
+  userLiked,
+  likesCount,
+  basePathWithId,
+  commentId,
+  isSlideUpPresent,
+}) => {
   const token = useSelector(state => state.token.token)
   const [isSelected, setIsSelected] = useState(userLiked)
   const [currentLikesCount, setCurrentLikesCount] = useState(likesCount)
@@ -64,7 +70,11 @@ const LikeButton = ({ userLiked, likesCount, basePathWithId, commentId }) => {
         </div>
       </div>
       {showAuthModal && (
-        <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+        <AuthModal
+          authType={'login'}
+          onClick={handleAuthModalToggle}
+          isSlideUpPresent={isSlideUpPresent}
+        />
       )}
     </>
   )

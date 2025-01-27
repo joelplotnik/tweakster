@@ -5,7 +5,12 @@ import { useSelector } from 'react-redux'
 import AuthModal from '../../UI/Modals/AuthModal'
 import classes from './CommentForm.module.css'
 
-const CommentForm = ({ onSubmit, replyingTo, onTextChange }) => {
+const CommentForm = ({
+  onSubmit,
+  replyingTo,
+  onTextChange,
+  isSlideUpPresent,
+}) => {
   const token = useSelector(state => state.token.token)
   const [commentText, setCommentText] = useState('')
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -73,7 +78,11 @@ const CommentForm = ({ onSubmit, replyingTo, onTextChange }) => {
         </button>
       </form>
       {showAuthModal && (
-        <AuthModal authType={'login'} onClick={handleAuthModalToggle} />
+        <AuthModal
+          authType={'login'}
+          onClick={handleAuthModalToggle}
+          isSlideUpPresent={isSlideUpPresent}
+        />
       )}
     </>
   )

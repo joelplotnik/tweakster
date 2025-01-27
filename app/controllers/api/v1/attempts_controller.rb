@@ -1,7 +1,7 @@
 class Api::V1::AttemptsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
   before_action :authenticate_devise_api_token!, only: %i[create update destroy]
-  before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
+  before_action :authenticate_devise_api_token_if_present!, only: %i[index show attempts]
   before_action :set_challenge, only: %i[index create destroy]
   before_action :set_attempt, only: %i[show update destroy]
 
@@ -23,8 +23,8 @@ class Api::V1::AttemptsController < ApplicationController
     attempts_with_metadata = paginated_attempts.map do |attempt|
       attempt_data = format_attempt(attempt)
 
-      attempt_data[:is_owner] = (current_user == attempt.user)
-      attempt_data[:user_approved] = current_user.approvals.exists?(attempt_id: attempt.id)
+      attempt_data[:is_owner] = current_user.present? && (current_user == attempt.user)
+      attempt_data[:user_approved] = current_user.present? && current_user.approvals.exists?(attempt_id: attempt.id)
       attempt_data[:user_challenge_rating] = user_ratings[attempt.challenge_id]
 
       attempt_data

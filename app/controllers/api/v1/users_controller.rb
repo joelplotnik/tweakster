@@ -138,8 +138,8 @@ class Api::V1::UsersController < ApplicationController
 
     attempts_with_metadata = paginated_attempts.map do |attempt|
       format_attempt(attempt).merge(
-        is_owner: current_user == attempt.user,
-        user_approved: current_user&.approvals&.exists?(attempt:),
+        is_owner: current_user.present? && current_user == attempt.user,
+        user_approved: current_user.present? && current_user.approvals.exists?(attempt:),
         user_challenge_rating: user_ratings[attempt.challenge_id]
       )
     end
