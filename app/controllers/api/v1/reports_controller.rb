@@ -1,6 +1,6 @@
 class Api::V1::ReportsController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, only: %i[index]
+  before_action :authenticate_devise_api_token!, only: %i[index create destroy]
 
   def index
     if current_user.role == 'admin'

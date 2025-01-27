@@ -9,6 +9,7 @@ import CommentButton from '../../UI/Buttons/CommentButton'
 import DifficultyButton from '../../UI/Buttons/DifficultyButton'
 import ReportButton from '../../UI/Buttons/ReportButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
+import ReportModal from '../../UI/Modals/ReportModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
 import classes from './Attempt.module.css'
@@ -39,6 +40,7 @@ const Attempt = ({ attempt }) => {
     isUserPage || isGameChallenge ? gameAttemptPath : userAttemptPath
   const [slideUpModalContentType, setSlideUpModalContentType] = useState(null)
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
   const [userRating, setUserRating] = useState(user_challenge_rating)
   const [difficultyRating, setDifficultyRating] = useState(
     challenge.difficulty_rating
@@ -64,6 +66,10 @@ const Attempt = ({ attempt }) => {
   const handleSlideUpModalToggle = contentType => {
     setSlideUpModalContentType(contentType)
     setShowSlideUpModal(!showSlideUpModal)
+  }
+
+  const handleReportModalToggle = () => {
+    setShowReportModal(!showReportModal)
   }
 
   const displayedDescription = isExpanded
@@ -205,7 +211,7 @@ const Attempt = ({ attempt }) => {
                   onClick={() => handleSlideUpModalToggle('comments')}
                 />
                 <ShareButton pathToShare={pathToShare} />
-                <ReportButton />
+                <ReportButton onClick={handleReportModalToggle} />
               </div>
             </>
           )}
@@ -236,6 +242,12 @@ const Attempt = ({ attempt }) => {
             </div>
           )}
         </SlideUpModal>
+      )}
+      {showReportModal && (
+        <ReportModal
+          onClick={handleReportModalToggle}
+          content={{ type: 'attempt', id: id }}
+        />
       )}
     </>
   )

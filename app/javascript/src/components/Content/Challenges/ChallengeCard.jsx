@@ -19,8 +19,6 @@ const ChallengeCard = ({ challenge, isOwner, basePath }) => {
     challenge.difficulties_count
   )
 
-  console.log(challenge)
-
   const handleSlideUpModalToggle = () => {
     setShowSlideUpModal(!showSlideUpModal)
   }

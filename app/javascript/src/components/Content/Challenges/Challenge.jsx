@@ -10,6 +10,7 @@ import ReportButton from '../../UI/Buttons/ReportButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
 import VoteButton from '../../UI/Buttons/VoteButton'
 import AuthModal from '../../UI/Modals/AuthModal'
+import ReportModal from '../../UI/Modals/ReportModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import CommentSlideUpForm from '../Forms/CommentSlideUpForm'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
@@ -41,6 +42,7 @@ const Challenge = ({ challenge, isUserContext }) => {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [slideUpModalContentType, setSlideUpModalContentType] = useState(null)
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
   const { username, name: gameName } = useParams()
   const basePath = username ? `users/${username}` : `games/${gameName}`
   const rootUrl = window.location.origin
@@ -66,6 +68,10 @@ const Challenge = ({ challenge, isUserContext }) => {
   const handleSlideUpModalToggle = contentType => {
     setSlideUpModalContentType(contentType)
     setShowSlideUpModal(!showSlideUpModal)
+  }
+
+  const handleReportModalToggle = () => {
+    setShowReportModal(!showReportModal)
   }
 
   const toggleExpanded = () => {
@@ -211,7 +217,7 @@ const Challenge = ({ challenge, isUserContext }) => {
               onClick={() => handleSlideUpModalToggle('comments')}
             />
             <ShareButton pathToShare={pathToShare} />
-            <ReportButton />
+            <ReportButton onClick={handleReportModalToggle} />
           </div>
         </div>
       </div>
@@ -241,6 +247,12 @@ const Challenge = ({ challenge, isUserContext }) => {
             <CommentSlideUpForm basePath={basePath} challengeId={id} />
           )}
         </SlideUpModal>
+      )}
+      {showReportModal && (
+        <ReportModal
+          onClick={handleReportModalToggle}
+          content={{ type: 'challenge', id: id }}
+        />
       )}
     </>
   )
