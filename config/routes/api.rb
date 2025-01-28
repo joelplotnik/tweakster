@@ -13,6 +13,7 @@ concern :challengeable do
 
       resources :comments, only: %i[index create destroy] do
         resources :likes, only: [:create]
+        get 'replies', to: 'comments#replies', on: :member
       end
     end
   end

@@ -9,7 +9,14 @@ import CommentForm from '../Forms/CommentForm'
 import Comment from './Comment'
 import classes from './Comments.module.css'
 
-const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
+const Comments = ({
+  basePath,
+  challengeId,
+  attemptId,
+  isSlideUpPresent,
+  commentsCount,
+  setCommentsCount,
+}) => {
   const token = useSelector(state => state.token.token)
   const isLoggedIn = !!token
   const [comments, setComments] = useState([])
@@ -197,7 +204,10 @@ const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
         setHighlightedCommentId(newComment.id)
       }
 
-      dispatch(challengePageActions.incrementCommentsCount(1))
+      commentsCount
+        ? setCommentsCount(commentsCount + 1)
+        : dispatch(challengePageActions.incrementCommentsCount(1))
+
       setReplyingTo(null)
     } catch (error) {
       console.error('Failed to post comment:', error)
@@ -245,7 +255,6 @@ const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
 
       if (!response.ok) throw new Error('Failed to delete comment')
 
-      // Find the comment to delete, either in top-level comments or in replies
       const deletedComment =
         comments.find(comment => comment.id === commentId) ||
         Object.values(replies)
@@ -259,12 +268,19 @@ const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
 
       let totalCountToRemove = 1 // Start with 1 for the comment itself
 
-      // If it's a top-level comment, account for its replies
       if (deletedComment.replies_count) {
-        totalCountToRemove += deletedComment.replies_count
+        totalCountToRemove += deletedComment.replies_count // Add the server-known replies count
+      }
+
+      // Include dynamically loaded replies from state
+      const dynamicReplies = replies[commentId]?.data || []
+      totalCountToRemove += dynamicReplies.length
+
+      if (deletedComment.replies_count || dynamicReplies.length) {
+        // If it's a top-level comment, remove its replies from state
         setReplies(prevReplies => {
           const newReplies = { ...prevReplies }
-          delete newReplies[commentId] // Remove all replies of the top-level comment
+          delete newReplies[commentId]
           return newReplies
         })
       } else if (deletedComment.parent_id) {
@@ -278,7 +294,7 @@ const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
         )
       }
 
-      // Update comments and replies state
+      // Remove the comment from the state
       setComments(prevComments =>
         prevComments.filter(comment => comment.id !== commentId)
       )
@@ -295,8 +311,11 @@ const Comments = ({ basePath, challengeId, attemptId, isSlideUpPresent }) => {
         return newReplies
       })
 
-      // Decrement comments count in challengePage state
-      dispatch(challengePageActions.decrementCommentsCount(totalCountToRemove))
+      commentsCount
+        ? setCommentsCount(commentsCount - totalCountToRemove)
+        : dispatch(
+            challengePageActions.decrementCommentsCount(totalCountToRemove)
+          )
     } catch (error) {
       console.error('Failed to delete comment:', error)
     }

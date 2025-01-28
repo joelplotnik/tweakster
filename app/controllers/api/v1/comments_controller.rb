@@ -110,10 +110,10 @@ class Api::V1::CommentsController < ApplicationController
   end
 
   def find_commentable
-    if params[:challenge_id]
-      Challenge.find(params[:challenge_id])
-    elsif params[:attempt_id]
+    if params[:attempt_id]
       Attempt.find(params[:attempt_id])
+    elsif params[:challenge_id]
+      Challenge.find(params[:challenge_id])
     else
       render json: { error: 'Commentable not found' }, status: :not_found
     end

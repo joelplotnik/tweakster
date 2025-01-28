@@ -11,6 +11,7 @@ import ReportButton from '../../UI/Buttons/ReportButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
 import ReportModal from '../../UI/Modals/ReportModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
+import CommentSlideUpForm from '../Forms/CommentSlideUpForm'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
 import classes from './Attempt.module.css'
 
@@ -48,6 +49,7 @@ const Attempt = ({ attempt }) => {
   const [difficultiesCount, setDifficultiesCount] = useState(
     challenge.difficulties_count
   )
+  const [commentsCount, setCommentsCount] = useState(comments_count)
 
   const handleDifficultyRating = (
     newUserRating,
@@ -207,7 +209,7 @@ const Attempt = ({ attempt }) => {
                   />
                 )}
                 <CommentButton
-                  commentsCount={formatNumber(comments_count)}
+                  commentsCount={formatNumber(commentsCount)}
                   onClick={() => handleSlideUpModalToggle('comments')}
                 />
                 <ShareButton pathToShare={pathToShare} />
@@ -237,9 +239,13 @@ const Attempt = ({ attempt }) => {
             />
           )}
           {slideUpModalContentType === 'comments' && (
-            <div>
-              <p>HERES WHERE STUFF GOES</p>
-            </div>
+            <CommentSlideUpForm
+              basePath={isUserPage ? `games/${challenge.game.slug}` : basePath}
+              challengeId={challenge.id}
+              attemptId={id}
+              commentsCount={commentsCount}
+              setCommentsCount={setCommentsCount}
+            />
           )}
         </SlideUpModal>
       )}
