@@ -207,7 +207,7 @@ class Api::V1::UsersController < ApplicationController
     user.as_json.merge({
                          avatar_url: user.avatar_url,
                          points: user.points,
-                         attempts_count: user.attempts_count,
+                         active_attempts_count: user.active_attempts_count,
                          challenges_count: user.challenges_count,
                          following_count: user.followees_count,
                          followers_count: user.followers_count

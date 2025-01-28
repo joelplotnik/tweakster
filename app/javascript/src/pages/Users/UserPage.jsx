@@ -19,7 +19,7 @@ const UserPage = () => {
   const tabs = [
     {
       key: 'attempts',
-      label: `Attempts (${formatNumber(user.attempts_count)})`,
+      label: `Attempts (${formatNumber(user.active_attempts_count)})`,
       icon: <RiGhostLine />,
       content: <AttemptsList />,
     },
