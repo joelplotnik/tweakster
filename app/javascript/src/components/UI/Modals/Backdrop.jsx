@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import classes from './Backdrop.module.css'
 
-export function Backdrop({ onClick }) {
+export function Backdrop({ onClick, isSlideUpPresent }) {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
 
@@ -11,7 +11,11 @@ export function Backdrop({ onClick }) {
     }
   }, [])
 
-  return <div className={classes.backdrop} onClick={onClick} />
+  const backdropClass = isSlideUpPresent
+    ? `${classes.backdrop} ${classes['higher-backdrop']}`
+    : classes.backdrop
+
+  return <div className={backdropClass} onClick={onClick} />
 }
 
 export default Backdrop

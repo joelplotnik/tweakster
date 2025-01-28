@@ -1,0 +1,13 @@
+.comments-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  max-width: 800px;
+  min-width: 800px;
+}
+
+@media (max-width: 768px) {
+  .comments-container {
+    min-width: 100%;
+  }
+}

@@ -2,20 +2,6 @@
   text-align: center;
 }
 
-.header {
-  margin: 0 0 16px 0;
-  color: var(--primary-text-color);
-}
-
-.divider {
-  border: none;
-  height: 0.5px;
-  width: 97%;
-  background-color: var(--primary-border-color);
-  margin-top: 5px;
-  margin-bottom: 16px;
-}
-
 .difficulty {
   display: flex;
   justify-content: center;
@@ -43,6 +29,22 @@
 
 .unfilled {
   color: var(--primary-text-color);
+}
+
+.ratings {
+  font-size: 14px;
+  margin-top: 12px;
+  font-weight: 500;
+  color: var(--secondary-text-color);
+}
+
+.ratings-info {
+  margin-bottom: 6px;
+}
+
+.ratings span {
+  font-weight: bold;
+  color: var(--primary-red-color);
 }
 
 @media (max-width: 768px) {

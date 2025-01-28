@@ -47,6 +47,10 @@ class Challenge < ApplicationRecord
     attempts.where.not(status: 'Pending').size
   end
 
+  def difficulties_count
+    difficulties.size
+  end
+
   def difficulty_rating
     difficulties.average(:rating).to_f.round
   end

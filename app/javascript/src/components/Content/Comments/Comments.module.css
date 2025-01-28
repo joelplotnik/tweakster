@@ -1,18 +1,20 @@
 .comments-section {
-  padding: 12px;
+  padding: 12px 12px 0 12px;
   border-radius: 5px;
   position: relative;
 }
 
 .comment-form-container {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
   background-color: var(--secondary-background-color);
-  margin-bottom: 2rem;
-  width: 100%;
-  max-width: 800px;
+  padding-bottom: 2rem;
+}
+
+.comment-form-container-slide-up {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--secondary-background-color);
 }
 
 .load-more {

@@ -16,6 +16,7 @@ const ConfirmationModal = ({
   button,
   onClick,
   onConfirm,
+  isSlideUpPresent,
 }) => {
   const handleConfirm = () => {
     onClick()
@@ -25,7 +26,7 @@ const ConfirmationModal = ({
   return (
     <>
       {ReactDOM.createPortal(
-        <Backdrop onClick={onClick} />,
+        <Backdrop onClick={onClick} isSlideUpPresent={isSlideUpPresent} />,
         document.getElementById('backdrop-root')
       )}
       {ReactDOM.createPortal(

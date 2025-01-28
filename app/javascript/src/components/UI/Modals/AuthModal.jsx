@@ -16,7 +16,7 @@ import { storeTokens } from '../../../util/auth'
 import classes from './AuthModal.module.css'
 import { Backdrop } from './Backdrop'
 
-export function AuthModal({ authType, onClick }) {
+export function AuthModal({ authType, onClick, isSlideUpPresent }) {
   const setRefreshRoot = useContext(RefreshContext)
   const [modalType, setModalType] = useState(authType)
   const [signupError, setSignupError] = useState(null)
@@ -221,6 +221,7 @@ export function AuthModal({ authType, onClick }) {
             event.stopPropagation()
             onClick()
           }}
+          isSlideUpPresent={isSlideUpPresent}
         />,
         document.getElementById('backdrop-root')
       )}

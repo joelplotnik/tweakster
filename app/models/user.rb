@@ -132,6 +132,10 @@ class User < ApplicationRecord
     attempts.size
   end
 
+  def active_attempts_count
+    attempts.where.not(status: 'Pending').size
+  end
+
   def points
     attempts.joins(:approvals).count
   end

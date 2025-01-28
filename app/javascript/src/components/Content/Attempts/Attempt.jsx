@@ -6,9 +6,13 @@ import { formatNumber } from '../../../util/format'
 import AttemptStatus from '../../UI/AttemptStatus'
 import ApprovalButton from '../../UI/Buttons/ApprovalButton'
 import CommentButton from '../../UI/Buttons/CommentButton'
+import DifficultyButton from '../../UI/Buttons/DifficultyButton'
 import ReportButton from '../../UI/Buttons/ReportButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
-import Difficulty from '../../UI/Difficulty'
+import ReportModal from '../../UI/Modals/ReportModal'
+import SlideUpModal from '../../UI/Modals/SlideUpModal'
+import CommentSlideUpForm from '../Forms/CommentSlideUpForm'
+import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
 import classes from './Attempt.module.css'
 
 const Attempt = ({ attempt }) => {
@@ -22,6 +26,7 @@ const Attempt = ({ attempt }) => {
     challenge,
     user,
     user_approved,
+    user_challenge_rating,
   } = attempt
   const descriptionLimit = 250
   const [isExpanded, setIsExpanded] = useState(false)
@@ -34,9 +39,39 @@ const Attempt = ({ attempt }) => {
   const userAttemptPath = `${rootUrl}/users/${challenge.user.slug}/challenges/${challenge.id}/attempts/${id}`
   const pathToShare =
     isUserPage || isGameChallenge ? gameAttemptPath : userAttemptPath
+  const [slideUpModalContentType, setSlideUpModalContentType] = useState(null)
+  const [showSlideUpModal, setShowSlideUpModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [userRating, setUserRating] = useState(user_challenge_rating)
+  const [difficultyRating, setDifficultyRating] = useState(
+    challenge.difficulty_rating
+  )
+  const [difficultiesCount, setDifficultiesCount] = useState(
+    challenge.difficulties_count
+  )
+  const [commentsCount, setCommentsCount] = useState(comments_count)
+
+  const handleDifficultyRating = (
+    newUserRating,
+    newDifficultyRating,
+    newDifficultiesCount
+  ) => {
+    setUserRating(newUserRating)
+    setDifficultyRating(newDifficultyRating)
+    setDifficultiesCount(newDifficultiesCount)
+  }
 
   const toggleExpanded = () => {
     setIsExpanded(prev => !prev)
+  }
+
+  const handleSlideUpModalToggle = contentType => {
+    setSlideUpModalContentType(contentType)
+    setShowSlideUpModal(!showSlideUpModal)
+  }
+
+  const handleReportModalToggle = () => {
+    setShowReportModal(!showReportModal)
   }
 
   const displayedDescription = isExpanded
@@ -46,135 +81,181 @@ const Attempt = ({ attempt }) => {
     : challenge.description
 
   return (
-    <div className={classes.attempt}>
-      <div className={classes['user-game-details']}>
-        {!isUserPage && (
-          <>
-            <div className={classes['user-info']}>
-              <img
-                src={user.avatar_url}
-                alt={`${user.username}'s avatar`}
-                className={classes.avatar}
-              />
-              <Link to={`/users/${user.slug}`} className={classes.username}>
-                {user.username}
-              </Link>
-            </div>
-            <div className={classes.status}>
-              <AttemptStatus status={status} />
-            </div>
-          </>
-        )}
-        {isUserPage && (
-          <div className={classes['game-info']}>
-            <Link
-              to={`/games/${challenge.game.slug}`}
-              className={classes['game-name']}
-            >
-              {challenge.game.name}
-            </Link>
-            <p className={classes['game-platform']}>
-              {challenge.game.platform}
-            </p>
-          </div>
-        )}
-      </div>
-      <div className={classes['challenge-details']}>
-        {isUserPage && (
-          <>
-            <div className={classes['challenge-header']}>
-              <h3 className={classes['challenge-title']}>
-                <Link
-                  to={`/games/${challenge.game.slug}/challenges/${challenge.id}`}
-                  className={classes.link}
-                >
-                  {challenge.title}
+    <>
+      <div className={classes.attempt}>
+        <div className={classes['user-game-details']}>
+          {!isUserPage && (
+            <>
+              <div className={classes['user-info']}>
+                <img
+                  src={user.avatar_url}
+                  alt={`${user.username}'s avatar`}
+                  className={classes.avatar}
+                />
+                <Link to={`/users/${user.slug}`} className={classes.username}>
+                  {user.username}
                 </Link>
-              </h3>
-
+              </div>
               <div className={classes.status}>
                 <AttemptStatus status={status} />
               </div>
+            </>
+          )}
+          {isUserPage && (
+            <div className={classes['game-info']}>
+              <Link
+                to={`/games/${challenge.game.slug}`}
+                className={classes['game-name']}
+              >
+                {challenge.game.name}
+              </Link>
+              <p className={classes['game-platform']}>
+                {challenge.game.platform}
+              </p>
             </div>
-          </>
-        )}
-        {isUserPage && (
-          <>
-            <hr className={classes.divider} />
-            <div className={classes['category-difficulty']}>
-              <Difficulty rating={challenge.difficulty_rating} />
-              <p className={classes.category}> {challenge.category}</p>
-            </div>
-            <hr className={classes.divider} />
-            <div className={classes['challenge-description']}>
-              <span className={classes['challenge-description-content']}>
-                {displayedDescription}
-              </span>
-              <div className={classes['description-actions']}>
-                {challenge.description.length > descriptionLimit && (
-                  <button
-                    onClick={toggleExpanded}
-                    className={classes['show-more-button']}
+          )}
+        </div>
+        <div className={classes['challenge-details']}>
+          {isUserPage && (
+            <>
+              <div className={classes['challenge-header']}>
+                <h3 className={classes['challenge-title']}>
+                  <Link
+                    to={`/games/${challenge.game.slug}/challenges/${challenge.id}`}
+                    className={classes.link}
                   >
-                    {isExpanded ? 'Show Less' : 'Show More'}
-                  </button>
-                )}
-                <Link
-                  to={`/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`}
-                  className={classes['view-full-link']}
-                >
-                  View Full Attempt
-                </Link>
-              </div>
-            </div>
-          </>
-        )}
+                    {challenge.title}
+                  </Link>
+                </h3>
 
-        {(status === 'Complete' || status === 'In Progress') && (
-          <>
-            <div className={classes['completion-details']}>
-              {status === 'Complete' && (
-                <p className={classes['completion-date']}>
-                  Completed {moment(completed_at).fromNow()}
-                </p>
-              )}
-              <div className={classes['proof']}>
-                {proof_url ? (
-                  proof_url.endsWith('.mp4') ? (
-                    <video className={classes['proof-video']} controls>
-                      <source src={proof_url} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  ) : (
-                    <img
-                      src={proof_url}
-                      alt="Proof of Completion"
-                      className={classes['proof-image']}
-                    />
-                  )
-                ) : (
-                  <p>No proof provided</p>
-                )}
+                <div className={classes.status}>
+                  <AttemptStatus status={status} />
+                </div>
               </div>
-            </div>
-            <div className={classes['bottom-bar']}>
-              {status === 'Complete' && (
-                <ApprovalButton
-                  userApproval={user_approved}
-                  approvalsCount={formatNumber(approvals_count)}
-                  basePath={basePath}
-                  challengeId={challenge.id}
-                  attemptId={id}
+            </>
+          )}
+          {isUserPage && (
+            <>
+              <hr className={classes.divider} />
+              <div className={classes['category-difficulty']}>
+                <DifficultyButton
+                  rating={difficultyRating}
+                  onClick={() => handleSlideUpModalToggle('rateDifficulty')}
                 />
-              )}
-              <CommentButton commentsCount={formatNumber(comments_count)} />
-              <ShareButton pathToShare={pathToShare} />
-              <ReportButton />
-            </div>
-          </>
-        )}
+                <p className={classes.category}> {challenge.category}</p>
+              </div>
+              <hr className={classes.divider} />
+              <div className={classes['challenge-description']}>
+                <span className={classes['challenge-description-content']}>
+                  {displayedDescription}
+                </span>
+                <div className={classes['description-actions']}>
+                  {challenge.description.length > descriptionLimit && (
+                    <button
+                      onClick={toggleExpanded}
+                      className={classes['show-more-button']}
+                    >
+                      {isExpanded ? 'Show Less' : 'Show More'}
+                    </button>
+                  )}
+                  <Link
+                    to={`/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`}
+                    className={classes['view-full-link']}
+                  >
+                    View Full Attempt
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
+
+          {(status === 'Complete' || status === 'In Progress') && (
+            <>
+              <div className={classes['completion-details']}>
+                {status === 'Complete' && (
+                  <p className={classes['completion-date']}>
+                    Completed {moment(completed_at).fromNow()}
+                  </p>
+                )}
+                <div className={classes['proof']}>
+                  {proof_url ? (
+                    proof_url.endsWith('.mp4') ? (
+                      <video className={classes['proof-video']} controls>
+                        <source src={proof_url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <img
+                        src={proof_url}
+                        alt="Proof of Completion"
+                        className={classes['proof-image']}
+                      />
+                    )
+                  ) : (
+                    <p>No proof provided</p>
+                  )}
+                </div>
+              </div>
+              <div className={classes['bottom-bar']}>
+                {status === 'Complete' && (
+                  <ApprovalButton
+                    userApproval={user_approved}
+                    approvalsCount={formatNumber(approvals_count)}
+                    basePath={
+                      isUserPage ? `games/${challenge.game.slug}` : basePath
+                    }
+                    challengeId={challenge.id}
+                    attemptId={id}
+                  />
+                )}
+                <CommentButton
+                  commentsCount={formatNumber(commentsCount)}
+                  onClick={() => handleSlideUpModalToggle('comments')}
+                />
+                <ShareButton pathToShare={pathToShare} />
+                <ReportButton onClick={handleReportModalToggle} />
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      {showSlideUpModal && (
+        <SlideUpModal
+          header={
+            slideUpModalContentType === 'comments'
+              ? 'Comments'
+              : 'Rate Difficulty'
+          }
+          onClick={() => handleSlideUpModalToggle(null)}
+        >
+          {slideUpModalContentType === 'rateDifficulty' && (
+            <DifficultySlideUpForm
+              userRating={userRating}
+              difficultiesCount={difficultiesCount}
+              average={difficultyRating}
+              basePath={isUserPage ? `games/${challenge.game.slug}` : basePath}
+              challengeId={challenge.id}
+              handleDifficultyRating={handleDifficultyRating}
+            />
+          )}
+          {slideUpModalContentType === 'comments' && (
+            <CommentSlideUpForm
+              basePath={isUserPage ? `games/${challenge.game.slug}` : basePath}
+              challengeId={challenge.id}
+              attemptId={id}
+              commentsCount={commentsCount}
+              setCommentsCount={setCommentsCount}
+            />
+          )}
+        </SlideUpModal>
+      )}
+      {showReportModal && (
+        <ReportModal
+          onClick={handleReportModalToggle}
+          content={{ type: 'attempt', id: id }}
+        />
+      )}
+    </>
   )
 }
 

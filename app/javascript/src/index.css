@@ -29,7 +29,8 @@
   --font-family-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
   --body-margin: 0;
-  --main-margin: 3rem;
+  --main-margin-top: 3rem;
+  --main-margin-bottom: 2rem;
 }
 
 body {
@@ -42,7 +43,7 @@ body {
 }
 
 main {
-  margin: var(--main-margin) auto;
+  margin: var(--main-margin-top) auto auto auto;
   display: flex;
   justify-content: center;
 }
