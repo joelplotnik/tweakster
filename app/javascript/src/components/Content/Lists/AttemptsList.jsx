@@ -7,7 +7,7 @@ import { API_URL } from '../../../constants/constants'
 import Attempt from '../Attempts/Attempt'
 import classes from './AttemptsList.module.css'
 
-const AttemptsList = () => {
+const AttemptsList = ({ isPendingAttemptsPage }) => {
   const token = useSelector(state => state.token.token)
   const [attempts, setAttempts] = useState([])
   const [loading, setLoading] = useState(false)
@@ -16,6 +16,9 @@ const AttemptsList = () => {
   const { username, name: gameName, challengeId: challengeId } = useParams()
 
   const getEndpoint = page => {
+    if (isPendingAttemptsPage && username) {
+      return `${API_URL}/users/${username}/pending_attempts?page=${page}`
+    }
     if (username && !challengeId && !gameName) {
       return `${API_URL}/users/${username}/attempts?page=${page}`
     }
