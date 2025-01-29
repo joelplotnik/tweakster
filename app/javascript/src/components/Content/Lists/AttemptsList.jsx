@@ -4,10 +4,12 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
+import NoItems from '../../UI/NoItems'
+import ListItemSkeleton from '../../UI/Skeletons/ListItemSkeleton'
 import Attempt from '../Attempts/Attempt'
 import classes from './AttemptsList.module.css'
 
-const AttemptsList = () => {
+const AttemptsList = ({ isPendingAttemptsPage }) => {
   const token = useSelector(state => state.token.token)
   const [attempts, setAttempts] = useState([])
   const [loading, setLoading] = useState(false)
@@ -16,6 +18,9 @@ const AttemptsList = () => {
   const { username, name: gameName, challengeId: challengeId } = useParams()
 
   const getEndpoint = page => {
+    if (isPendingAttemptsPage && username) {
+      return `${API_URL}/users/${username}/pending_attempts?page=${page}`
+    }
     if (username && !challengeId && !gameName) {
       return `${API_URL}/users/${username}/attempts?page=${page}`
     }
@@ -52,8 +57,10 @@ const AttemptsList = () => {
       } else {
         console.error('Unexpected response format:', data)
       }
+
+      setLoading(false)
     } catch (error) {
-      console.error('Failed to fetch attempts:', error)
+      console.error('Failed to fetch attempts:', error.message)
     } finally {
       setLoading(false)
     }
@@ -73,8 +80,10 @@ const AttemptsList = () => {
         dataLength={attempts.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={<div className={classes.loading}>Loading more...</div>}
-        endMessage={<p>No more attempts to show</p>}
+        loader={loading && <ListItemSkeleton />}
+        endMessage={
+          <>{attempts.length === 0 ? <NoItems item={'attempt'} /> : <></>}</>
+        }
       >
         {attempts.map(attempt => (
           <Attempt key={attempt.id} attempt={attempt} />

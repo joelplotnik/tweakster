@@ -1,0 +1,21 @@
+.skeleton-container {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list-item-container {
+  background-color: var(--secondary-background-color);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  width: 100%;
+}
+
+.body {
+  width: 100%;
+}

@@ -30,6 +30,7 @@ namespace :api do
     resources :users, only: %i[index show update destroy] do
       member do
         get 'attempts'
+        get 'pending_attempts'
         get 'following'
         post 'follow', to: 'relationships#create'
         delete 'unfollow', to: 'relationships#destroy'

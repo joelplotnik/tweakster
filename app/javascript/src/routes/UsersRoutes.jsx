@@ -1,3 +1,4 @@
+import PendingAttemptsPage from '../pages/Attempts/PendingAttemptsPage'
 import EditUserPage, {
   action as editUserAction,
 } from '../pages/Users/EditUserPage'
@@ -29,6 +30,10 @@ const usersRoutes = [
             path: 'edit',
             element: <EditUserPage />,
             action: editUserAction,
+          },
+          {
+            path: 'pending-attempts',
+            element: <PendingAttemptsPage />,
           },
           {
             path: 'following',

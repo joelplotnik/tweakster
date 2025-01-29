@@ -1,8 +1,8 @@
 class Api::V1::UsersController < ApplicationController
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :authenticate_devise_api_token!, only: %i[me update destroy]
+  before_action :authenticate_devise_api_token!, only: %i[me update destroy pending_attempts]
   before_action :authenticate_devise_api_token_if_present!, only: %i[show attempts]
-  before_action :set_user, only: %i[show update destroy attempts following popular_users]
+  before_action :set_user, only: %i[show update destroy attempts pending_attempts following popular_users]
 
   def index
     users = User.with_attached_avatar
@@ -140,6 +140,35 @@ class Api::V1::UsersController < ApplicationController
       format_attempt(attempt).merge(
         is_owner: current_user.present? && current_user == attempt.user,
         user_approved: current_user.present? && current_user.approvals.exists?(attempt:),
+        user_challenge_rating: user_ratings[attempt.challenge_id]
+      )
+    end
+
+    render json: attempts_with_metadata
+  end
+
+  def pending_attempts
+    attempts = @user.attempts.includes(:challenge, challenge: :game).where(status: 'Pending')
+
+    attempts = attempts.order(created_at: :desc)
+
+    per_page = 10
+    page = params[:page].to_i.positive? ? params[:page].to_i : 1
+    paginated_attempts = attempts.offset((page - 1) * per_page).limit(per_page)
+
+    challenge_ids = paginated_attempts.map(&:challenge_id)
+
+    user_ratings = if current_user
+                     Difficulty.where(user: current_user, challenge_id: challenge_ids)
+                               .pluck(:challenge_id, :rating)
+                               .to_h
+                   else
+                     {}
+                   end
+
+    attempts_with_metadata = paginated_attempts.map do |attempt|
+      format_attempt(attempt).merge(
+        is_owner: current_user.present? && current_user == attempt.user,
         user_challenge_rating: user_ratings[attempt.challenge_id]
       )
     end

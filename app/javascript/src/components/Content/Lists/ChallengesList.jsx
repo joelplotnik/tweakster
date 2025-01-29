@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
+import NoItems from '../../UI/NoItems'
+import ListItemSkeleton from '../../UI/Skeletons/ListItemSkeleton'
 import Challenge from '../Challenges/Challenge'
 import classes from './ChallengesList.module.css'
 
@@ -50,8 +52,12 @@ const ChallengesList = () => {
       } else {
         console.error('Unexpected response format:', data)
       }
+
+      setLoading(false)
     } catch (error) {
-      console.error('Error fetching challenges:', error.message)
+      console.error('Failed to fetch challenges:', error.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -69,9 +75,11 @@ const ChallengesList = () => {
         dataLength={challenges.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={<div className={classes.loading}>Loading more...</div>}
+        loader={loading && <ListItemSkeleton />}
         endMessage={
-          <p className={classes['end-message']}>No more challenges to show</p>
+          <>
+            {challenges.length === 0 ? <NoItems item={'challenge'} /> : <></>}
+          </>
         }
       >
         {challenges.map(challenge => (
