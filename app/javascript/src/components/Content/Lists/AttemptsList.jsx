@@ -4,6 +4,8 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
 import { API_URL } from '../../../constants/constants'
+import NoItems from '../../UI/NoItems'
+import ListItemSkeleton from '../../UI/Skeletons/ListItemSkeleton'
 import Attempt from '../Attempts/Attempt'
 import classes from './AttemptsList.module.css'
 
@@ -55,8 +57,10 @@ const AttemptsList = ({ isPendingAttemptsPage }) => {
       } else {
         console.error('Unexpected response format:', data)
       }
+
+      setLoading(false)
     } catch (error) {
-      console.error('Failed to fetch attempts:', error)
+      console.error('Failed to fetch attempts:', error.message)
     } finally {
       setLoading(false)
     }
@@ -76,8 +80,10 @@ const AttemptsList = ({ isPendingAttemptsPage }) => {
         dataLength={attempts.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={<div className={classes.loading}>Loading more...</div>}
-        endMessage={<p>No more attempts to show</p>}
+        loader={loading && <ListItemSkeleton />}
+        endMessage={
+          <>{attempts.length === 0 ? <NoItems item={'attempt'} /> : <></>}</>
+        }
       >
         {attempts.map(attempt => (
           <Attempt key={attempt.id} attempt={attempt} />
