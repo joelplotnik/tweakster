@@ -1,20 +1,17 @@
 import { RiGhostLine, RiSwordLine } from 'react-icons/ri'
-import { useSelector } from 'react-redux'
-import { json } from 'react-router-dom'
+import { json, useRouteLoaderData } from 'react-router-dom'
 
 import AttemptsList from '../../components/Content/Lists/AttemptsList'
 import ChallengesList from '../../components/Content/Lists/ChallengesList'
 import ProfileCard from '../../components/Content/Users/ProfileCard'
 import Tabs from '../../components/UI/Tabs'
 import { API_URL } from '../../constants/constants'
-import store from '../../store'
-import { userPageActions } from '../../store/userPage'
 import { getAuthToken } from '../../util/auth'
 import { formatNumber } from '../../util/format'
 import classes from './UserPage.module.css'
 
 const UserPage = () => {
-  const user = useSelector(state => state.userPage.user)
+  const user = useRouteLoaderData('user')
 
   const tabs = [
     {
@@ -58,8 +55,6 @@ export async function loader({ params }) {
   }
 
   const data = await response.json()
-
-  store.dispatch(userPageActions.setUser(data))
 
   return data
 }

@@ -19,7 +19,7 @@ const attemptsRoutes = context => [
         path: ':attemptId',
         id: `${context}-attempt`,
         loader: attemptLoader,
-        element: <AttemptPage />,
+        element: <AttemptPage context={context} />,
       },
     ],
   },

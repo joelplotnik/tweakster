@@ -1,0 +1,49 @@
+.comment {
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: var(--secondary-background-color);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.avatar-container {
+  flex-shrink: 0;
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.user-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.like-container {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}

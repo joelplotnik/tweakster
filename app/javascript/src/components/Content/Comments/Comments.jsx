@@ -4,7 +4,8 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { API_URL } from '../../../constants/constants'
-import { challengePageActions } from '../../../store/challengePage'
+import NoComments from '../../UI/NoComments'
+import CommentSkeleton from '../../UI/Skeletons/CommentSkeleton'
 import CommentForm from '../Forms/CommentForm'
 import Comment from './Comment'
 import classes from './Comments.module.css'
@@ -204,9 +205,7 @@ const Comments = ({
         setHighlightedCommentId(newComment.id)
       }
 
-      commentsCount
-        ? setCommentsCount(commentsCount + 1)
-        : dispatch(challengePageActions.incrementCommentsCount(1))
+      commentsCount && setCommentsCount(commentsCount + 1)
 
       setReplyingTo(null)
     } catch (error) {
@@ -311,11 +310,7 @@ const Comments = ({
         return newReplies
       })
 
-      commentsCount
-        ? setCommentsCount(commentsCount - totalCountToRemove)
-        : dispatch(
-            challengePageActions.decrementCommentsCount(totalCountToRemove)
-          )
+      commentsCount && setCommentsCount(commentsCount - totalCountToRemove)
     } catch (error) {
       console.error('Failed to delete comment:', error)
     }
@@ -332,7 +327,8 @@ const Comments = ({
           dataLength={comments.length}
           next={() => setPage(prevPage => prevPage + 1)}
           hasMore={hasMore}
-          loader={<p>Loading...</p>}
+          loader={loading && <CommentSkeleton />}
+          endMessage={<>{comments.length === 0 ? <NoComments /> : <></>}</>}
         >
           {comments.map(comment => (
             <div key={comment.id} id={`comment-${comment.id}`}>

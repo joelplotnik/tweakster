@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../../constants/constants'
-import { userPageActions } from '../../../store/userPage'
+// import { userPageActions } from '../../../store/userPage'
 import AuthModal from '../Modals/AuthModal'
 import classes from './FollowButton.module.css'
 
 const FollowButton = ({ userFollowing, userId, followersCount }) => {
   const token = useSelector(state => state.token.token)
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
   const [isHovered, setIsHovered] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
 
@@ -44,12 +44,12 @@ const FollowButton = ({ userFollowing, userId, followersCount }) => {
       const updatedCount =
         action === 'follow' ? followersCount + 1 : followersCount - 1
 
-      dispatch(
-        userPageActions.updateFollowState({
-          isFollowing: action === 'follow',
-          followerCount: updatedCount,
-        })
-      )
+      // dispatch(
+      //   userPageActions.updateFollowState({
+      //     isFollowing: action === 'follow',
+      //     followerCount: updatedCount,
+      //   })
+      // )
     } catch (error) {
       console.error('Error: ', error.message)
       toast.error(`Error ${action === 'follow' ? 'following' : 'unfollowing'}`)
