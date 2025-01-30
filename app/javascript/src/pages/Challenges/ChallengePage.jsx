@@ -1,22 +1,21 @@
+import { useState } from 'react'
 import { RiChat3Line, RiGhostLine } from 'react-icons/ri'
-import { useSelector } from 'react-redux'
-import { json, useParams } from 'react-router-dom'
+import { json, useParams, useRouteLoaderData } from 'react-router-dom'
 
 import ChallengeCard from '../../components/Content/Challenges/ChallengeCard'
 import Comments from '../../components/Content/Comments/Comments'
 import AttemptsList from '../../components/Content/Lists/AttemptsList'
 import Tabs from '../../components/UI/Tabs'
 import { API_URL } from '../../constants/constants'
-import store from '../../store'
-import { challengePageActions } from '../../store/challengePage'
 import { getAuthToken } from '../../util/auth'
 import { formatNumber } from '../../util/format'
 import classes from './ChallengePage.module.css'
 
-const ChallengePage = () => {
-  const challenge = useSelector(state => state.challengePage.challenge)
+const ChallengePage = ({ context }) => {
+  const challenge = useRouteLoaderData(`${context}-challenge`)
   const { username, name: gameName } = useParams()
   const basePath = username ? `users/${username}` : `games/${gameName}`
+  const [commentsCount, setCommentsCount] = useState(challenge.comments_count)
 
   const tabs = [
     {
@@ -27,9 +26,16 @@ const ChallengePage = () => {
     },
     {
       key: 'comments',
-      label: `Comments (${formatNumber(challenge.comments_count)})`,
+      label: `Comments (${formatNumber(commentsCount)})`,
       icon: <RiChat3Line />,
-      content: <Comments basePath={basePath} challengeId={challenge.id} />,
+      content: (
+        <Comments
+          basePath={basePath}
+          challengeId={challenge.id}
+          commentsCount={commentsCount}
+          setCommentsCount={setCommentsCount}
+        />
+      ),
     },
   ]
 
@@ -76,8 +82,6 @@ export async function loader({ params }) {
   }
 
   const data = await response.json()
-
-  store.dispatch(challengePageActions.setChallenge(data))
 
   return data
 }

@@ -31,7 +31,7 @@ const challengesRoutes = context => [
           {
             index: true,
             id: `${context}-challenge-index`,
-            element: <ChallengePage />,
+            element: <ChallengePage context={context} />,
           },
           {
             path: 'edit',

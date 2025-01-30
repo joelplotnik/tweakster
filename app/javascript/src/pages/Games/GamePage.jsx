@@ -1,13 +1,11 @@
-import { useSelector } from 'react-redux'
+import { useRouteLoaderData } from 'react-router-dom'
 
 import { API_URL } from '../../constants/constants'
-import store from '../../store'
-import { gamePageActions } from '../../store/gamePage'
 import { getAuthToken } from '../../util/auth'
 import classes from './GamePage.module.css'
 
 const GamePage = () => {
-  const game = useSelector(state => state.gamePage.game)
+  const game = useRouteLoaderData('game')
 
   return (
     <div className={classes['game-page']} key={game.id}>
@@ -36,8 +34,6 @@ export async function loader({ params }) {
   }
 
   const data = await response.json()
-
-  store.dispatch(gamePageActions.setGame(data))
 
   return data
 }

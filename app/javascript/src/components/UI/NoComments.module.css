@@ -1,0 +1,36 @@
+.no-comments {
+  margin: 2rem auto;
+  padding: 1.5rem;
+  max-width: 400px;
+  text-align: center;
+  background-color: var(--secondary-background-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  font-size: 3rem;
+  color: var(--primary-text-color);
+}
+
+.text h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--primary-text-color);
+}
+
+.text p {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--primary-text-color);
+}

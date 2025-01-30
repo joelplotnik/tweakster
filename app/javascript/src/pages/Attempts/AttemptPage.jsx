@@ -1,15 +1,12 @@
-import { useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useParams, useRouteLoaderData } from 'react-router-dom'
 
 import AttemptCard from '../../components/Content/Attempts/AttemptCard'
 import { API_URL } from '../../constants/constants'
-import store from '../../store'
-import { attemptPageActions } from '../../store/attemptPage'
 import { getAuthToken } from '../../util/auth'
 import classes from './AttemptPage.module.css'
 
-const AttemptPage = () => {
-  const attempt = useSelector(state => state.attemptPage.attempt)
+const AttemptPage = ({ context }) => {
+  const attempt = useRouteLoaderData(`${context}-attempt`)
   const { username, name: gameName, challengeId } = useParams()
   const basePath = username
     ? `/users/${username}/challenges/${challengeId}`
@@ -57,8 +54,6 @@ export async function loader({ params }) {
   }
 
   const data = await response.json()
-
-  store.dispatch(attemptPageActions.setAttempt(data))
 
   return data
 }
