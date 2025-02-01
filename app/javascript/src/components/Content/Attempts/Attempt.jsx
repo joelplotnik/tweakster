@@ -160,7 +160,7 @@ const Attempt = ({ attempt }) => {
                   )}
                   <Link
                     to={`/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`}
-                    className={classes['view-full-link']}
+                    className={classes['view-full-link-user-page']}
                   >
                     View Full Attempt
                   </Link>
@@ -172,6 +172,14 @@ const Attempt = ({ attempt }) => {
           {(status === 'Complete' || status === 'In Progress') && (
             <>
               <div className={classes['completion-details']}>
+                {!isUserPage && (
+                  <Link
+                    to={`attempts/${id}`}
+                    className={classes['view-full-link']}
+                  >
+                    View Full Attempt
+                  </Link>
+                )}
                 {status === 'Complete' && (
                   <p className={classes['completion-date']}>
                     Completed {moment(completed_at).fromNow()}

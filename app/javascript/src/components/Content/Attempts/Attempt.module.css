@@ -139,10 +139,27 @@
   text-decoration: underline;
 }
 
-.view-full-link {
+.view-full-link-user-page {
   display: inline-block;
   margin: 0;
   padding: 0;
+  background: none;
+  border: none;
+  color: var(--primary-red-color);
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.view-full-link-user-page:hover {
+  color: var(--primary-red-color-hover);
+  text-decoration: underline;
+}
+
+.view-full-link {
+  display: inline-block;
+  margin: 0 0 5px 0;
+  padding: 0 0 0 12px;
   background: none;
   border: none;
   color: var(--primary-red-color);
@@ -174,7 +191,7 @@
   font-size: 0.9rem;
   color: var(--primary-text-color);
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding-left: 12px;
 }
 

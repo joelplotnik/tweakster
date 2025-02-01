@@ -9,6 +9,21 @@
   padding-bottom: 3rem;
 }
 
+.divider {
+  border: none;
+  height: 0.5px;
+  width: 97%;
+  background-color: var(--primary-border-color);
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.comment-header {
+  text-align: center;
+  margin: 12px 12px 0 12px;
+  color: var(--primary-text-color);
+}
+
 @media (max-width: 768px) {
   .attempt-page {
     min-width: 100%;
