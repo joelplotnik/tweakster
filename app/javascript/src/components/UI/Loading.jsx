@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Logo from '../../assets/logo.svg'
+import Logo from '../../assets/logo_color.svg'
 import classes from './Loading.module.css'
 
 const Loading = ({ text = 'Loading your experience...' }) => {

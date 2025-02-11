@@ -35,8 +35,6 @@ const Comments = ({
     attemptId ? `/attempts/${attemptId}` : ''
   }`
 
-  console.log(comments)
-
   const fetchComments = async page => {
     setLoading(true)
     try {
