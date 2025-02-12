@@ -8,16 +8,14 @@ import classes from './AttemptPage.module.css'
 
 const AttemptPage = ({ context }) => {
   const attempt = useRouteLoaderData(`${context}-attempt`)
-  const { username, name: gameName, challengeId } = useParams()
+  const { username, name: gameName } = useParams()
   const basePath = username ? `users/${username}` : `games/${gameName}`
-
-  console.log(attempt)
 
   return (
     <div className={classes['attempt-page']} key={attempt.id}>
       <AttemptCard
         attempt={attempt}
-        // isOwner={attempt.is_owner}
+        isOwner={attempt.is_owner}
         basePath={basePath}
       />
       <hr className={classes.divider} />

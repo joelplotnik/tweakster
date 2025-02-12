@@ -8,24 +8,31 @@ import ApprovalButton from '../../UI/Buttons/ApprovalButton'
 import DifficultyButton from '../../UI/Buttons/DifficultyButton'
 import ReportButton from '../../UI/Buttons/ReportButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
+import ReportModal from '../../UI/Modals/ReportModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
 import classes from './AttemptCard.module.css'
 
-const AttemptCard = ({ attempt, isOwner = true, basePath }) => {
+const AttemptCard = ({ attempt, isOwner, basePath }) => {
   const { challenge, user } = attempt
-
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
-  const [userRating, setUserRating] = useState(attempt.challenge.user_rating)
+  const [userRating, setUserRating] = useState(attempt.user_rating)
   const [difficultyRating, setDifficultyRating] = useState(
     attempt.challenge.difficulty_rating
   )
   const [difficultiesCount, setDifficultiesCount] = useState(
     attempt.challenge.difficulties_count
   )
+  const [showReportModal, setShowReportModal] = useState(false)
+  const rootUrl = window.location.origin
+  const pathToShare = `${rootUrl}/${basePath}/challenges/${challenge.id}/attempts/${attempt.id}`
 
   const handleSlideUpModalToggle = () => {
     setShowSlideUpModal(!showSlideUpModal)
+  }
+
+  const handleReportModalToggle = () => {
+    setShowReportModal(!showReportModal)
   }
 
   const handleDifficultyRating = (
@@ -54,13 +61,13 @@ const AttemptCard = ({ attempt, isOwner = true, basePath }) => {
           </div>
           <div className={classes['game-info']}>
             <Link
-              to={`/games/${attempt.challenge.game.slug}`}
+              to={`/games/${challenge.game.slug}`}
               className={classes['game-name']}
             >
-              {attempt.challenge.game.name}
+              {challenge.game.name}
             </Link>
             <p className={classes['game-platform']}>
-              {attempt.challenge.game.platform}
+              {challenge.game.platform}
             </p>
           </div>
         </div>
@@ -71,7 +78,7 @@ const AttemptCard = ({ attempt, isOwner = true, basePath }) => {
                 <p className={classes['attempt-label']}>
                   Attempting:{' '}
                   <Link
-                    href={`/challenges/${challenge.id}`}
+                    to={`/${basePath}/challenges/${challenge.id}`}
                     className={classes['challenge-title']}
                   >
                     {challenge.title}
@@ -111,22 +118,20 @@ const AttemptCard = ({ attempt, isOwner = true, basePath }) => {
               <ApprovalButton
                 userApproval={attempt.user_approved}
                 approvalsCount={formatNumber(attempt.approvals_count)}
-                basePath={
-                  'isUserPage ? `games/${challenge.game.slug}` : basePath'
-                }
+                basePath={basePath}
                 challengeId={challenge.id}
                 attemptId={attempt.id}
               />
             )}
-            <ShareButton pathToShare={'pathToShare'} />
-            <ReportButton onClick={'handleReportModalToggle'} />
+            <ShareButton pathToShare={pathToShare} />
+            <ReportButton onClick={handleReportModalToggle} />
           </div>
         </div>
         <h3 className={classes['section-header']}>Challenge Description</h3>
         <div className={classes['small-details']}>
           <div className={classes['small-details-container']}>
             <p className={classes.category} id="description">
-              {attempt.challenge.description}
+              {challenge.description}
             </p>
           </div>
         </div>
@@ -148,7 +153,7 @@ const AttemptCard = ({ attempt, isOwner = true, basePath }) => {
               Category:
             </label>
             <p className={classes.category} id="category">
-              {attempt.challenge.category}
+              {challenge.category}
             </p>
           </div>
           <div className={classes['small-details-container']}>
@@ -156,7 +161,7 @@ const AttemptCard = ({ attempt, isOwner = true, basePath }) => {
               Created:
             </label>
             <p className={classes.category} id="createdAt">
-              {moment(attempt.challenge.created_at).fromNow()}
+              {moment(challenge.created_at).fromNow()}
             </p>
           </div>
         </div>
@@ -175,6 +180,12 @@ const AttemptCard = ({ attempt, isOwner = true, basePath }) => {
             handleDifficultyRating={handleDifficultyRating}
           />
         </SlideUpModal>
+      )}
+      {showReportModal && (
+        <ReportModal
+          onClick={handleReportModalToggle}
+          content={{ type: 'attempt', id: attempt.id }}
+        />
       )}
     </>
   )

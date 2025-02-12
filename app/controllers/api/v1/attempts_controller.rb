@@ -34,7 +34,19 @@ class Api::V1::AttemptsController < ApplicationController
   end
 
   def show
-    render json: format_attempt(@attempt)
+    is_owner = current_user.present? && current_user == @attempt.user
+    user_rating = current_user ? Difficulty.find_by(user: current_user, challenge: @attempt.challenge)&.rating : nil
+    user_approved = if @attempt.status == 'Complete' && current_user
+                      Approval.exists?(user: current_user, attempt: @attempt)
+                    else
+                      false
+                    end
+
+    render json: format_attempt(@attempt).merge({
+                                                  is_owner:,
+                                                  user_rating:,
+                                                  user_approved:
+                                                })
   end
 
   def create

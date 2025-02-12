@@ -1,5 +1,3 @@
-import React from 'react'
-
 import Logo from '../../assets/logo_color.svg'
 import classes from './Loading.module.css'
 
