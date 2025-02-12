@@ -152,7 +152,6 @@
 }
 
 .show-more-button:hover {
-  color: var(--primary-red-color-hover);
   text-decoration: underline;
 }
 
@@ -169,7 +168,6 @@
 }
 
 .view-full-link:hover {
-  color: var(--primary-red-color-hover);
   text-decoration: underline;
 }
 

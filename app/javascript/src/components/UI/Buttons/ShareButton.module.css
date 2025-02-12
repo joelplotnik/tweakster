@@ -14,6 +14,14 @@
   font-size: 12px;
 }
 
+.share-button:hover:not(:has(.popup-menu:hover)) .icon {
+  color: var(--twitch-color);
+}
+
+.share-button:hover:not(:has(.popup-menu:hover)) .text {
+  color: var(--twitch-color);
+}
+
 .popup-menu {
   position: absolute;
   margin-top: 5.5rem;
@@ -26,7 +34,7 @@
 }
 
 .copy-link-button {
-  background-color: var(--primary-green-color);
+  background-color: var(--twitch-color);
   color: white;
   border: none;
   padding: 8px 12px;
@@ -37,5 +45,5 @@
 }
 
 .copy-link-button:hover {
-  background-color: var(--primary-green-color-hover);
+  background-color: var(--twitch-color-hover);
 }

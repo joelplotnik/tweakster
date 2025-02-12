@@ -13,3 +13,11 @@
   margin-left: 5px;
   font-size: 12px;
 }
+
+.comment-button:hover .icon {
+  color: var(--primary-yellow-color);
+}
+
+.comment-button:hover .comment-count {
+  color: var(--primary-yellow-color);
+}

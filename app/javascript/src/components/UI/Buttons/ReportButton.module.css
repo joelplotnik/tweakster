@@ -13,3 +13,11 @@
   margin-left: 5px;
   font-size: 12px;
 }
+
+.report-button:hover .icon {
+  color: var(--primary-red-color);
+}
+
+.report-button:hover .text {
+  color: var(--primary-red-color);
+}

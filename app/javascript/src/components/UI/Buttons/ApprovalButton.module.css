@@ -25,3 +25,11 @@
 .unselected {
   color: var(--primary-text-color);
 }
+
+.approval-button:hover .icon-unselected {
+  color: var(--primary-green-color);
+}
+
+.approval-button:hover .approval-count {
+  color: var(--primary-green-color);
+}
