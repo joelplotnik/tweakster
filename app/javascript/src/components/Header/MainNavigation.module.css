@@ -1,8 +1,8 @@
 @font-face {
-  font-family: 'Nunito';
+  font-family: 'RussoOne';
   font-style: normal;
   font-weight: 800;
-  src: url('../../fonts/Nunito-VariableFont_wght.ttf') format('truetype');
+  src: url('../../fonts/RussoOne-Regular.ttf') format('truetype');
 }
 
 .navbar {
@@ -58,9 +58,9 @@
   margin-left: 0.4em;
   margin-top: 0rem;
   margin-bottom: 0rem;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'RussoOne', sans-serif;
   font-weight: 800;
-  font-size: 30px;
+  font-size: 28px;
   line-height: 30px;
   color: var(--primary-text-color);
   text-decoration: none;

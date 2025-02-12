@@ -28,6 +28,14 @@
   color: var(--primary-text-color);
 }
 
+.tab:not(.active):hover {
+  color: var(--primary-text-color);
+}
+
+.tab:not(.active):hover .icon {
+  color: var(--primary-text-color);
+}
+
 .icon {
   margin-right: 8px;
   font-size: 20px;

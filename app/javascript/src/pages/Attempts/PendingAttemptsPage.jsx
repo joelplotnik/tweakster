@@ -1,10 +1,10 @@
-import { useSelector } from 'react-redux'
+import { useRouteLoaderData } from 'react-router-dom'
 
 import AttemptsList from '../../components/Content/Lists/AttemptsList'
 import classes from './PendingAttemptsPage.module.css'
 
 const PendingAttemptsPage = () => {
-  const user = useSelector(state => state.userPage.user)
+  const user = useRouteLoaderData('user')
 
   return (
     <div className={classes['pending-attempts-page']} key={user.id}>

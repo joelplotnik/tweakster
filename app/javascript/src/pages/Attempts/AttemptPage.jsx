@@ -1,23 +1,29 @@
 import { useParams, useRouteLoaderData } from 'react-router-dom'
 
 import AttemptCard from '../../components/Content/Attempts/AttemptCard'
+import Comments from '../../components/Content/Comments/Comments'
 import { API_URL } from '../../constants/constants'
 import { getAuthToken } from '../../util/auth'
 import classes from './AttemptPage.module.css'
 
 const AttemptPage = ({ context }) => {
   const attempt = useRouteLoaderData(`${context}-attempt`)
-  const { username, name: gameName, challengeId } = useParams()
-  const basePath = username
-    ? `/users/${username}/challenges/${challengeId}`
-    : `/games/${gameName}/challenges/${challengeId}`
+  const { username, name: gameName } = useParams()
+  const basePath = username ? `users/${username}` : `games/${gameName}`
 
   return (
     <div className={classes['attempt-page']} key={attempt.id}>
       <AttemptCard
         attempt={attempt}
-        // isOwner={attempt.is_owner}
+        isOwner={attempt.is_owner}
         basePath={basePath}
+      />
+      <hr className={classes.divider} />
+      <h3 className={classes['comment-header']}>Comments</h3>
+      <Comments
+        basePath={basePath}
+        challengeId={attempt.challenge.id}
+        attemptId={attempt.id}
       />
     </div>
   )
