@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { RiDeleteBin7Line } from 'react-icons/ri'
+import { RiCloseLine } from 'react-icons/ri'
 import { toast } from 'react-toastify'
 
 import classes from './Dropzone.module.css'
 
-const SingleImageDropzone = ({ onImageChange }) => {
+const Dropzone = ({ onImageChange }) => {
   const [image, setImage] = useState(null)
 
   const onDrop = useCallback(
@@ -59,7 +59,7 @@ const SingleImageDropzone = ({ onImageChange }) => {
               onClick={deleteImage}
               className={classes['delete-button']}
             >
-              <RiDeleteBin7Line />
+              <RiCloseLine />
             </button>
           </div>
         </div>
@@ -84,4 +84,4 @@ const SingleImageDropzone = ({ onImageChange }) => {
   )
 }
 
-export default SingleImageDropzone
+export default Dropzone

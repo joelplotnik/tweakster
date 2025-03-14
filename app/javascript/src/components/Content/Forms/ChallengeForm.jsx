@@ -21,6 +21,12 @@ const ChallengeForm = () => {
     setSelectedCategory(category)
   }
 
+  //   data.append('challenge[title]', data.get('title'))
+  //   data.append('challenge[description]', data.get('description'))
+  //   data.append('challenge[category]', data.get('category'))
+  //   data.append('challenge[game]', data.get('game'))
+  //   data.append('challenge[image]', data.get('image'))
+
   return (
     <>
       <Form
