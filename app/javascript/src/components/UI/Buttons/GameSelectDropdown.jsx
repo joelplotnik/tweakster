@@ -5,7 +5,11 @@ import { RiCloseLine } from 'react-icons/ri'
 import { API_URL } from '../../../constants/constants'
 import classes from './GameSelectDropdown.module.css'
 
-const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
+const GameSelectDropdown = ({
+  onGameSelect,
+  selectedGame,
+  isChallengeForm,
+}) => {
   const [searchTerm, setSearchTerm] = useState(
     selectedGame ? selectedGame.name : ''
   )
@@ -80,7 +84,11 @@ const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
       <div className={classes['search']}>
         <input
           type="text"
-          placeholder="What are you playing?"
+          placeholder={
+            isChallengeForm
+              ? 'Select a game for your challenge'
+              : 'What are you playing?'
+          }
           value={searchTerm}
           onChange={handleInputChange}
           onFocus={handleInputFocus}

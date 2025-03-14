@@ -19,7 +19,7 @@ import GameSelectDropdown from '../../UI/Buttons/GameSelectDropdown'
 import ConfirmationModal from '../../UI/Modals/ConfirmationModal'
 import classes from './UserForm.module.css'
 
-const UserForm = ({ method, user }) => {
+const UserForm = ({ user }) => {
   const data = useActionData()
   const navigate = useNavigate()
   const navigation = useNavigation()
@@ -163,7 +163,7 @@ const UserForm = ({ method, user }) => {
   return (
     <>
       <Form
-        method={method}
+        method={'PUT'}
         className={classes['form-container']}
         encType="multipart/form-data"
       >
@@ -326,11 +326,7 @@ const UserForm = ({ method, user }) => {
           className={classes['form-submit-button']}
           disabled={isSubmitting}
         >
-          {isSubmitting
-            ? 'Submitting'
-            : method === 'POST'
-            ? 'Create User'
-            : 'Submit'}
+          {isSubmitting ? 'Submitting' : 'Submit'}
         </button>
       </Form>
       <div className={classes['delete-button-container']}>

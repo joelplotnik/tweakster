@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import {
   json,
   redirect,
@@ -10,7 +10,6 @@ import { toast } from 'react-toastify'
 import UserForm from '../../components/Content/Forms/UserForm'
 import { API_URL } from '../../constants/constants'
 import store from '../../store/index'
-import { userActions } from '../../store/user'
 import { fetchUserData } from '../../store/user-actions'
 import { tokenLoader } from '../../util/auth'
 import classes from './EditUserPage.module.css'
@@ -21,20 +20,15 @@ const EditUserPage = () => {
 
   useEffect(() => {
     if (!user.is_owner) {
-      toast.error('You are not authorized to edit this profile.')
       navigate('/')
     }
   }, [user, navigate])
-
-  if (!user.is_owner) {
-    return null
-  }
 
   return (
     <div className={classes['edit-user-page']}>
       <h1 className={classes.heading}>Edit profile</h1>
       <hr className={classes.divider} />
-      <UserForm method="PUT" user={user} />
+      <UserForm user={user} />
     </div>
   )
 }
