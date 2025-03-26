@@ -41,19 +41,7 @@ export const action = async ({ request, params }) => {
   const data = await request.formData()
 
   const currentlyPlaying = data.get('user[currently_playing]')
-
-  data.append('user[currently_playing]', currentlyPlaying || 'none')
-  data.append('user[avatar]', data.get('avatar'))
-  data.append('user[remove_avatar]', data.get('remove_avatar'))
-  data.append('user[username]', data.get('username'))
-  data.append('user[bio]', data.get('bio'))
-  data.append('user[email]', data.get('email'))
-  data.append('user[password]', data.get('password'))
-
-  const newPassword = data.get('newPassword')
-  if (newPassword) {
-    data.append('user[new_password]', data.get('newPassword'))
-  }
+  data.set('user[currently_playing]', currentlyPlaying || 'none')
 
   const token = await tokenLoader()
 

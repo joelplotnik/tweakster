@@ -175,7 +175,7 @@ const UserForm = ({ user }) => {
             className={classes['avatar-input']}
             type="file"
             id="avatar"
-            name="avatar"
+            name="user[avatar]"
             accept="image/*"
             ref={fileInput}
             onChange={handleAvatarUpload}
@@ -201,7 +201,7 @@ const UserForm = ({ user }) => {
           )}
           <input
             type="hidden"
-            name="remove_avatar"
+            name="user[remove_avatar]"
             value={removeAvatar ? 'true' : 'false'}
           />
         </div>
@@ -215,7 +215,7 @@ const UserForm = ({ user }) => {
             className={classes['form-input']}
             type="text"
             id="username"
-            name="username"
+            name="user[username]"
             placeholder="Username"
             value={enteredUsername}
             onChange={handleUsernameChange}
@@ -231,7 +231,7 @@ const UserForm = ({ user }) => {
             className={classes['form-input']}
             type="email"
             id="email"
-            name="email"
+            name="user[email]"
             placeholder="Email"
             value={enteredEmail}
             onChange={handleEmailChange}
@@ -242,7 +242,7 @@ const UserForm = ({ user }) => {
         <textarea
           className={classes['form-textarea']}
           id="bio"
-          name="bio"
+          name="user[bio]"
           placeholder="Bio"
           defaultValue={user ? user.bio : ''}
         />
@@ -274,8 +274,8 @@ const UserForm = ({ user }) => {
               <input
                 className={classes['form-input']}
                 type="password"
-                id="newPassword"
-                name="newPassword"
+                id="new_password"
+                name="user[new_password]"
                 onChange={handleNewPasswordChange}
                 onBlur={handleNewPasswordBlur}
                 placeholder="New password"
@@ -290,8 +290,8 @@ const UserForm = ({ user }) => {
               <input
                 className={classes['form-input']}
                 type="password"
-                id="confirmPassword"
-                name="confirmPassword"
+                id="confirm_password"
+                name="user[confirm_password]"
                 onChange={handleConfirmPasswordChange}
                 onBlur={handleConfirmPasswordBlur}
                 placeholder="Confirm password"
@@ -308,7 +308,7 @@ const UserForm = ({ user }) => {
                 className={classes['form-input']}
                 type="password"
                 id="password"
-                name="password"
+                name="user[password]"
                 onChange={handlePasswordChange}
                 onBlur={handlePasswordBlur}
                 placeholder="Current password"
