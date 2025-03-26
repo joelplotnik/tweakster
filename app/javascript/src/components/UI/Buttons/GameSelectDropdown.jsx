@@ -118,7 +118,14 @@ const GameSelectDropdown = ({
         </div>
       )}
       {selectedGame && (
-        <input type="hidden" name="currently_playing" value={selectedGame.id} />
+        <input
+          type="hidden"
+          id="game"
+          name={
+            isChallengeForm ? 'challenge[game_id]' : 'user[currently_playing]'
+          }
+          value={selectedGame.id}
+        />
       )}
     </div>
   )

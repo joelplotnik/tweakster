@@ -29,18 +29,24 @@ const NewChallengePage = () => {
 
 export default NewChallengePage
 
-export const action = async ({ request }) => {
+export const action = async ({ request, params }) => {
+  const { username } = params
+
   const data = await request.formData()
 
-  data.append('challenge[title]', data.get('title'))
-  data.append('challenge[description]', data.get('description'))
-  data.append('challenge[category]', data.get('category'))
-  data.append('challenge[game]', data.get('game'))
-  data.append('challenge[image]', data.get('image'))
+  const gameId = data.get('challenge[game_id]')
+
+  if (!gameId) {
+    toast.error('You must select a game for your challenge')
+    return json(
+      { error: 'You must select a game for your challenge' },
+      { status: 400 }
+    )
+  }
 
   const token = await getAuthToken()
 
-  const response = await fetch(`${API_URL}/challenges`, {
+  const response = await fetch(`${API_URL}/users/${username}/challenges`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -63,7 +69,7 @@ export const action = async ({ request }) => {
     throw json({ message: 'Could not create challenge' }, { status: 500 })
   }
 
-  const challenge = await response.json()
+  const newChallenge = await response.json()
 
-  return redirect(`/challenges/${challenge.id}`)
+  return redirect(`/users/${username}/challenges/${newChallenge.challenge.id}`)
 }

@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Form, useActionData, useNavigation } from 'react-router-dom'
 
 import CategorySelectDropdown from '../../UI/Buttons/CategorySelectDropdown'
 import GameSelectDropdown from '../../UI/Buttons/GameSelectDropdown'
-import Dropzone from '../../UI/Dropzone'
 import classes from './ChallengeForm.module.css'
 
 const ChallengeForm = () => {
@@ -12,20 +11,29 @@ const ChallengeForm = () => {
   const isSubmitting = navigation.state === 'submitting'
   const [selectedGame, setSelectedGame] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
-  const [image, setImage] = useState([])
+  const fileInput = useRef(null)
+  const [image, setImage] = useState(null)
 
   const handleGameSelect = game => {
     setSelectedGame(game)
   }
+
   const handleCategorySelect = category => {
     setSelectedCategory(category)
   }
 
-  //   data.append('challenge[title]', data.get('title'))
-  //   data.append('challenge[description]', data.get('description'))
-  //   data.append('challenge[category]', data.get('category'))
-  //   data.append('challenge[game]', data.get('game'))
-  //   data.append('challenge[image]', data.get('image'))
+  const handleImageUpload = event => {
+    const file = event.target.files[0]
+
+    if (file) {
+      const imageUrl = URL.createObjectURL(file)
+      setImage(imageUrl)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setImage(null)
+  }
 
   return (
     <>
@@ -43,6 +51,44 @@ const ChallengeForm = () => {
             ))}
           </ul>
         )}
+        <div className={classes['image-upload-container']}>
+          {image && (
+            <img
+              src={image}
+              alt="Uploaded preview"
+              className={classes['image-preview']}
+            />
+          )}
+          <input
+            className={classes['file-input']}
+            type="file"
+            id="image"
+            name="challenge[image]"
+            accept="image/*"
+            ref={fileInput}
+            onChange={handleImageUpload}
+          />
+          {!image ? (
+            <button
+              className={classes['add-image-button']}
+              onClick={event => {
+                event.preventDefault()
+                fileInput.current.click()
+              }}
+            >
+              Add Image
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={classes['remove-image-button']}
+              onClick={handleRemoveImage}
+            >
+              Remove Image
+            </button>
+          )}
+        </div>
+
         <GameSelectDropdown
           onGameSelect={handleGameSelect}
           selectedGame={selectedGame}
@@ -52,23 +98,24 @@ const ChallengeForm = () => {
           className={classes['title-input']}
           type="text"
           id="title"
-          title="title"
+          name="challenge[title]"
           placeholder="Title"
           required
         />
-        <Dropzone onImageChange={newImage => setImage(newImage)} />
         <CategorySelectDropdown
           onCategorySelect={handleCategorySelect}
           selectedCategory={selectedCategory}
         />
+
         <textarea
           className={classes['form-textarea']}
           id="description"
-          name="description"
+          name="challenge[description]"
           placeholder="Description"
           defaultValue={''}
           required
         />
+
         <button
           type="submit"
           className={classes['form-submit-button']}

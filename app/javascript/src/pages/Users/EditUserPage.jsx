@@ -40,7 +40,7 @@ export const action = async ({ request, params }) => {
 
   const data = await request.formData()
 
-  const currentlyPlaying = data.get('currently_playing')
+  const currentlyPlaying = data.get('user[currently_playing]')
 
   data.append('user[currently_playing]', currentlyPlaying || 'none')
   data.append('user[avatar]', data.get('avatar'))

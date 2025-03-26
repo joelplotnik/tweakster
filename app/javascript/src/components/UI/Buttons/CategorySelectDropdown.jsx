@@ -92,7 +92,8 @@ const CategorySelectDropdown = ({ onCategorySelect, selectedCategory }) => {
       {selectedCategory && (
         <input
           type="hidden"
-          name="selected_category"
+          id="category"
+          name="challenge[category]"
           value={selectedCategory}
         />
       )}

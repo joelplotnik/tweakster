@@ -68,7 +68,10 @@ class Api::V1::ChallengesController < ApplicationController
   end
 
   def create
-    challenge = Challenge.new(challenge_params.merge(user_id: params[:user_id], game_id: params[:game_id]))
+    challenge = Challenge.new(challenge_params.except(:image))
+    challenge.user = current_user
+
+    challenge.image.attach(params[:challenge][:image]) if params[:challenge][:image].present?
 
     if challenge.save
       render json: { message: 'Challenge created successfully', challenge: format_challenge(challenge) },
@@ -118,7 +121,7 @@ class Api::V1::ChallengesController < ApplicationController
   private
 
   def challenge_params
-    params.require(:challenge).permit(:title, :description, :category)
+    params.require(:challenge).permit(:game_id, :title, :description, :category, :image)
   end
 
   def set_user
