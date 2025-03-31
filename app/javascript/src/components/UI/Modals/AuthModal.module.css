@@ -96,7 +96,7 @@
   background-color: var(--primary-red-color);
   color: var(--primary-text-color);
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
   width: 100%;
 }
 
@@ -125,7 +125,7 @@
   background-color: var(--twitch-color);
   color: var(--primary-text-color);
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
   width: 100%;
 }
 
@@ -155,7 +155,7 @@
   font-size: 1.5rem;
   color: var(--primary-text-color);
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
   z-index: 12;
   background-color: transparent;
   border: none;
@@ -175,6 +175,7 @@
   font-weight: bold;
   text-decoration: none;
   margin-top: 30px;
+  transition: text-decoration 0.3s;
 }
 
 .modal-content .switch-modal-btn:hover {
@@ -187,6 +188,7 @@
   text-decoration: none;
   display: block;
   margin-bottom: 1rem;
+  transition: text-decoration 0.3s;
 }
 
 .trouble-link:hover {

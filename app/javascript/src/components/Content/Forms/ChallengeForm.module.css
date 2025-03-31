@@ -23,7 +23,7 @@
   border-radius: 5px;
   border: 1px solid var(--primary-border-color);
   text-align: left;
-  transition: border-color 0.3s;
+  transition: border 0.3s;
 }
 
 .form-textarea {
@@ -39,24 +39,21 @@
   border: 1px solid var(--primary-border-color);
   height: 100px;
   resize: none;
-  transition: border-color 0.3s;
+  transition: border 0.3s;
 }
 
 .form-textarea:focus,
-.form-input:focus,
 .title-input:focus {
   border: 1px solid var(--primary-red-color);
   outline: none;
 }
 
 .form-textarea:hover,
-.form-input:hover,
 .title-input:hover {
   border: 1px solid var(--primary-red-color);
   outline: none;
 }
 
-.form-input::placeholder,
 .form-textarea::placeholder,
 .title-input::placeholder {
   padding-left: 2px;
@@ -77,6 +74,7 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   width: 100%;
+  transition: background-color 0.3s;
 }
 
 .form-submit-button:hover {
@@ -115,6 +113,7 @@
   transition: all 0.2s ease-in-out;
   text-align: center;
   display: inline-block;
+  transition: background-color 0.3s;
 }
 
 .add-image-button:hover {
@@ -129,7 +128,7 @@
   font-size: 14px;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
 }
 
 .remove-image-button:hover {
@@ -145,6 +144,7 @@
 
 .invalid input {
   border: 1px solid var(--primary-red-color);
+  transition: border-color 0.3s;
 }
 
 .invalid input:hover {

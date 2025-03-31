@@ -21,7 +21,7 @@
   border-radius: 5px;
   border: 1px solid var(--primary-border-color);
   text-align: left;
-  transition: border-color 0.3s;
+  transition: border 0.3s;
 }
 
 .search-input:focus {
@@ -71,7 +71,7 @@
   justify-content: space-between;
   background-color: var(--secondary-background-color);
   color: var(--primary-text-color);
-  transition: border-color 0.3s;
+  transition: background-color 0.3s;
   gap: 12px;
 }
 

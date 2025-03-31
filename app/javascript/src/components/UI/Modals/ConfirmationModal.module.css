@@ -61,7 +61,7 @@
   font-size: 1.5rem;
   color: var(--primary-text-color);
   cursor: pointer;
-  transition: color 0.2s ease-in-out;
+  transition: color 0.3s;
   z-index: 22;
   background-color: transparent;
   border: none;
@@ -86,7 +86,7 @@
   margin-right: 0.5rem;
   border-radius: 0.25rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition: background-color 0.3s;
 }
 
 .cancel-button:hover {
@@ -102,7 +102,7 @@
   padding: 0.5rem 1rem;
   margin-left: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
 }
 
 .delete-button:hover {
@@ -118,7 +118,7 @@
   padding: 0.5rem 1rem;
   margin-left: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
 }
 
 .confirm-button:hover {

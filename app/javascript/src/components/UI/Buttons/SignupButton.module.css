@@ -12,7 +12,7 @@
   background-color: var(--primary-red-color);
   color: var(--primary-text-color);
   margin: 5px;
-  transition: all 0.2s ease;
+  transition: all 0.3s;
 }
 
 .button:hover {

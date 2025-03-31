@@ -49,6 +49,7 @@
   color: var(--primary-link-color);
   text-decoration: none;
   display: inline-block;
+  transition: text-decoration 0.3s;
 }
 
 .username:hover {
@@ -72,6 +73,7 @@
   padding: 0;
   margin: 0;
   text-align: left;
+  transition: text-decoration 0.3s;
 }
 
 .reply-button:hover {
@@ -101,6 +103,7 @@
   padding: 0;
   position: relative;
   top: 3px;
+  transition: color 0.3s;
 }
 
 .more-button:hover {
@@ -132,6 +135,7 @@
   cursor: pointer;
   width: 100%;
   text-align: left;
+  transition: background-color 0.3s;
 }
 
 .dropdown-item:hover {

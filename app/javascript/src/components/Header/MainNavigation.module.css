@@ -105,7 +105,7 @@
   background-color: var(--primary-border-color);
   opacity: 0;
   z-index: -1;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s;
 }
 
 .notification-button:hover::before {
@@ -128,7 +128,7 @@
   cursor: pointer;
   background-color: var(--secondary-background-color);
   color: var(--primary-text-color);
-  transition: background-color 0.2s ease-in-out;
+  transition: color 0.3s;
 }
 
 .icon-button:hover {
@@ -151,7 +151,7 @@
   cursor: pointer;
   background-color: var(--secondary-background-color);
   color: var(--primary-text-color);
-  transition: background-color 0.2s ease-in-out;
+  transition: color 0.3s;
 }
 
 .search-icon:hover {
@@ -203,7 +203,7 @@
   cursor: pointer;
   background-color: var(--secondary-background-color);
   color: var(--primary-text-color);
-  transition: background-color 0.2s ease-in-out;
+  transition: border 0.3s, background-color 0.3s;
   font-size: 20px;
 }
 
@@ -239,6 +239,7 @@
   font-size: 0.9rem;
   display: flex;
   align-items: center;
+  transition: background-color 0.3s;
 }
 
 .dropdown-menu a svg {
@@ -260,6 +261,7 @@
   background: none;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .dropdown-menu button svg {

@@ -29,7 +29,7 @@
   display: flex;
   border-radius: 5px;
   border: 1px solid var(--primary-border-color);
-  transition: border-color 0.3s;
+  transition: border 0.3s, background-color 0.3s;
 }
 
 .search:hover {
@@ -133,6 +133,7 @@
   font-weight: 600;
   background-color: var(--secondary-background-color);
   border-radius: 5px;
+  transition: background-color 0.3s;
 }
 
 .game-name-image-container {
@@ -151,6 +152,7 @@
   background-color: var(--secondary-background-color);
   border-radius: 5px;
   gap: 12px;
+  transition: background-color 0.3s;
 }
 
 .user-result:hover,
