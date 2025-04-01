@@ -35,13 +35,18 @@ export const action = async ({ request, params }) => {
   const data = await request.formData()
 
   const gameId = data.get('challenge[game_id]')
+  const category = data.get('challenge[category]')
 
-  if (!gameId) {
-    toast.error('You must select a game for your challenge')
-    return json(
-      { error: 'You must select a game for your challenge' },
-      { status: 400 }
-    )
+  const missingFields = []
+  if (!gameId) missingFields.push('game')
+  if (!category) missingFields.push('category')
+
+  if (missingFields.length > 0) {
+    const errorMessage = `You must select a ${missingFields.join(
+      ' and '
+    )} for your challenge`
+    toast.error(errorMessage)
+    return json({ error: errorMessage }, { status: 400 })
   }
 
   const token = await getAuthToken()
@@ -61,8 +66,9 @@ export const action = async ({ request, params }) => {
 
   if (response.status === 422) {
     const responseData = await response.json()
-    toast.error(responseData.message || 'Validation failed')
-    return response
+    const errorMessage = responseData.errors[0] || 'Validation failed'
+    toast.error(errorMessage)
+    return responseData
   }
 
   if (!response.ok) {

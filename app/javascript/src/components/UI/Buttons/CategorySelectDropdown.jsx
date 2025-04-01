@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import debounce from 'lodash/debounce'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { RiCloseLine } from 'react-icons/ri'
 
 import classes from './CategorySelectDropdown.module.css'
@@ -18,8 +19,30 @@ const CATEGORIES = [
 
 const CategorySelectDropdown = ({ onCategorySelect, selectedCategory }) => {
   const [searchTerm, setSearchTerm] = useState(selectedCategory || '')
+  const [filteredCategories, setFilteredCategories] = useState(CATEGORIES)
   const [isFocused, setIsFocused] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
   const searchRef = useRef(null)
+
+  const filterCategories = useCallback(
+    debounce(query => {
+      if (!query) {
+        setFilteredCategories(CATEGORIES)
+        return
+      }
+      setFilteredCategories(
+        CATEGORIES.filter(category =>
+          category.toLowerCase().includes(query.toLowerCase())
+        )
+      )
+    }, 300),
+    []
+  )
+
+  useEffect(() => {
+    filterCategories(searchTerm)
+    return () => filterCategories.cancel()
+  }, [searchTerm, filterCategories])
 
   useEffect(() => {
     const handleClickOutside = event => {
@@ -35,29 +58,42 @@ const CategorySelectDropdown = ({ onCategorySelect, selectedCategory }) => {
 
   const handleInputChange = event => {
     setSearchTerm(event.target.value)
+    setShowWarning(false)
+    if (selectedCategory && event.target.value !== selectedCategory) {
+      onCategorySelect(null)
+    }
   }
 
   const handleCategorySelect = category => {
     onCategorySelect(category)
     setSearchTerm(category)
     setIsFocused(false)
+    setShowWarning(false)
   }
 
   const handleInputFocus = () => {
     setIsFocused(true)
   }
 
+  const handleInputBlur = () => {
+    if (searchTerm && !CATEGORIES.includes(searchTerm)) {
+      setShowWarning(true)
+    }
+  }
+
   const handleClearCategory = () => {
     onCategorySelect(null)
     setSearchTerm('')
+    setShowWarning(false)
   }
-
-  const filteredCategories = CATEGORIES.filter(category =>
-    category.toLowerCase().includes(searchTerm.toLowerCase())
-  )
 
   return (
     <div className={classes['search-bar']} ref={searchRef}>
+      {showWarning && (
+        <div className={classes['warning']}>
+          Please select a category from the list.
+        </div>
+      )}
       <div className={classes['search']}>
         <input
           type="text"
@@ -65,6 +101,7 @@ const CategorySelectDropdown = ({ onCategorySelect, selectedCategory }) => {
           value={searchTerm}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
           autoComplete="off"
           className={classes['search-input']}
         />

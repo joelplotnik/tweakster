@@ -94,3 +94,9 @@
 .platform {
   color: var(--primary-text-color-hover);
 }
+
+.warning {
+  padding-bottom: 8px;
+  font-size: 14px;
+  color: var(--primary-red-color);
+}

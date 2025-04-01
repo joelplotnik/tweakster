@@ -15,6 +15,7 @@ const GameSelectDropdown = ({
   )
   const [gameResults, setGameResults] = useState([])
   const [isFocused, setIsFocused] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
   const searchRef = useRef(null)
 
   const fetchGames = useCallback(
@@ -59,6 +60,7 @@ const GameSelectDropdown = ({
   const handleInputChange = event => {
     const value = event.target.value
     setSearchTerm(value)
+    setShowWarning(false)
     if (selectedGame && value !== selectedGame.name) {
       onGameSelect(null)
     }
@@ -68,19 +70,32 @@ const GameSelectDropdown = ({
     onGameSelect(game)
     setSearchTerm(game.name)
     setIsFocused(false)
+    setShowWarning(false)
   }
 
   const handleInputFocus = () => {
     setIsFocused(true)
   }
 
+  const handleInputBlur = () => {
+    if (searchTerm && !selectedGame) {
+      setShowWarning(true)
+    }
+  }
+
   const handleClearGame = () => {
     onGameSelect(null)
     setSearchTerm('')
+    setShowWarning(false)
   }
 
   return (
     <div className={classes['search-bar']} ref={searchRef}>
+      {showWarning && (
+        <div className={classes['warning']}>
+          Please select a game from the list.
+        </div>
+      )}
       <div className={classes['search']}>
         <input
           type="text"
@@ -92,6 +107,7 @@ const GameSelectDropdown = ({
           value={searchTerm}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
+          onBlur={handleInputBlur} // Handle blur event
           autoComplete="off"
           className={classes['search-input']}
         />
