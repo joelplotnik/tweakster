@@ -7,10 +7,12 @@
 
 .icon-selected {
   color: var(--primary-green-color);
+  transition: color 0.3s;
 }
 
 .icon-unselected {
   color: var(--primary-text-color);
+  transition: color 0.3s;
 }
 
 .approval-count {

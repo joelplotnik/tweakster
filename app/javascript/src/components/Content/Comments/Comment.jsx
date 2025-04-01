@@ -66,16 +66,16 @@ const Comment = ({
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target) &&
+        moreButtonRef.current &&
         !moreButtonRef.current.contains(event.target)
       ) {
         setShowDropdown(false)
       }
     }
 
-    document.addEventListener('click', handleClickOutside)
-
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
 
@@ -113,14 +113,12 @@ const Comment = ({
               <button
                 onClick={toggleDropdown}
                 className={classes['more-button']}
-                ref={moreButtonRef} // Add ref to the button
+                ref={moreButtonRef}
               >
                 <RiMoreFill />
               </button>
               {showDropdown && (
                 <div className={classes.dropdown} ref={dropdownRef}>
-                  {' '}
-                  {/* Add ref to dropdown */}
                   <button
                     className={classes['dropdown-item']}
                     onClick={() => handleConfirmationModalToggle()}

@@ -5,12 +5,17 @@ import { RiCloseLine } from 'react-icons/ri'
 import { API_URL } from '../../../constants/constants'
 import classes from './GameSelectDropdown.module.css'
 
-const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
+const GameSelectDropdown = ({
+  onGameSelect,
+  selectedGame,
+  isChallengeForm,
+}) => {
   const [searchTerm, setSearchTerm] = useState(
     selectedGame ? selectedGame.name : ''
   )
   const [gameResults, setGameResults] = useState([])
   const [isFocused, setIsFocused] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
   const searchRef = useRef(null)
 
   const fetchGames = useCallback(
@@ -55,6 +60,7 @@ const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
   const handleInputChange = event => {
     const value = event.target.value
     setSearchTerm(value)
+    setShowWarning(false)
     if (selectedGame && value !== selectedGame.name) {
       onGameSelect(null)
     }
@@ -64,26 +70,44 @@ const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
     onGameSelect(game)
     setSearchTerm(game.name)
     setIsFocused(false)
+    setShowWarning(false)
   }
 
   const handleInputFocus = () => {
     setIsFocused(true)
   }
 
+  const handleInputBlur = () => {
+    if (searchTerm && !selectedGame) {
+      setShowWarning(true)
+    }
+  }
+
   const handleClearGame = () => {
     onGameSelect(null)
     setSearchTerm('')
+    setShowWarning(false)
   }
 
   return (
     <div className={classes['search-bar']} ref={searchRef}>
+      {showWarning && (
+        <div className={classes['warning']}>
+          Please select a game from the list.
+        </div>
+      )}
       <div className={classes['search']}>
         <input
           type="text"
-          placeholder="What are you playing?"
+          placeholder={
+            isChallengeForm
+              ? 'Select a game for your challenge'
+              : 'What are you playing?'
+          }
           value={searchTerm}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
+          onBlur={handleInputBlur} // Handle blur event
           autoComplete="off"
           className={classes['search-input']}
         />
@@ -110,7 +134,14 @@ const GameSelectDropdown = ({ onGameSelect, selectedGame }) => {
         </div>
       )}
       {selectedGame && (
-        <input type="hidden" name="currently_playing" value={selectedGame.id} />
+        <input
+          type="hidden"
+          id="game"
+          name={
+            isChallengeForm ? 'challenge[game_id]' : 'user[currently_playing]'
+          }
+          value={selectedGame.id}
+        />
       )}
     </div>
   )

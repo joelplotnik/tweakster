@@ -49,6 +49,7 @@
 .link {
   color: var(--primary-blue-color);
   text-decoration: none;
+  transition: text-decoration 0.3s;
 }
 
 .link:hover {

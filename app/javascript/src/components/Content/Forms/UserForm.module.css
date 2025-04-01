@@ -38,6 +38,7 @@
   width: 35px;
   height: 35px;
   color: var(--primary-red-color);
+  transition: color 0.3s;
 }
 
 .upload-avatar-btn svg:hover {
@@ -57,7 +58,7 @@
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .remove-avatar-button:hover {
@@ -98,6 +99,7 @@
   border-radius: 5px;
   border: 1px solid var(--primary-border-color);
   text-align: left;
+  transition: border 0.3s;
 }
 
 .form-textarea {
@@ -113,6 +115,7 @@
   border: 1px solid var(--primary-border-color);
   height: 100px;
   resize: none;
+  transition: border 0.3s;
 }
 
 .form-textarea:focus,
@@ -145,7 +148,7 @@
   padding: 5px 10px 5px 0;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .change-password-btn:hover {
@@ -164,6 +167,7 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   width: 100%;
+  transition: background-color 0.3s;
 }
 
 .form-submit-button:hover {
@@ -179,6 +183,7 @@
 
 .invalid input {
   border: 1px solid var(--primary-red-color);
+  transition: background-color 0.3s;
 }
 
 .invalid input:hover {
@@ -206,7 +211,7 @@
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: color 0.3s;
 }
 
 .delete-button:hover {

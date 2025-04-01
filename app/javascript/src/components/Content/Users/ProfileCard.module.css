@@ -64,6 +64,7 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .edit-button:hover {
@@ -102,6 +103,7 @@
 .url a {
   color: var(--primary-red-color);
   text-decoration: none;
+  transition: text-direction 0.3s;
 }
 
 .url a:hover {
@@ -126,6 +128,7 @@
   color: var(--primary-red-color);
   text-decoration: none;
   word-wrap: break-word;
+  transition: text-direction 0.3s;
 }
 
 .currently-playing:hover {

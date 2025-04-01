@@ -11,8 +11,10 @@ class Challenge < ApplicationRecord
 
   attribute :hidden, :boolean, default: false
 
-  validates :title, presence: true
-  validates :description, presence: true
+  before_validation :strip_whitespace
+
+  validates :title, presence: true, length: { minimum: 3, maximum: 100 }
+  validates :description, presence: true, length: { minimum: 10, maximum: 1000 }
 
   CATEGORIES = [
     'Perfectionist',
@@ -30,6 +32,11 @@ class Challenge < ApplicationRecord
   validates :category, inclusion: { in: CATEGORIES }
 
   validates_uniqueness_of :title, scope: :game_id, message: 'Title must be unique within a game'
+
+  def strip_whitespace
+    self.title = title.strip if title.present?
+    self.description = description.strip if description.present?
+  end
 
   def image_url
     Rails.application.routes.url_helpers.url_for(image) if image.attached?

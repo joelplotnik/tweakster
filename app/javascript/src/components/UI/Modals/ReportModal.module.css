@@ -57,6 +57,7 @@
   z-index: 22;
   background-color: transparent;
   border: none;
+  transition: color 0.3s;
 }
 
 .close-icon:hover {
@@ -126,6 +127,7 @@
   background-color: var(--secondary-background-color);
   border: 1px solid var(--primary-border-color);
   border-radius: 5px;
+  transition: border 0.3s;
 }
 
 .reason-textarea:hover {
@@ -153,7 +155,7 @@
   margin-right: 0.5rem;
   border-radius: 0.25rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition: background-color 0.3s;
 }
 
 .cancel-button:hover {
@@ -169,7 +171,7 @@
   padding: 0.5rem 1rem;
   margin-left: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
 }
 
 .report-button:hover {

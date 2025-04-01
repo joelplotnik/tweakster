@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import {
   json,
   redirect,
@@ -10,7 +10,6 @@ import { toast } from 'react-toastify'
 import UserForm from '../../components/Content/Forms/UserForm'
 import { API_URL } from '../../constants/constants'
 import store from '../../store/index'
-import { userActions } from '../../store/user'
 import { fetchUserData } from '../../store/user-actions'
 import { tokenLoader } from '../../util/auth'
 import classes from './EditUserPage.module.css'
@@ -21,20 +20,15 @@ const EditUserPage = () => {
 
   useEffect(() => {
     if (!user.is_owner) {
-      toast.error('You are not authorized to edit this profile.')
       navigate('/')
     }
   }, [user, navigate])
-
-  if (!user.is_owner) {
-    return null
-  }
 
   return (
     <div className={classes['edit-user-page']}>
       <h1 className={classes.heading}>Edit profile</h1>
       <hr className={classes.divider} />
-      <UserForm method="PUT" user={user} />
+      <UserForm user={user} />
     </div>
   )
 }
@@ -46,20 +40,8 @@ export const action = async ({ request, params }) => {
 
   const data = await request.formData()
 
-  const currentlyPlaying = data.get('currently_playing')
-
-  data.append('user[currently_playing]', currentlyPlaying || 'none')
-  data.append('user[avatar]', data.get('avatar'))
-  data.append('user[remove_avatar]', data.get('remove_avatar'))
-  data.append('user[username]', data.get('username'))
-  data.append('user[bio]', data.get('bio'))
-  data.append('user[email]', data.get('email'))
-  data.append('user[password]', data.get('password'))
-
-  const newPassword = data.get('newPassword')
-  if (newPassword) {
-    data.append('user[new_password]', data.get('newPassword'))
-  }
+  const currentlyPlaying = data.get('user[currently_playing]')
+  data.set('user[currently_playing]', currentlyPlaying || 'none')
 
   const token = await tokenLoader()
 

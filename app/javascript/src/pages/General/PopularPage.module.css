@@ -31,7 +31,7 @@
   border-radius: 8px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s;
 }
 
 .item:hover {

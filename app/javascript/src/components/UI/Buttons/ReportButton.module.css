@@ -7,11 +7,13 @@
 
 .icon {
   color: var(--primary-text-color);
+  transition: color 0.3s;
 }
 
 .text {
   margin-left: 5px;
   font-size: 12px;
+  transition: color 0.3s;
 }
 
 .report-button:hover .icon {

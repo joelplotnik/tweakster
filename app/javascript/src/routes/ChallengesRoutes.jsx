@@ -4,7 +4,9 @@ import ChallengePage, {
 import ChallengesLayout from '../pages/Challenges/ChallengesLayout'
 import ChallengesPage from '../pages/Challenges/ChallengesPage'
 import EditChallengePage from '../pages/Challenges/EditChallengePage'
-import NewChallengePage from '../pages/Challenges/NewChallengePage'
+import NewChallengePage, {
+  action as newChallengeAction,
+} from '../pages/Challenges/NewChallengePage'
 import attemptsRoutes from './AttemptsRoutes'
 
 const challengesRoutes = context => [
@@ -22,6 +24,7 @@ const challengesRoutes = context => [
         path: 'new',
         id: `${context}-challenges-new`,
         element: <NewChallengePage />,
+        action: newChallengeAction,
       },
       {
         path: ':challengeId',

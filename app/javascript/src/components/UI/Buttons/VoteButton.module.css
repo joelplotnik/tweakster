@@ -19,6 +19,7 @@
 .downvote {
   color: var(--primary-text-color);
   font-size: 1.25rem;
+  transition: color 0.3s;
 }
 
 .upvote-filled {

@@ -48,7 +48,7 @@ const ChallengeCard = ({ challenge, isOwner, basePath }) => {
               {challenge.game.platform}
             </span>
           </div>
-          {challenge.image_url ? (
+          {challenge.image_url && (
             <div className={classes['image-container']}>
               <img
                 src={challenge.image_url}
@@ -56,8 +56,6 @@ const ChallengeCard = ({ challenge, isOwner, basePath }) => {
                 className={classes['challenge-image']}
               />
             </div>
-          ) : (
-            <hr className={classes.divider} />
           )}
           <div className={classes.meta}>
             <hr className={classes.divider} />
