@@ -5,12 +5,7 @@ import { useSelector } from 'react-redux'
 import AuthModal from '../../UI/Modals/AuthModal'
 import classes from './CommentForm.module.css'
 
-const CommentForm = ({
-  onSubmit,
-  replyingTo,
-  onTextChange,
-  isSlideUpPresent,
-}) => {
+const CommentForm = ({ onSubmit, replyingTo, isSlideUpPresent }) => {
   const token = useSelector(state => state.token.token)
   const [commentText, setCommentText] = useState('')
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -39,9 +34,6 @@ const CommentForm = ({
   const handleChange = event => {
     const value = event.target.value
     setCommentText(value)
-    if (onTextChange) {
-      onTextChange(value)
-    }
   }
 
   const handleSubmit = event => {
