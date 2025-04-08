@@ -10,7 +10,7 @@ import {
 } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-import placeholderAvatar from '../../../assets/default-avatar.png'
+import placeholderAvatar from '../../../assets/default_avatar.png'
 import { API_URL } from '../../../constants/constants'
 import useInput from '../../../hooks/useInput'
 import { userActions } from '../../../store/user'
@@ -189,7 +189,7 @@ const UserForm = ({ user }) => {
           >
             <RiImageAddLine />
           </button>
-          {avatar && (
+          {avatar && !avatar.endsWith('default_avatar.png') && (
             <div className={classes['remove-avatar-button-container']}>
               <button
                 className={classes['remove-avatar-button']}
