@@ -1,0 +1,25 @@
+.edit-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.25em;
+}
+
+.icon {
+  color: var(--primary-text-color);
+  transition: color 0.3s;
+}
+
+.text {
+  margin-left: 5px;
+  font-size: 12px;
+  transition: color 0.3s;
+}
+
+.edit-button:hover .icon {
+  color: var(--primary-blue-color);
+}
+
+.edit-button:hover .text {
+  color: var(--primary-blue-color);
+}

@@ -25,7 +25,7 @@ const AttemptCard = ({ attempt, isOwner, basePath }) => {
   )
   const [showReportModal, setShowReportModal] = useState(false)
   const rootUrl = window.location.origin
-  const pathToShare = `${rootUrl}/${basePath}/challenges/${challenge.id}/attempts/${attempt.id}`
+  const sharePath = `${rootUrl}/${basePath}/challenges/${challenge.id}/attempts/${attempt.id}`
 
   const handleSlideUpModalToggle = () => {
     setShowSlideUpModal(!showSlideUpModal)
@@ -123,7 +123,7 @@ const AttemptCard = ({ attempt, isOwner, basePath }) => {
                 attemptId={attempt.id}
               />
             )}
-            <ShareButton pathToShare={pathToShare} />
+            <ShareButton sharePath={sharePath} />
             <ReportButton onClick={handleReportModalToggle} />
           </div>
         </div>

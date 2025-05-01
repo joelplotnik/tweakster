@@ -60,27 +60,30 @@ class Api::V1::AttemptsController < ApplicationController
     end
   end
 
-  def update
-    if @attempt.present? && current_user == @attempt.user
-      if @attempt.update(attempt_params)
-        render json: { message: 'Attempt updated successfully',
-                       attempt: format_attempt(@attempt) }
-      else
-        render json: { errors: @attempt.errors.full_messages }, status: :unprocessable_entity
-      end
-    else
-      render json: { error: 'You are not authorized to update this challenge' }, status: :forbidden
-    end
-  end
+  # def update
+  #   if @attempt.present? && current_user == @attempt.user
+  #     if @attempt.update(attempt_params)
+  #       render json: { message: 'Attempt updated successfully',
+  #                      attempt: format_attempt(@attempt) }
+  #     else
+  #       render json: { errors: @attempt.errors.full_messages }, status: :unprocessable_entity
+  #     end
+  #   else
+  #     render json: { error: 'You are not authorized to update this challenge' }, status: :forbidden
+  #   end
+  # end
 
   def destroy
-    attempt = current_user.attempts.find_by(id: params[:id], challenge_id: params[:challenge_id])
+    render json: { error: 'Attempt not found' }, status: :not_found and return unless @attempt
 
-    if attempt
-      attempt.destroy
-      render json: { message: 'Attempt deleted successfully', attempt_id: attempt.id }, status: :ok
+    unless current_user == @attempt.user
+      render json: { error: 'Unauthorized to delete this attempt' }, status: :unauthorized and return
+    end
+
+    if @attempt.destroy
+      render json: { message: 'Attempt deleted successfully', attempt_id: @attempt.id }, status: :ok
     else
-      render json: { error: 'Attempt not found or unauthorized' }, status: :not_found
+      render json: { error: 'Failed to delete attempt' }, status: :unprocessable_entity
     end
   end
 

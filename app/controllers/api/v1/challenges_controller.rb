@@ -45,7 +45,8 @@ class Api::V1::ChallengesController < ApplicationController
         'user_vote' => user_votes[challenge.id],
         'user_rating' => user_ratings[challenge.id],
         'user_attempted' => user_attempts.key?(challenge.id),
-        'user_attempt_id' => user_attempts[challenge.id]
+        'user_attempt_id' => user_attempts[challenge.id],
+        'is_owner' => current_user.present? && (current_user == challenge.user)
       )
     end
 
@@ -81,24 +82,27 @@ class Api::V1::ChallengesController < ApplicationController
     end
   end
 
-  def update
-    @challenge = find_challenge
+  # def update
+  #   @challenge = find_challenge
 
-    if @challenge.update(challenge_params)
-      render json: { message: 'Challenge updated successfully', challenge: format_challenge(@challenge) }
-    else
-      render json: { errors: @challenge.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
+  #   if @challenge.update(challenge_params)
+  #     render json: { message: 'Challenge updated successfully', challenge: format_challenge(@challenge) }
+  #   else
+  #     render json: { errors: @challenge.errors.full_messages }, status: :unprocessable_entity
+  #   end
+  # end
 
   def destroy
-    @challenge = find_challenge
+    render json: { error: 'Challenge not found' }, status: :not_found and return unless @challenge
 
-    if @challenge
-      @challenge.destroy
-      render json: { message: 'Challenge deleted successfully' }, status: :no_content
+    unless current_user == @challenge.user
+      render json: { error: 'Unauthorized to delete this challenge' }, status: :unauthorized and return
+    end
+
+    if @challenge.destroy
+      render json: { message: 'Challenge deleted successfully' }, status: :ok
     else
-      render json: { error: 'Challenge not found' }, status: :not_found
+      render json: { error: 'Failed to delete challenge' }, status: :unprocessable_entity
     end
   end
 

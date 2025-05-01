@@ -6,11 +6,10 @@ import { formatNumber } from '../../../util/format'
 import AttemptButton from '../../UI/Buttons/AttemptButton'
 import CommentButton from '../../UI/Buttons/CommentButton'
 import DifficultyButton from '../../UI/Buttons/DifficultyButton'
-import ReportButton from '../../UI/Buttons/ReportButton'
+import MoreButton from '../../UI/Buttons/MoreButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
 import VoteButton from '../../UI/Buttons/VoteButton'
 import AuthModal from '../../UI/Modals/AuthModal'
-import ReportModal from '../../UI/Modals/ReportModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import CommentSlideUpForm from '../Forms/CommentSlideUpForm'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
@@ -36,17 +35,17 @@ const Challenge = ({ challenge, isUserContext }) => {
     comments_count,
     game,
     user,
+    is_owner,
   } = challenge
   const descriptionLimit = 250
   const [isExpanded, setIsExpanded] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [slideUpModalContentType, setSlideUpModalContentType] = useState(null)
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
   const { username, name: gameName } = useParams()
   const basePath = username ? `users/${username}` : `games/${gameName}`
   const rootUrl = window.location.origin
-  const pathToShare = `${rootUrl}/${basePath}/challenges/${id}`
+  const sharePath = `${rootUrl}/${basePath}/challenges/${id}`
   const [userRating, setUserRating] = useState(user_rating)
   const [difficultyRating, setDifficultyRating] = useState(difficulty_rating)
   const [difficultiesCount, setDifficultiesCount] = useState(difficulties_count)
@@ -68,10 +67,6 @@ const Challenge = ({ challenge, isUserContext }) => {
   const handleSlideUpModalToggle = contentType => {
     setSlideUpModalContentType(contentType)
     setShowSlideUpModal(!showSlideUpModal)
-  }
-
-  const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal)
   }
 
   const toggleExpanded = () => {
@@ -216,8 +211,13 @@ const Challenge = ({ challenge, isUserContext }) => {
               commentsCount={formatNumber(comments_count)}
               onClick={() => handleSlideUpModalToggle('comments')}
             />
-            <ShareButton pathToShare={pathToShare} />
-            <ReportButton onClick={handleReportModalToggle} />
+            <ShareButton sharePath={sharePath} />
+            <MoreButton
+              content={{ type: 'challenge', id: id }}
+              basePath={basePath}
+              sharePath={sharePath}
+              isOwner={is_owner}
+            />
           </div>
         </div>
       </div>
@@ -247,12 +247,6 @@ const Challenge = ({ challenge, isUserContext }) => {
             <CommentSlideUpForm basePath={basePath} challengeId={id} />
           )}
         </SlideUpModal>
-      )}
-      {showReportModal && (
-        <ReportModal
-          onClick={handleReportModalToggle}
-          content={{ type: 'challenge', id: id }}
-        />
       )}
     </>
   )
