@@ -6,7 +6,7 @@ import { formatNumber } from '../../../util/format'
 import AttemptStatus from '../../UI/AttemptStatus'
 import ApprovalButton from '../../UI/Buttons/ApprovalButton'
 import DifficultyButton from '../../UI/Buttons/DifficultyButton'
-import ReportButton from '../../UI/Buttons/ReportButton'
+import MoreButton from '../../UI/Buttons/MoreButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
 import ReportModal from '../../UI/Modals/ReportModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
@@ -124,7 +124,17 @@ const AttemptCard = ({ attempt, isOwner, basePath }) => {
               />
             )}
             <ShareButton sharePath={sharePath} />
-            <ReportButton onClick={handleReportModalToggle} />
+            <MoreButton
+              content={{
+                type: 'attempt',
+                id: attempt.id,
+                challenge_id: challenge.id,
+              }}
+              basePath={basePath}
+              sharePath={sharePath}
+              isOwner={isOwner}
+              isContentPage={true}
+            />
           </div>
         </div>
         <h3 className={classes['section-header']}>Challenge Description</h3>

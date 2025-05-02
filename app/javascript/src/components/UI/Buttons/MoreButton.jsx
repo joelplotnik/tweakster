@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { RiMoreFill } from 'react-icons/ri'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../../constants/constants'
@@ -12,8 +13,15 @@ import DeleteButton from './DeleteButton'
 import classes from './MoreButton.module.css'
 import ReportButton from './ReportButton'
 
-const MoreButton = ({ content, basePath, sharePath, isOwner }) => {
+const MoreButton = ({
+  content,
+  basePath,
+  sharePath,
+  isOwner,
+  isContentPage,
+}) => {
   const token = useSelector(state => state.token.token)
+  const navigate = useNavigate()
   const [isPopupVisible, setPopupVisible] = useState(false)
   const buttonRef = useRef(null)
   const popupRef = useRef(null)
@@ -82,7 +90,12 @@ const MoreButton = ({ content, basePath, sharePath, isOwner }) => {
         throw new Error(`Failed to delete ${type} (status: ${response.status})`)
       }
 
-      window.location.reload()
+      if (isContentPage) {
+        toast.success(`Successfully deleted ${type}`)
+        navigate(`/${basePath}`)
+      } else {
+        window.location.reload()
+      }
     } catch (error) {
       console.error('Error deleting:', error)
     }
