@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import AttemptButton from '../../UI/Buttons/AttemptButton'
 import DifficultyButton from '../../UI/Buttons/DifficultyButton'
+import MoreButton from '../../UI/Buttons/MoreButton'
 import VoteButton from '../../UI/Buttons/VoteButton'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
@@ -18,6 +19,8 @@ const ChallengeCard = ({ challenge, isOwner, basePath }) => {
   const [difficultiesCount, setDifficultiesCount] = useState(
     challenge.difficulties_count
   )
+  const rootUrl = window.location.origin
+  const sharePath = `${rootUrl}/${basePath}/challenges/${challenge.id}`
 
   const handleSlideUpModalToggle = () => {
     setShowSlideUpModal(!showSlideUpModal)
@@ -69,7 +72,23 @@ const ChallengeCard = ({ challenge, isOwner, basePath }) => {
             </div>
             <hr className={classes.divider} />
           </div>
-          <h1 className={classes['title']}>{challenge.title}</h1>
+          <div className={classes['title-row']}>
+            <h1 className={classes['title']}>{challenge.title}</h1>
+            {isOwner && (
+              <div className={classes['more-button-wrapper']}>
+                <MoreButton
+                  content={{
+                    type: 'challenge',
+                    id: challenge.id,
+                  }}
+                  basePath={basePath}
+                  sharePath={sharePath}
+                  isOwner={isOwner}
+                  isContentPage={true}
+                />
+              </div>
+            )}
+          </div>
           <p className={classes['description']}>{challenge.description}</p>
           <div className={classes['user-info']}>
             <span className={classes['created-at']}>

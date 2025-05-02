@@ -3,6 +3,7 @@ import AttemptPage, {
 } from '../pages/Attempts/AttemptPage'
 import AttemptsLayout from '../pages/Attempts/AttemptsLayout'
 import AttemptsPage from '../pages/Attempts/AttemptsPage'
+import EditAttemptPage from '../pages/Attempts/EditAttemptPage'
 
 const attemptsRoutes = context => [
   {
@@ -19,7 +20,18 @@ const attemptsRoutes = context => [
         path: ':attemptId',
         id: `${context}-attempt`,
         loader: attemptLoader,
-        element: <AttemptPage context={context} />,
+        children: [
+          {
+            index: true,
+            id: `${context}-attempt-index`,
+            element: <AttemptPage context={context} />,
+          },
+          {
+            path: 'edit',
+            id: `${context}-attempt-edit`,
+            element: <EditAttemptPage />,
+          },
+        ],
       },
     ],
   },

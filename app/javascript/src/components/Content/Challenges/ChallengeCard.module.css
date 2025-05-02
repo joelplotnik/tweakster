@@ -114,12 +114,23 @@
   text-align: center;
 }
 
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .title {
   font-size: 20px;
   font-weight: bold;
   color: var(--primary-text-color);
   margin: 0;
   margin-bottom: 12px;
+}
+
+.more-button-wrapper {
+  position: relative;
+  top: -8px;
 }
 
 .description {

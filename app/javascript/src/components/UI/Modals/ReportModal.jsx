@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 import { RiCloseLine, RiSkullLine } from 'react-icons/ri'
-import { useRouteLoaderData } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 
 import { API_URL } from '../../../constants/constants'
@@ -9,7 +9,7 @@ import { Backdrop } from './Backdrop'
 import classes from './ReportModal.module.css'
 
 const ReportModal = ({ onClick, content, isSlideUpPresent }) => {
-  const token = useRouteLoaderData('root')
+  const token = useSelector(state => state.token.token)
   const [reportReason, setReportReason] = useState('')
   const [otherReason, setOtherReason] = useState('')
   const maxCharacters = 200

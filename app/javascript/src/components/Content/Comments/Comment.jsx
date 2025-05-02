@@ -61,6 +61,27 @@ const Comment = ({
     onDeleteClick(comment.id)
   }
 
+  const formatMessageWithLinks = message => {
+    const regex = /@(\w+)/g
+
+    return message.split(regex).map((part, index) => {
+      if (index % 2 === 1) {
+        // This is a match for @username
+        return (
+          <Link
+            to={`/users/${part}`}
+            key={index}
+            className={classes['username-link']}
+          >
+            @{part}
+          </Link>
+        )
+      } else {
+        return part
+      }
+    })
+  }
+
   useEffect(() => {
     const handleClickOutside = event => {
       if (
@@ -93,7 +114,7 @@ const Comment = ({
           <div className={classes['text-container']}>
             <div className={classes['user-info']}>
               <Link
-                to={`/profile/${comment.user.id}`}
+                to={`/users/${comment.user.slug}`}
                 className={classes.username}
               >
                 {comment.user.username}
@@ -102,7 +123,9 @@ const Comment = ({
                 {moment(comment.created_at).fromNow()}
               </span>
             </div>
-            <p className={classes.message}>{comment.message}</p>
+            <p className={classes.message}>
+              {formatMessageWithLinks(comment.message)}
+            </p>
             <div className={classes['action-buttons']}>
               <button
                 onClick={handleOnReplyClick}

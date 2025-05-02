@@ -7,9 +7,8 @@ import AttemptStatus from '../../UI/AttemptStatus'
 import ApprovalButton from '../../UI/Buttons/ApprovalButton'
 import CommentButton from '../../UI/Buttons/CommentButton'
 import DifficultyButton from '../../UI/Buttons/DifficultyButton'
-import ReportButton from '../../UI/Buttons/ReportButton'
+import MoreButton from '../../UI/Buttons/MoreButton'
 import ShareButton from '../../UI/Buttons/ShareButton'
-import ReportModal from '../../UI/Modals/ReportModal'
 import SlideUpModal from '../../UI/Modals/SlideUpModal'
 import CommentSlideUpForm from '../Forms/CommentSlideUpForm'
 import DifficultySlideUpForm from '../Forms/DifficultySlideUpForm'
@@ -27,6 +26,7 @@ const Attempt = ({ attempt }) => {
     user,
     user_approved,
     user_challenge_rating,
+    is_owner,
   } = attempt
   const descriptionLimit = 250
   const [isExpanded, setIsExpanded] = useState(false)
@@ -37,11 +37,10 @@ const Attempt = ({ attempt }) => {
   const isGameChallenge = gameName && challengeId
   const gameAttemptPath = `${rootUrl}/games/${challenge.game.slug}/challenges/${challenge.id}/attempts/${id}`
   const userAttemptPath = `${rootUrl}/users/${challenge.user.slug}/challenges/${challenge.id}/attempts/${id}`
-  const pathToShare =
+  const sharePath =
     isUserPage || isGameChallenge ? gameAttemptPath : userAttemptPath
   const [slideUpModalContentType, setSlideUpModalContentType] = useState(null)
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
-  const [showReportModal, setShowReportModal] = useState(false)
   const [userRating, setUserRating] = useState(user_challenge_rating)
   const [difficultyRating, setDifficultyRating] = useState(
     challenge.difficulty_rating
@@ -68,10 +67,6 @@ const Attempt = ({ attempt }) => {
   const handleSlideUpModalToggle = contentType => {
     setSlideUpModalContentType(contentType)
     setShowSlideUpModal(!showSlideUpModal)
-  }
-
-  const handleReportModalToggle = () => {
-    setShowReportModal(!showReportModal)
   }
 
   const displayedDescription = isExpanded
@@ -204,27 +199,40 @@ const Attempt = ({ attempt }) => {
                   )}
                 </div>
               </div>
-              <div className={classes['bottom-bar']}>
-                {status === 'Complete' && (
-                  <ApprovalButton
-                    userApproval={user_approved}
-                    approvalsCount={formatNumber(approvals_count)}
-                    basePath={
-                      isUserPage ? `games/${challenge.game.slug}` : basePath
-                    }
-                    challengeId={challenge.id}
-                    attemptId={id}
-                  />
-                )}
+            </>
+          )}
+          <div className={classes['bottom-bar']}>
+            {status === 'Complete' && (
+              <ApprovalButton
+                userApproval={user_approved}
+                approvalsCount={formatNumber(approvals_count)}
+                basePath={
+                  isUserPage ? `games/${challenge.game.slug}` : basePath
+                }
+                challengeId={challenge.id}
+                attemptId={id}
+              />
+            )}
+            {status !== 'Pending' && (
+              <>
                 <CommentButton
                   commentsCount={formatNumber(commentsCount)}
                   onClick={() => handleSlideUpModalToggle('comments')}
                 />
-                <ShareButton pathToShare={pathToShare} />
-                <ReportButton onClick={handleReportModalToggle} />
-              </div>
-            </>
-          )}
+                <ShareButton sharePath={sharePath} />
+              </>
+            )}
+            <MoreButton
+              content={{
+                type: 'attempt',
+                id: id,
+                challenge_id: challenge.id,
+              }}
+              basePath={basePath}
+              sharePath={sharePath}
+              isOwner={is_owner}
+            />
+          </div>
         </div>
       </div>
       {showSlideUpModal && (
@@ -256,12 +264,6 @@ const Attempt = ({ attempt }) => {
             />
           )}
         </SlideUpModal>
-      )}
-      {showReportModal && (
-        <ReportModal
-          onClick={handleReportModalToggle}
-          content={{ type: 'attempt', id: id }}
-        />
       )}
     </>
   )

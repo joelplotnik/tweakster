@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 
 import classes from './ShareButton.module.css'
 
-const ShareButton = ({ pathToShare }) => {
+const ShareButton = ({ sharePath }) => {
   const [isPopupVisible, setPopupVisible] = useState(false)
   const buttonRef = useRef(null)
   const popupRef = useRef(null)
@@ -33,7 +33,7 @@ const ShareButton = ({ pathToShare }) => {
 
   const handleCopyLink = () => {
     navigator.clipboard
-      .writeText(pathToShare)
+      .writeText(sharePath)
       .then(() => {
         toast.success('Link copied to clipboard')
         setPopupVisible(false)

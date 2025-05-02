@@ -80,6 +80,19 @@
   text-decoration: underline;
 }
 
+.username-link {
+  color: var(--primary-red-color);
+  cursor: pointer;
+  text-decoration: none;
+  word-break: break-word;
+  transition: color 0.3s, text-decoration 0.3s;
+}
+
+.username-link:hover {
+  color: var(--primary-red-color-hover);
+  text-decoration: underline;
+}
+
 .like-container {
   margin-left: 12px;
   display: flex;

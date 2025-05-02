@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import { toast } from 'react-toastify'
 
 import Loading from '../../components/UI/Loading'
-import { userActions } from '../../store/user'
 import { storeTokens } from '../../util/auth'
 
 const OauthCallback = () => {

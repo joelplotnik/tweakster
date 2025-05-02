@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { RiSubtractLine } from 'react-icons/ri'
 import InfiniteScroll from 'react-infinite-scroll-component'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { API_URL } from '../../../constants/constants'
 import NoComments from '../../UI/NoComments'
@@ -30,7 +30,6 @@ const Comments = ({
   const [newReplyIds, setNewReplyIds] = useState([])
   const [highlightedCommentId, setHighlightedCommentId] = useState(null)
   const [highlightedReplyId, setHighlightedReplyId] = useState(null)
-  const dispatch = useDispatch()
   const basePathWithId = `${basePath}/challenges/${challengeId}${
     attemptId ? `/attempts/${attemptId}` : ''
   }`
@@ -147,12 +146,6 @@ const Comments = ({
 
   const handleReplyClick = comment => {
     setReplyingTo(comment)
-  }
-
-  const handleInputChange = text => {
-    if (replyingTo && !text.startsWith(`@${replyingTo.user.username} `)) {
-      setReplyingTo(null)
-    }
   }
 
   const handleSubmitComment = async commentText => {
@@ -395,7 +388,6 @@ const Comments = ({
         <CommentForm
           onSubmit={handleSubmitComment}
           replyingTo={replyingTo}
-          onTextChange={handleInputChange}
           isSlideUpPresent={isSlideUpPresent}
         />
       </div>

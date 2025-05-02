@@ -223,3 +223,7 @@
   background-color: var(--primary-background-color);
   border-radius: 0 0 5px 5px;
 }
+
+.bottom-bar > :only-child {
+  margin-left: auto;
+}
