@@ -3,7 +3,9 @@ import ChallengePage, {
 } from '../pages/Challenges/ChallengePage'
 import ChallengesLayout from '../pages/Challenges/ChallengesLayout'
 import ChallengesPage from '../pages/Challenges/ChallengesPage'
-import EditChallengePage from '../pages/Challenges/EditChallengePage'
+import EditChallengePage, {
+  action as editChallengeAction,
+} from '../pages/Challenges/EditChallengePage'
 import NewChallengePage, {
   action as newChallengeAction,
 } from '../pages/Challenges/NewChallengePage'
@@ -39,7 +41,8 @@ const challengesRoutes = context => [
           {
             path: 'edit',
             id: `${context}-challenge-edit`,
-            element: <EditChallengePage />,
+            element: <EditChallengePage context={context} />,
+            action: editChallengeAction,
           },
           ...attemptsRoutes(`${context}-challenge`),
         ],

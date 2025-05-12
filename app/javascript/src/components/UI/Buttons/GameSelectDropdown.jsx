@@ -107,7 +107,7 @@ const GameSelectDropdown = ({
           value={searchTerm}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
-          onBlur={handleInputBlur} // Handle blur event
+          onBlur={handleInputBlur}
           autoComplete="off"
           className={classes['search-input']}
         />

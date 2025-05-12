@@ -82,15 +82,27 @@ class Api::V1::ChallengesController < ApplicationController
     end
   end
 
-  # def update
-  #   @challenge = find_challenge
+  def update
+    unless current_user == @challenge.user
+      render json: { error: 'Unauthorized to update this challenge' }, status: :unauthorized and return
+    end
 
-  #   if @challenge.update(challenge_params)
-  #     render json: { message: 'Challenge updated successfully', challenge: format_challenge(@challenge) }
-  #   else
-  #     render json: { errors: @challenge.errors.full_messages }, status: :unprocessable_entity
-  #   end
-  # end
+    if params[:challenge][:image].present?
+      @challenge.image.purge if @challenge.image.attached?
+      @challenge.image.attach(params[:challenge][:image])
+    elsif params[:challenge][:remove_image] == 'true'
+      @challenge.image.purge if @challenge.image.attached?
+    end
+
+    if @challenge.update(challenge_params.except(:image))
+      render json: {
+        message: 'Challenge updated successfully',
+        challenge: format_challenge(@challenge)
+      }, status: :ok
+    else
+      render json: { errors: @challenge.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
 
   def destroy
     render json: { error: 'Challenge not found' }, status: :not_found and return unless @challenge

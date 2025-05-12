@@ -5,14 +5,17 @@ import CategorySelectDropdown from '../../UI/Buttons/CategorySelectDropdown'
 import GameSelectDropdown from '../../UI/Buttons/GameSelectDropdown'
 import classes from './ChallengeForm.module.css'
 
-const ChallengeForm = () => {
+const ChallengeForm = ({ challenge }) => {
   const data = useActionData()
   const navigation = useNavigation()
   const isSubmitting = navigation.state === 'submitting'
-  const [selectedGame, setSelectedGame] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedGame, setSelectedGame] = useState(challenge?.game || '')
+  const [selectedCategory, setSelectedCategory] = useState(
+    challenge?.category || ''
+  )
+  const [removeImage, setRemoveImage] = useState(false)
+  const [image, setImage] = useState(challenge?.image_url || null)
   const fileInput = useRef(null)
-  const [image, setImage] = useState(null)
 
   const handleGameSelect = game => {
     setSelectedGame(game)
@@ -31,8 +34,11 @@ const ChallengeForm = () => {
     }
   }
 
-  const handleRemoveImage = () => {
+  const handleRemoveImage = event => {
+    event.preventDefault()
     setImage(null)
+    setRemoveImage(true)
+    fileInput.current.value = null
   }
 
   return (
@@ -87,6 +93,11 @@ const ChallengeForm = () => {
               Remove Image
             </button>
           )}
+          <input
+            type="hidden"
+            name="challenge[remove_image]"
+            value={removeImage ? 'true' : 'false'}
+          />
         </div>
 
         <GameSelectDropdown
@@ -101,6 +112,7 @@ const ChallengeForm = () => {
           name="challenge[title]"
           placeholder="Title"
           required
+          defaultValue={challenge?.title || ''}
         />
         <CategorySelectDropdown
           onCategorySelect={handleCategorySelect}
@@ -112,7 +124,7 @@ const ChallengeForm = () => {
           id="description"
           name="challenge[description]"
           placeholder="Description"
-          defaultValue={''}
+          defaultValue={challenge?.description || ''}
           required
         />
 
