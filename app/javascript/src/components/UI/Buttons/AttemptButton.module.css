@@ -17,8 +17,8 @@
   background-color: var(--primary-green-color-hover);
 }
 
-.drop-button {
-  background-color: var(--primary-red-color);
+.try-again-button {
+  background-color: var(--primary-green-color);
   color: var(--primary-text-color) fff;
   font-size: 0.8em;
   font-weight: bold;
@@ -32,6 +32,6 @@
   transition: color 0.3s;
 }
 
-.drop-button:hover {
-  background-color: var(--primary-red-color-hover);
+.try-again-button:hover {
+  background-color: var(--primary-green-color-hover);
 }

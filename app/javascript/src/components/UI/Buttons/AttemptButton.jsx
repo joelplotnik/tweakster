@@ -83,11 +83,11 @@ const AttemptButton = ({
     <>
       <button
         className={
-          attemptId ? classes['drop-button'] : classes['attempt-button']
+          attemptId ? classes['try-again-button'] : classes['attempt-button']
         }
         onClick={attemptId ? handleDropClick : handleAttemptClick}
       >
-        {attemptId ? 'Drop' : 'Attempt'}
+        {attemptId ? 'Try Again' : 'Attempt'}
       </button>
       {showAuthModal && (
         <AuthModal authType={'login'} onClick={handleAuthModalToggle} />

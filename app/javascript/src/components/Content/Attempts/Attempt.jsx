@@ -203,25 +203,23 @@ const Attempt = ({ attempt }) => {
           )}
           <div className={classes['bottom-bar']}>
             {status === 'Complete' && (
-              <ApprovalButton
-                userApproval={user_approved}
-                approvalsCount={formatNumber(approvals_count)}
-                basePath={
-                  isUserPage ? `games/${challenge.game.slug}` : basePath
-                }
-                challengeId={challenge.id}
-                attemptId={id}
-              />
-            )}
-            {status !== 'Pending' && (
               <>
+                <ApprovalButton
+                  userApproval={user_approved}
+                  approvalsCount={formatNumber(approvals_count)}
+                  basePath={
+                    isUserPage ? `games/${challenge.game.slug}` : basePath
+                  }
+                  challengeId={challenge.id}
+                  attemptId={id}
+                />
                 <CommentButton
                   commentsCount={formatNumber(commentsCount)}
                   onClick={() => handleSlideUpModalToggle('comments')}
                 />
-                <ShareButton sharePath={sharePath} />
               </>
             )}
+            {status !== 'Pending' && <ShareButton sharePath={sharePath} />}
             <MoreButton
               content={{
                 type: 'attempt',

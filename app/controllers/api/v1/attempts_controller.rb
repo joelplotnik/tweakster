@@ -107,7 +107,7 @@ class Api::V1::AttemptsController < ApplicationController
   private
 
   def attempt_params
-    params.require(:attempt).permit(:challenge_id, :status)
+    params.require(:attempt).permit(:challenge_id, :status, :twitch_video_link)
   end
 
   def set_user
@@ -130,7 +130,7 @@ class Api::V1::AttemptsController < ApplicationController
           methods: %i[difficulty_rating difficulties_count]
         },
         user: {
-          only: %i[username slug],
+          only: %i[username slug provider uid],
           methods: [:avatar_url]
         }
       },
