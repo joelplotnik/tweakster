@@ -3,7 +3,9 @@ import AttemptPage, {
 } from '../pages/Attempts/AttemptPage'
 import AttemptsLayout from '../pages/Attempts/AttemptsLayout'
 import AttemptsPage from '../pages/Attempts/AttemptsPage'
-import EditAttemptPage from '../pages/Attempts/EditAttemptPage'
+import EditAttemptPage, {
+  action as editAttemptAction,
+} from '../pages/Attempts/EditAttemptPage'
 
 const attemptsRoutes = context => [
   {
@@ -29,7 +31,8 @@ const attemptsRoutes = context => [
           {
             path: 'edit',
             id: `${context}-attempt-edit`,
-            element: <EditAttemptPage />,
+            element: <EditAttemptPage context={context} />,
+            action: editAttemptAction,
           },
         ],
       },

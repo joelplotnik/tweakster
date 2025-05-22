@@ -1,0 +1,36 @@
+.edit-attempt-page {
+  background-color: var(--secondary-background-color);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  max-width: 800px;
+  min-width: 800px;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.heading {
+  font-size: 24px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.divider {
+  border: none;
+  height: 0.5px;
+  width: 50%;
+  background-color: var(--primary-text-color);
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .edit-attempt-page {
+    min-width: 100%;
+  }
+
+  .divider {
+    width: 75%;
+  }
+}

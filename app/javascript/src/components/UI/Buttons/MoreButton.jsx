@@ -120,7 +120,9 @@ const MoreButton = ({
                   className={classes['menu-item']}
                   onClick={handleConfirmationModalToggle}
                 >
-                  <DeleteButton />
+                  <DeleteButton
+                    {...(content.type === 'attempt' && { label: 'Abandon' })}
+                  />
                 </div>
               </>
             )}
@@ -142,6 +144,11 @@ const MoreButton = ({
         <ConfirmationModal
           onConfirm={handleDelete}
           onClick={handleConfirmationModalToggle}
+          {...(content.type === 'attempt' && {
+            message:
+              'This action cannot be undone. Are you sure you want to abandon this attempt?',
+            button: 'Abandon',
+          })}
         />
       )}
     </>
