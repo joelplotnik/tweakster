@@ -298,22 +298,24 @@ const UserForm = ({ user }) => {
                 required={enteredNewPassword.trim().length > 0}
               />
             </div>
-            <div className={`${classes['input-wrapper']} ${passwordInvalid}`}>
-              {passwordInputHasError && (
-                <p className={classes['error-text']}>
-                  Please enter a valid password.
-                </p>
-              )}
-              <input
-                className={classes['form-input']}
-                type="password"
-                id="password"
-                name="user[password]"
-                onChange={handlePasswordChange}
-                onBlur={handlePasswordBlur}
-                placeholder="Current password"
-              />
-            </div>{' '}
+            {user.password_set && (
+              <div className={`${classes['input-wrapper']} ${passwordInvalid}`}>
+                {passwordInputHasError && (
+                  <p className={classes['error-text']}>
+                    Please enter a valid password.
+                  </p>
+                )}
+                <input
+                  className={classes['form-input']}
+                  type="password"
+                  id="password"
+                  name="user[password]"
+                  onChange={handlePasswordChange}
+                  onBlur={handlePasswordBlur}
+                  placeholder="Current password"
+                />
+              </div>
+            )}{' '}
           </>
         )}
         {data && data.error && (

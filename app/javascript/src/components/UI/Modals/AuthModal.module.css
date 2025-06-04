@@ -144,6 +144,37 @@
   background-color: var(--twitch-color-hover);
 }
 
+.submit-btn-google {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: var(--primary-red-color);
+  color: var(--primary-text-color);
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.submit-btn-google svg {
+  font-size: 1.2em;
+  margin-right: 0px;
+}
+
+.google-button-text {
+  font-size: 14px;
+  flex: 1;
+  text-align: center;
+}
+
+.submit-btn-google:hover {
+  background-color: var(--primary-red-color-hover);
+}
+
 .close-icon {
   position: absolute;
   display: flex;

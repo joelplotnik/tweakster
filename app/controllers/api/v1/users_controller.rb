@@ -51,10 +51,10 @@ class Api::V1::UsersController < ApplicationController
       end
     end
 
-    # Check if the user is trying to update their password
+    # Handle password update
     if params[:user][:new_password].present?
-      if @user.valid_password?(params[:user][:password])
-        if @user.update(password: params[:user][:new_password])
+      if !@user.password_set || @user.valid_password?(params[:user][:password])
+        if @user.update(password: params[:user][:new_password], password_set: true)
           render json: format_user(@user)
         else
           render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -62,7 +62,7 @@ class Api::V1::UsersController < ApplicationController
       else
         render json: { error: 'Invalid current password' }, status: :unauthorized
       end
-    # Update other fields, excluding password fields
+    # Update other attributes
     elsif @user.update(user_params.except(:password, :new_password))
       render json: format_user(@user)
     else

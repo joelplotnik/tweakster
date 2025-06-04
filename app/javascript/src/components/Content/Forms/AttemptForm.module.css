@@ -171,22 +171,22 @@
   background-color: var(--primary-background-color);
 }
 
-.twitch-warning {
+.google-warning {
   color: var(--primary-text-color);
   font-size: 14px;
   margin-top: 8px;
   font-weight: 500;
 }
 
-.twitch-link {
-  color: var(--twitch-color);
+.google-link {
+  color: var(--primary-red-color);
   text-decoration: none;
   font-weight: bold;
   transition: all 0.2s ease-in-out;
 }
 
-.twitch-link:hover {
-  color: var(--twitch-color-hover);
+.google-link:hover {
+  color: var(--primary-red-color-hover);
 }
 
 .video-section {

@@ -33,6 +33,12 @@ gem 'devise-api', '~> 0.2.0'
 # An OmniAuth strategy for Twitch
 gem 'omniauth-twitch'
 
+# Core OmniAuth library that omniauth-google-oauth2 depends on
+gem 'omniauth'
+
+# An OmniAuth strategy for Google
+gem 'omniauth-google-oauth2'
+
 # Slugging and permalink plugins for Active Record
 gem 'friendly_id', '~> 5.5.0'
 
