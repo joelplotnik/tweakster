@@ -155,9 +155,9 @@ const AttemptForm = ({ attempt, onSubmit, user, onDropAttempt }) => {
         )}
 
         {showTwitchWarning && (
-          <p className={classes['twitch-warning']}>
+          <p className={classes['google-warning']}>
             You need to{' '}
-            <Link to="/settings/connections" className={classes['twitch-link']}>
+            <Link to="/settings/connections" className={classes['google-link']}>
               link your Twitch account
             </Link>{' '}
             to update the status.

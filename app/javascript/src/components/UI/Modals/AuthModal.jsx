@@ -1,12 +1,14 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { RiCloseLine, RiTwitchFill } from 'react-icons/ri'
+import { RiCloseLine, RiGoogleFill, RiTwitchFill } from 'react-icons/ri'
 import { Form, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import Logo from '../../../assets/logo_color.svg'
 import {
   API_URL,
+  GOOGLE_OAUTH_CLIENT_ID,
+  GOOGLE_OAUTH_REDIRECT_URI,
   TWITCH_CLIENT_ID,
   TWITCH_REDIRECT_URI,
 } from '../../../constants/constants'
@@ -97,6 +99,25 @@ export function AuthModal({ authType, onClick, isSlideUpPresent }) {
     const buttonType = event.nativeEvent.submitter.dataset.type
 
     try {
+      if (buttonType === 'google') {
+        const currentPath = window.location.pathname
+        localStorage.setItem('previous', currentPath)
+
+        const googleAuthUrl =
+          `https://accounts.google.com/o/oauth2/v2/auth?` +
+          new URLSearchParams({
+            response_type: 'code',
+            client_id: GOOGLE_OAUTH_CLIENT_ID,
+            redirect_uri: GOOGLE_OAUTH_REDIRECT_URI,
+            scope:
+              'openid email profile https://www.googleapis.com/auth/youtube',
+            access_type: 'offline',
+            prompt: 'consent',
+          })
+
+        window.location.href = googleAuthUrl
+      }
+
       if (buttonType === 'twitch') {
         const currentPath = window.location.pathname
         localStorage.setItem('previous', currentPath)
@@ -347,6 +368,18 @@ export function AuthModal({ authType, onClick, isSlideUpPresent }) {
                   disabled={!formIsValid}
                 >
                   {modalType === 'login' ? 'Log in' : 'Sign up'}
+                </button>
+                <button
+                  type="submit"
+                  className={classes['submit-btn-google']}
+                  data-type="google"
+                >
+                  <RiGoogleFill />
+                  <span className={classes['google-button-text']}>
+                    {modalType === 'login'
+                      ? 'Log in with Google'
+                      : 'Sign up with Google'}
+                  </span>
                 </button>
                 <button
                   type="submit"

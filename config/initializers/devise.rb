@@ -352,6 +352,13 @@ Devise.setup do |config|
   # When set to false, does not sign a user in automatically after their password is
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
+  config.omniauth :google_oauth2,
+                  Rails.application.credentials.dig(:google_oauth2, :client_id),
+                  Rails.application.credentials.dig(:google_oauth2, :client_secret),
+                  scope: 'openid email profile https://www.googleapis.com/auth/youtube',
+                  prompt: 'consent',
+                  redirect_uri: Rails.application.credentials.dig(:google_oauth2, :redirect_uri)[Rails.env.to_sym],
+                  provider_ignores_state: true
 
   config.omniauth :twitch,
                   Rails.application.credentials.dig(:twitch, :client_id),

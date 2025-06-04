@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_05_22_201200) do
+ActiveRecord::Schema[7.0].define(version: 2025_06_04_230643) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -125,6 +125,19 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_22_201200) do
     t.index ["slug"], name: "index_games_on_slug", unique: true
   end
 
+  create_table "identities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.string "access_token"
+    t.string "refresh_token"
+    t.datetime "token_expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
+    t.index ["user_id"], name: "index_identities_on_user_id"
+  end
+
   create_table "likes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "comment_id", null: false
@@ -194,9 +207,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_22_201200) do
     t.string "username"
     t.string "role", default: "user"
     t.string "bio", default: ""
-    t.string "provider", default: ""
-    t.string "uid", default: ""
     t.string "slug"
+    t.boolean "password_set", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["slug"], name: "index_users_on_slug", unique: true
@@ -224,6 +236,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_22_201200) do
   add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "difficulties", "challenges"
   add_foreign_key "difficulties", "users"
+  add_foreign_key "identities", "users"
   add_foreign_key "likes", "comments"
   add_foreign_key "likes", "users"
   add_foreign_key "user_games", "games"

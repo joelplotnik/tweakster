@@ -6,6 +6,10 @@ import ResetPasswordPage from '../pages/Sessions/ResetPasswordPage'
 
 const authRoutes = [
   {
+    path: 'auth/callback/google_oauth2',
+    element: <OauthCallback />,
+  },
+  {
     path: 'auth/callback/twitch',
     element: <OauthCallback />,
   },
