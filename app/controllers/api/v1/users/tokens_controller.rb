@@ -12,9 +12,13 @@ class Api::V1::Users::TokensController < Devise::Api::TokensController
 
     if service.success?
       token = service.success
-      call_devise_trackable!(token.resource_owner)
+      user = token.resource_owner
+
+      user.update_column(:password_set, true) if user.persisted? && user.encrypted_password.present?
+
+      call_devise_trackable!(user)
       token_response = Devise::Api::Responses::TokenResponse.new(request, token:, action: __method__)
-      Devise.api.config.after_successful_sign_up.call(token.resource_owner, token, request)
+      Devise.api.config.after_successful_sign_up.call(user, token, request)
       return render json: token_response.body, status: token_response.status
     end
 

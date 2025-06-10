@@ -1,6 +1,12 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { RiCloseLine, RiGoogleFill, RiTwitchFill } from 'react-icons/ri'
+import {
+  RiCloseLine,
+  RiEyeFill,
+  RiEyeOffFill,
+  RiGoogleFill,
+  RiTwitchFill,
+} from 'react-icons/ri'
 import { Form, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -24,6 +30,8 @@ export function AuthModal({ authType, onClick, isSlideUpPresent }) {
   const [signupError, setSignupError] = useState(null)
   const [loginError, setLoginError] = useState(null)
   const emailInputRef = useRef(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   useEffect(() => {
     emailInputRef.current?.focus()
@@ -321,12 +329,20 @@ export function AuthModal({ authType, onClick, isSlideUpPresent }) {
                   <label>
                     <span>Password</span>
                   </label>
-                  <input
-                    type="password"
-                    id="password"
-                    onChange={handlePasswordChange}
-                    onBlur={handlePasswordBlur}
-                  />
+                  <div className={classes['password-wrapper']}>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id="password"
+                      onChange={handlePasswordChange}
+                      onBlur={handlePasswordBlur}
+                    />
+                    <span
+                      className={classes['eye-icon']}
+                      onClick={() => setShowPassword(prev => !prev)}
+                    >
+                      {showPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+                    </span>
+                  </div>
                   {passwordInputHasError && (
                     <p className={classes['error-text']}>
                       Please enter a valid password.
@@ -338,12 +354,20 @@ export function AuthModal({ authType, onClick, isSlideUpPresent }) {
                     <label>
                       <span>Confirm Password</span>
                     </label>
-                    <input
-                      type="password"
-                      id="confirm-password"
-                      onChange={handleConfirmPasswordChange}
-                      onBlur={handleConfirmPasswordBlur}
-                    />
+                    <div className={classes['password-wrapper']}>
+                      <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        id="confirm-password"
+                        onChange={handleConfirmPasswordChange}
+                        onBlur={handleConfirmPasswordBlur}
+                      />
+                      <span
+                        className={classes['eye-icon']}
+                        onClick={() => setShowConfirmPassword(prev => !prev)}
+                      >
+                        {showConfirmPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+                      </span>
+                    </div>
                     {confirmPasswordInputHasError && (
                       <p className={classes['error-text']}>
                         Passwords do not match.

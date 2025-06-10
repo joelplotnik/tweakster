@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { RiEyeFill, RiEyeOffFill } from 'react-icons/ri'
 import { Form, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -10,6 +11,8 @@ const ResetPasswordPage = () => {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     value: enteredPassword,
@@ -89,13 +92,21 @@ const ResetPasswordPage = () => {
           <label htmlFor="password">
             <span className={classes.label}>New Password</span>
           </label>
-          <input
-            type="password"
-            id="password"
-            onChange={handlePasswordChange}
-            onBlur={handlePasswordBlur}
-            className={classes.input}
-          />
+          <div className={classes['password-wrapper']}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              onChange={handlePasswordChange}
+              onBlur={handlePasswordBlur}
+              className={classes.input}
+            />
+            <span
+              className={classes['eye-icon']}
+              onClick={() => setShowPassword(prev => !prev)}
+            >
+              {showPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+            </span>
+          </div>
           {passwordInputHasError && (
             <p className={classes['error-message']}>
               Please enter a valid password.
@@ -106,13 +117,21 @@ const ResetPasswordPage = () => {
           <label htmlFor="confirmPassword">
             <span className={classes.label}>Confirm Password</span>
           </label>
-          <input
-            type="password"
-            id="confirm-password"
-            onChange={handleConfirmPasswordChange}
-            onBlur={handleConfirmPasswordBlur}
-            className={classes.input}
-          />
+          <div className={classes['password-wrapper']}>
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              id="confirm-password"
+              onChange={handleConfirmPasswordChange}
+              onBlur={handleConfirmPasswordBlur}
+              className={classes.input}
+            />
+            <span
+              className={classes['eye-icon']}
+              onClick={() => setShowConfirmPassword(prev => !prev)}
+            >
+              {showConfirmPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+            </span>
+          </div>
           {confirmPasswordInputHasError && (
             <p className={classes['error-message']}>Passwords do not match.</p>
           )}
