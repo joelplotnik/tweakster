@@ -155,6 +155,22 @@
   color: var(--primary-red-color-hover);
 }
 
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.eye-icon {
+  position: absolute;
+  padding-top: 5px;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--primary-text-color);
+  font-size: 1rem;
+}
+
 .form-submit-button {
   margin-top: 6px;
   background-color: var(--primary-green-color);

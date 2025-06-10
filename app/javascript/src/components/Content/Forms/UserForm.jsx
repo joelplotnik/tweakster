@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { RiImageAddLine } from 'react-icons/ri'
+import { useRef, useState } from 'react'
+import { RiEyeFill, RiEyeOffFill, RiImageAddLine } from 'react-icons/ri'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Form,
@@ -32,6 +32,9 @@ const UserForm = ({ user }) => {
   const [removeAvatar, setRemoveAvatar] = useState(false)
   const [showPasswordFields, setShowPasswordFields] = useState(false)
   const [selectedGame, setSelectedGame] = useState(user?.currently_playing)
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleGameSelect = game => {
     setSelectedGame(game)
@@ -271,15 +274,23 @@ const UserForm = ({ user }) => {
                   Please enter a valid password.
                 </p>
               )}
-              <input
-                className={classes['form-input']}
-                type="password"
-                id="new_password"
-                name="user[new_password]"
-                onChange={handleNewPasswordChange}
-                onBlur={handleNewPasswordBlur}
-                placeholder="New password"
-              />
+              <div className={classes['password-wrapper']}>
+                <input
+                  className={classes['form-input']}
+                  type={showNewPassword ? 'text' : 'password'}
+                  id="new_password"
+                  name="user[new_password]"
+                  onChange={handleNewPasswordChange}
+                  onBlur={handleNewPasswordBlur}
+                  placeholder="New password"
+                />
+                <span
+                  className={classes['eye-icon']}
+                  onClick={() => setShowNewPassword(prev => !prev)}
+                >
+                  {showNewPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+                </span>
+              </div>
             </div>
             <div
               className={`${classes['input-wrapper']} ${confirmPasswordInvalidClass}`}
@@ -287,16 +298,24 @@ const UserForm = ({ user }) => {
               {confirmPasswordInputHasError && (
                 <p className={classes['error-text']}>Passwords do not match.</p>
               )}
-              <input
-                className={classes['form-input']}
-                type="password"
-                id="confirm_password"
-                name="user[confirm_password]"
-                onChange={handleConfirmPasswordChange}
-                onBlur={handleConfirmPasswordBlur}
-                placeholder="Confirm password"
-                required={enteredNewPassword.trim().length > 0}
-              />
+              <div className={classes['password-wrapper']}>
+                <input
+                  className={classes['form-input']}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  id="confirm_password"
+                  name="user[confirm_password]"
+                  onChange={handleConfirmPasswordChange}
+                  onBlur={handleConfirmPasswordBlur}
+                  placeholder="Confirm password"
+                  required={enteredNewPassword.trim().length > 0}
+                />
+                <span
+                  className={classes['eye-icon']}
+                  onClick={() => setShowConfirmPassword(prev => !prev)}
+                >
+                  {showConfirmPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+                </span>
+              </div>
             </div>
             {user.password_set && (
               <div className={`${classes['input-wrapper']} ${passwordInvalid}`}>
@@ -305,15 +324,23 @@ const UserForm = ({ user }) => {
                     Please enter a valid password.
                   </p>
                 )}
-                <input
-                  className={classes['form-input']}
-                  type="password"
-                  id="password"
-                  name="user[password]"
-                  onChange={handlePasswordChange}
-                  onBlur={handlePasswordBlur}
-                  placeholder="Current password"
-                />
+                <div className={classes['password-wrapper']}>
+                  <input
+                    className={classes['form-input']}
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    id="password"
+                    name="user[password]"
+                    onChange={handlePasswordChange}
+                    onBlur={handlePasswordBlur}
+                    placeholder="Current password"
+                  />
+                  <span
+                    className={classes['eye-icon']}
+                    onClick={() => setShowCurrentPassword(prev => !prev)}
+                  >
+                    {showCurrentPassword ? <RiEyeOffFill /> : <RiEyeFill />}
+                  </span>
+                </div>
               </div>
             )}{' '}
           </>
