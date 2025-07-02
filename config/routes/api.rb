@@ -26,6 +26,7 @@ namespace :api do
     get 'popular_games', to: 'games#popular_games'
     get 'popular_challenges', to: 'challenges#popular_challenges'
     get 'popular_attempts', to: 'attempts#popular_attempts'
+    get 'igdb/search', to: 'igdb#search'
 
     resources :users, only: %i[index show update destroy] do
       member do

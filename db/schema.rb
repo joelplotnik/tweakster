@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_06_04_230643) do
+ActiveRecord::Schema[7.0].define(version: 2025_06_18_213200) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -116,12 +116,16 @@ ActiveRecord::Schema[7.0].define(version: 2025_06_04_230643) do
 
   create_table "games", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
-    t.text "description"
-    t.string "platform", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "slug"
-    t.string "cover"
+    t.integer "igdb_id"
+    t.datetime "igdb_updated_at"
+    t.text "summary"
+    t.string "cover_url"
+    t.datetime "first_release_date"
+    t.json "platforms"
+    t.index ["igdb_id"], name: "index_games_on_igdb_id", unique: true
     t.index ["slug"], name: "index_games_on_slug", unique: true
   end
 

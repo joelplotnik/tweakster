@@ -10,11 +10,11 @@ class Attempt < ApplicationRecord
 
   validate :single_in_progress_attempt, if: -> { status == 'In Progress' }
 
-  validates :twitch_video_link, presence: true, if: -> { status == 'Complete' }
-  validates :twitch_video_link, format: {
-    with: %r{\Ahttps://www\.twitch\.tv/videos/[A-Za-z0-9_-]+\z},
-    message: 'must be a valid Twitch video link'
-  }, allow_nil: true
+  # validates :video_link, presence: true, if: -> { status == 'Complete' }
+  # validates :video_link, format: {
+  #   with: %r{\Ahttps://www\.twitch\.tv/videos/[A-Za-z0-9_-]+\z},
+  #   message: 'must be a valid Twitch video link'
+  # }, allow_nil: true
 
   def comments_count
     comments.size
