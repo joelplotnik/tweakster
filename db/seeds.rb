@@ -1,15 +1,17 @@
 # Clear existing data to avoid duplication and ensure a clean state
-User.delete_all
-Relationship.delete_all
-Game.delete_all
-UserGame.delete_all
-Challenge.delete_all
-Attempt.delete_all
-Comment.delete_all
 Like.delete_all
+Comment.where.not(parent_id: nil).delete_all
+Comment.where(parent_id: nil).delete_all
 Approval.delete_all
+Attempt.delete_all
 Difficulty.delete_all
 Report.delete_all
+Relationship.delete_all
+UserGame.delete_all
+Vote.delete_all
+Challenge.delete_all
+Game.delete_all
+User.delete_all
 
 # Delete all notifications
 ActiveRecord::Base.connection.execute('DELETE FROM noticed_notifications')
@@ -100,27 +102,10 @@ users.each do |follower|
 end
 
 # Create Games
-games = []
-PLATFORMS = %w[PC Xbox PlayStation Nintendo Steam Mobile].freeze
-20.times do
-  name = Faker::Game.title
-  next if Game.exists?(name:)
-
-  begin
-    game = Game.create!(
-      name:,
-      platform: PLATFORMS.sample,
-      description: Faker::Lorem.paragraph(sentence_count: 3),
-      cover: Faker::LoremFlickr.image(size: '300x400', search_terms: ['games'])
-    )
-
-    games << game
-  rescue ActiveRecord::RecordInvalid => e
-    puts "Validation error for Game: #{e.message}. Skipping this game."
-  rescue StandardError => e
-    puts "Error assigning cover URL for Game: #{e.message}. Skipping this game."
-  end
-end
+puts 'Starting import of games from IGDB...'
+Igdb::GameImporterService.new.import_one_batch
+games = Game.all
+puts 'IGDB games import completed.'
 
 # Create UserGames
 if games.any?
