@@ -9,8 +9,27 @@
   padding-bottom: 3rem;
 }
 
+.heading {
+  font-size: 24px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.divider {
+  border: none;
+  height: 0.5px;
+  width: 90%;
+  background-color: var(--primary-text-color);
+  margin-top: 10px;
+  margin-bottom: 16px;
+}
+
 @media (max-width: 768px) {
   .game-page {
     min-width: 100%;
+  }
+
+  .divider {
+    width: 75%;
   }
 }

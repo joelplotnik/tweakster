@@ -44,6 +44,7 @@ const Challenge = ({ challenge, isUserContext }) => {
   const [showSlideUpModal, setShowSlideUpModal] = useState(false)
   const { username, name: gameName } = useParams()
   const basePath = username ? `users/${username}` : `games/${gameName}`
+  const isGamePage = !!gameName
   const rootUrl = window.location.origin
   const sharePath = `${rootUrl}/${basePath}/challenges/${id}`
   const [userRating, setUserRating] = useState(user_rating)
@@ -95,18 +96,20 @@ const Challenge = ({ challenge, isUserContext }) => {
               </Link>
             </div>
           )}
-          <div
-            className={
-              isUserContext
-                ? classes['game-info-userpage']
-                : classes['game-info']
-            }
-          >
-            <Link to={`/games/${game.slug}`} className={classes['game-name']}>
-              {game.name}
-            </Link>
-            <p className={classes['game-platform']}>{game.platform}</p>
-          </div>
+          {!isGamePage && (
+            <div
+              className={
+                isUserContext
+                  ? classes['game-info-userpage']
+                  : classes['game-info']
+              }
+            >
+              <Link to={`/games/${game.slug}`} className={classes['game-name']}>
+                {game.name}
+              </Link>
+              <p className={classes['game-platform']}>{game.platform}</p>
+            </div>
+          )}
         </div>
         <div className={classes['challenge-details']}>
           <div className={classes['challenge-header']}>

@@ -1,5 +1,7 @@
 import { useRouteLoaderData } from 'react-router-dom'
 
+import GameCard from '../../components/Content/Games/GameCard'
+import ChallengesList from '../../components/Content/Lists/ChallengesList'
 import { API_URL } from '../../constants/constants'
 import { getAuthToken } from '../../util/auth'
 import classes from './GamePage.module.css'
@@ -9,8 +11,10 @@ const GamePage = () => {
 
   return (
     <div className={classes['game-page']} key={game.id}>
-      {/* <GameCard game={game} /> */}
-      <h1>YOU MADE IT TO THE GAME PAGE</h1>
+      <GameCard game={game} />
+      <h1 className={classes.heading}>Challenges</h1>
+      <hr className={classes.divider} />
+      <ChallengesList />
     </div>
   )
 }

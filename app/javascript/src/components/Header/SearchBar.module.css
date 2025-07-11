@@ -175,18 +175,29 @@
   object-fit: cover;
 }
 
+.game-name-image-container {
+  display: flex;
+  align-items: center;
+}
+
 .game-image-container {
+  flex-shrink: 0;
   width: 25px;
   height: 25px;
   overflow: hidden;
-  border-radius: 50%;
+  display: flex;
   margin-right: 10px;
 }
 
-.game-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.game-name {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.game-name span {
+  white-space: normal;
+  word-break: break-word;
+  display: block;
 }
 
 .platform {
