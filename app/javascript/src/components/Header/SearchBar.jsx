@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { RiArrowLeftLine, RiCloseLine, RiSearchLine } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
 
+import placeholderCover from '../../assets/default_cover.png'
 import { API_URL } from '../../constants/constants'
 import classes from './SearchBar.module.css'
 
@@ -163,14 +164,20 @@ function SearchBar({ mobile, handleBackClick }) {
                   <div className={classes['game-name-image-container']}>
                     <div className={classes['game-image-container']}>
                       <img
-                        src={result.cover}
+                        src={
+                          result.cover_url && result.cover_url !== 'https:'
+                            ? result.cover_url
+                            : placeholderCover
+                        }
                         alt="Game"
                         className={classes['game-visual']}
                       />
                     </div>
-                    <span>{result.name}</span>
+                    <div className={classes['game-name']}>
+                      <span>{result.name}</span>
+                    </div>
                   </div>
-                  <span className={classes.platform}>{result.platform}</span>
+                  {/* <span className={classes.platform}>{result.platform}</span> */}
                 </Link>
               ))}
             </div>
